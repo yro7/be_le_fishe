@@ -20,5 +20,6 @@
 
 # OS files
 .DS_Store
+*tmp/*
 Thumbs.db
 
