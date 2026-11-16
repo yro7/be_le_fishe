@@ -1,7 +1,7 @@
 ---
 title: "The Power Law Process and Reliability (Observation à horizon T fixé)"
 subtitle: "BE Processus Ponctuels & Applications — INSA Toulouse, 5ModIA"
-author: "yro7"
+author: "Marin Decanini, Amelie Pujol, Hazar Hamouda"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -23,13 +23,21 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 
-# Définit la racine du projet comme répertoire de travail pour knitr
-if (requireNamespace("rprojroot", quietly = TRUE)) {
-  knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+root_dir <- if (requireNamespace("rprojroot", quietly = TRUE)) {
+  rprojroot::find_rstudio_root_file()
+} else {
+  "../.."
 }
+knitr::opts_knit$set(root.dir = root_dir)
 
 library(ggplot2)
+library(patchwork)
+
+# Libs pr les parties numériques
+source(file.path(root_dir, "src", "01_convergences_emv.R"))
 ```
+
+
 
 # Introduction et Contexte
 
@@ -44,8 +52,9 @@ TODO:
 
 ```{r q1-model-exploration}
 # TODO: Tracé des profils d'intensité instantanée lambda(t) pour différentes valeurs de beta
-
 ```
+
+
 
 # Résultats Théoriques à Horizon $T$ Fixé (Cocozza-Thivent, 1997)
 
@@ -62,9 +71,15 @@ TODO:
 -->
 
 ```{r q2-mle-fixed-T}
-# TODO: Fonctions d'estimation par maximum de vraisemblance à T fixé
-
+# L'implémentation de l'EMV et de l'estimateur débiaisé est importée depuis src/01_convergences_emv.R
+# Formules :
+#   beta_hat = n / sum_{i=1}^n ln(T / W_i)
+#   alpha_hat = T / (n^(1 / beta_hat))
+#   beta_tilde = ((n - 1) / n) * beta_hat
+mle_power_law
 ```
+
+
 
 ## Propriétés d'échantillonnage et Intervalles de Confiance
 
@@ -79,8 +94,9 @@ TODO:
 
 ```{r q3-confint-fixed-T}
 # TODO: Fonctions de calcul des intervalles de confiance exacts (Chi-2) et asymptotiques
-
 ```
+
+
 
 # Test d'Adéquation à Horizon $T$ Fixé
 
@@ -94,8 +110,9 @@ TODO:
 
 ```{r q4-gof-test}
 # TODO: Fonction de test d'adéquation (KS test et bootstrap de Lilliefors à T fixé)
-
 ```
+
+
 
 # Simulations Numériques
 
@@ -110,22 +127,78 @@ TODO:
 -->
 
 ```{r q5-sim-function}
-# TODO: Fonction de simulation d'une trajectoire sur [0, T]
-
+# Algo de simulation :
+# 1. N(T) ~ Poisson((T / alpha)^beta)
+# 2. Conditionnellement à N(T) = n, W_i = T*U_(i)^(1 / beta) avec U_i ~ U(0, 1) iid
+set.seed(42)
+w_test <- sim_power_law_process(alpha = 1.0, beta = 1.5, T_end = 50)
+cat("Nombre d'événements simulés N(50) :", length(w_test), "\n")
+cat("Premiers temps d'arrivée W_i :", round(head(w_test, 6), 3), "...\n")
 ```
+
+
 
 ## Convergence et Biais de l'EMV
 
-<!-- 
-TODO:
-- Étudier le comportement de beta_hat et de l'estimateur corrigé beta_tilde en fonction de l'horizon T (ou de l'espérance de n).
-- Évaluer le biais empirique et la variance empirique sur M réplications Monte-Carlo.
--->
+Conformément à la consigne du BE, nous illustrons les différents modes et vitesses de convergence démontrés dans Cocozza-Thivent (1997, Propositions 3.7, 3.11 et 3.12). L'ensemble des calculs et visualisations repose sur les fonctions du module `src/01_convergences_emv.R`.
 
-```{r q6-sim-convergence}
-# TODO: Étude Monte-Carlo de la convergence
-
+```{r q6-sim-convergence, cache=TRUE, fig.width=9, fig.height=7}
+sim_outputs <- run_all_illustrations(save_figs = FALSE)
 ```
+
+
+
+### Convergence Presque-Sûre (Proposition 3.7)
+
+La Proposition 3.7 garantit que le long d'une même trajectoire observée jusqu'à $t \to +\infty$, les estimateurs $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent presque-sûrement vers leurs vraies valeurs.
+
+```{r q6-fig-ps, fig.width=8.5, fig.height=6.5}
+sim_outputs$plots$p_as
+```
+
+
+
+### Normalité Asymptotique et Asymétrie des Vitesses (Propositions 3.11 & 3.12)
+
+Les Propositions 3.11 et 3.12 mettent en évidence deux vitesses de convergence distinctes pour $\hat{\beta}$ et $\hat{\alpha}$ :
+
+1. **Pour $\beta$** : la vitesse est classique en $\sqrt{N(t)}$ :
+$$Z_{\beta}(t) = \sqrt{N(t)}\left(\frac{\hat{\beta}}{\beta} - 1\right) \xrightarrow{\mathcal{L}} \mathcal{N}(0, 1)$$
+
+```{r q6-fig-beta-norm, fig.width=8.5, fig.height=7}
+sim_outputs$plots$p_beta_norm
+```
+
+
+
+2. **Pour $\alpha$** : la vitesse est ralentie par un facteur $\ln t$ :
+$$Z_{\alpha}(t) = \frac{\sqrt{N(t)}}{\ln t}\left(\frac{\hat{\alpha}}{\alpha} - 1\right) \xrightarrow{\mathcal{L}} \mathcal{N}(0, 1)$$
+
+```{r q6-fig-alpha-norm, fig.width=8.5, fig.height=7}
+sim_outputs$plots$p_alpha_norm
+```
+
+
+
+### Dégénérescence Conjointe du Couple $(\hat{\alpha}, \hat{\beta})$ (Proposition 3.11-3 & 3.12)
+
+Asymptotiquement, la distribution jointe du couple d'estimateurs n'est pas une ellipse gaussienne bivariée standard, mais dégénère sur une droite 1D ($y = -x$ ou $y = x$) avec une corrélation théorique de $-1$ (forme 3.a) ou $+1$ (forme 3.b).
+
+```{r q6-fig-joint, fig.width=9.5, fig.height=5}
+sim_outputs$plots$p_joint
+```
+
+
+
+### Biais à Taille Finie de $\hat{\beta}$ et Correction
+
+Conditionnellement à $N(T) = n$, la statistique suit une loi du $\chi^2$, ce qui induit un biais positif $\mathbb{E}[\hat{\beta} \mid N(T) = n] = \frac{n}{n-1}\beta$. L'estimateur $\tilde{\beta} = \frac{n-1}{n}\hat{\beta}$ corrige ce biais dès $n \ge 2$.
+
+```{r q6-fig-bias, fig.width=8, fig.height=4.5}
+sim_outputs$plots$p_bias
+```
+
+
 
 ## Taux de Couverture des Intervalles de Confiance
 
@@ -137,8 +210,9 @@ TODO:
 
 ```{r q7-sim-coverage}
 # TODO: Simulation du taux de couverture à T fixé
-
 ```
+
+
 
 ## Niveau et Puissance du Test d'Adéquation
 
@@ -150,8 +224,9 @@ TODO:
 
 ```{r q8-sim-gof-power}
 # TODO: Étude de la puissance du test
-
 ```
+
+
 
 # Application aux Données Réelles (Proschan, 1963)
 
@@ -165,6 +240,8 @@ head(df_proschan)
 # Pour chaque avion, l'horizon d'observation T peut être pris comme la durée totale cumulée de suivi
 ```
 
+
+
 ## Ajustement du modèle par avion à horizon $T$
 
 <!-- 
@@ -176,8 +253,9 @@ TODO:
 
 ```{r q10-proschan-fit}
 # TODO: Estimation et IC par avion
-
 ```
+
+
 
 ## Test d'adéquation et Diagnostics graphiques
 
@@ -189,8 +267,9 @@ TODO:
 
 ```{r q11-proschan-diagnostics}
 # TODO: Diagnostics graphiques et p-valeurs du test d'adéquation
-
 ```
+
+
 
 ## Discussion : Le processus loi de puissance est-il adapté ?
 

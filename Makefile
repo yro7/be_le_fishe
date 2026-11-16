@@ -6,8 +6,8 @@ html:
 	./render.R
 
 open:
-	open rapport/rapport.html
+	open src/rapport/rapport.html
 
 clean:
-	rm -f rapport/rapport.html rapport/*.knit.md
+	rm -f src/rapport/rapport.html src/rapport/*.knit.md
 
