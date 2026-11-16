@@ -1,0 +1,215 @@
+---
+title: "The Power Law Process and Reliability (Observation à horizon T fixé)"
+subtitle: "BE Processus Ponctuels & Applications — INSA Toulouse, 5ModIA"
+author: "yro7"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+    theme: cosmo
+    highlight: tango
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+
+# Définit la racine du projet comme répertoire de travail pour knitr
+if (requireNamespace("rprojroot", quietly = TRUE)) {
+  knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+}
+
+library(ggplot2)
+```
+
+# Introduction et Contexte
+
+<!-- 
+TODO: 
+- Présenter le problème de fiabilité des systèmes réparables sous observation temporelle tronquée [0, T].
+- Définir le Processus de Poisson Non-Homogène de Weibull (Loi de puissance) :
+    Intensité instantanée : lambda(s) = (beta / alpha) * (s / alpha)^(beta - 1)
+    Moyenne cumulée : Lambda(t) = (t / alpha)^beta
+- Discuter de la signification physique de beta (beta < 1 : rodage / fiabilisation, beta = 1 : PPH sans mémoire, beta > 1 : usure / vieillissement).
+-->
+
+```{r q1-model-exploration}
+# TODO: Tracé des profils d'intensité instantanée lambda(t) pour différentes valeurs de beta
+
+```
+
+# Résultats Théoriques à Horizon $T$ Fixé (Cocozza-Thivent, 1997)
+
+## Vraisemblance et Estimateurs du Maximum de Vraisemblance (EMV)
+
+<!-- 
+TODO:
+- On observe le processus sur [0, T]. Le nombre d'événements N(T) = n est aléatoire.
+- Écrire la fonction de vraisemblance L(alpha, beta) et la log-vraisemblance ln L(alpha, beta).
+- Dériver les équations du score par rapport à alpha et beta.
+- Établir les expressions analytiques des EMV :
+    beta_hat = n / sum_{i=1}^n ln(T / W_i)
+    alpha_hat = T / (n^(1 / beta_hat))
+-->
+
+```{r q2-mle-fixed-T}
+# TODO: Fonctions d'estimation par maximum de vraisemblance à T fixé
+
+```
+
+## Propriétés d'échantillonnage et Intervalles de Confiance
+
+<!-- 
+TODO:
+- Montrer que conditionnellement à N(T) = n, les variables ln(T / W_i) sont des statistiques d'ordre d'exponentielles i.i.d. de paramètre beta.
+- En déduire la loi exacte de la statistique : 2 * n * (beta / beta_hat) ~ Chi2(2 * n).
+- Expliciter le biais de beta_hat et donner l'estimateur sans biais : beta_tilde = (n - 1) / n * beta_hat.
+- Déterminer l'intervalle de confiance EXACT pour beta au niveau (1 - gamma) via la loi du Chi-deux.
+- Déterminer les intervalles de confiance asymptotiques (loi normale / matrice d'information de Fisher) pour beta et alpha.
+-->
+
+```{r q3-confint-fixed-T}
+# TODO: Fonctions de calcul des intervalles de confiance exacts (Chi-2) et asymptotiques
+
+```
+
+# Test d'Adéquation à Horizon $T$ Fixé
+
+<!-- 
+TODO:
+- Propriété fondamentale : conditionnellement à N(T) = n, les ratios (W_i / T) ont pour f.r. F(t) = (t / T)^beta sur [0, T].
+- En déduire que U_i = (W_i / T)^beta sont réparties comme les statistiques d'ordre d'un échantillon i.i.d. uniforme U(0, 1).
+- Construction du test d'adéquation de Kolmogorov-Smirnov sur les U_i^* = (W_i / T)^beta_hat.
+- Nécessité d'une correction de Lilliefors (bootstrap paramétrique) pour calibrer la p-valeur suite à l'estimation de beta.
+-->
+
+```{r q4-gof-test}
+# TODO: Fonction de test d'adéquation (KS test et bootstrap de Lilliefors à T fixé)
+
+```
+
+# Simulations Numériques
+
+## Simulation du Processus Loi de Puissance sur $[0, T]$
+
+<!-- 
+TODO:
+- Implémenter la simulation par inversion :
+    1. Tirer N(T) ~ Poisson( (T / alpha)^beta )
+    2. Conditionnellement à N(T) = n, tirer n variables uniformes U_i ~ U(0, 1)
+    3. Poser W_i = T * U_(i)^(1 / beta)
+-->
+
+```{r q5-sim-function}
+# TODO: Fonction de simulation d'une trajectoire sur [0, T]
+
+```
+
+## Convergence et Biais de l'EMV
+
+<!-- 
+TODO:
+- Étudier le comportement de beta_hat et de l'estimateur corrigé beta_tilde en fonction de l'horizon T (ou de l'espérance de n).
+- Évaluer le biais empirique et la variance empirique sur M réplications Monte-Carlo.
+-->
+
+```{r q6-sim-convergence}
+# TODO: Étude Monte-Carlo de la convergence
+
+```
+
+## Taux de Couverture des Intervalles de Confiance
+
+<!-- 
+TODO:
+- Évaluer le taux de couverture empirique de l'IC exact Chi-2 vs l'IC asymptotique gaussien au niveau nominal 95%.
+- Vérifier la validité de l'IC exact même lorsque le nombre de sauts N(T) est faible.
+-->
+
+```{r q7-sim-coverage}
+# TODO: Simulation du taux de couverture à T fixé
+
+```
+
+## Niveau et Puissance du Test d'Adéquation
+
+<!-- 
+TODO:
+- Évaluer le niveau du test sous H0 (adéquation au processus loi de puissance).
+- Évaluer la puissance face à une alternative (ex: Processus de Poisson Homogène ou Processus de Renouvellement de Weibull).
+-->
+
+```{r q8-sim-gof-power}
+# TODO: Étude de la puissance du test
+
+```
+
+# Application aux Données Réelles (Proschan, 1963)
+
+## Préparation des données et définition de l'horizon $T$
+
+```{r q9-load-proschan}
+# Données de la flotte Boeing 720
+df_proschan <- read.csv("data/proschan1963.csv")
+head(df_proschan)
+
+# Pour chaque avion, l'horizon d'observation T peut être pris comme la durée totale cumulée de suivi
+```
+
+## Ajustement du modèle par avion à horizon $T$
+
+<!-- 
+TODO:
+- Estimer alpha et beta pour chaque appareil de la flotte à horizon T_avion.
+- Calculer les intervalles de confiance exacts à 95% pour beta.
+- La valeur beta = 1 (absence d'usure / PPH) appartient-elle aux intervalles de confiance ?
+-->
+
+```{r q10-proschan-fit}
+# TODO: Estimation et IC par avion
+
+```
+
+## Test d'adéquation et Diagnostics graphiques
+
+<!-- 
+TODO:
+- Appliquer le test d'adéquation sur les données de chaque avion.
+- Tracer les QQ-plots uniformes (U_i^* vs U(0, 1)) pour les avions ayant le plus d'observations.
+-->
+
+```{r q11-proschan-diagnostics}
+# TODO: Diagnostics graphiques et p-valeurs du test d'adéquation
+
+```
+
+## Discussion : Le processus loi de puissance est-il adapté ?
+
+<!-- 
+TODO:
+- Interprétation des résultats sur la flotte.
+- Effet des révisions majeures ("major overhaul").
+- Paradoxe du mélange d'exponentielles de Proschan (1963).
+-->
+
+# Conclusion
+
+<!-- 
+TODO: Synthèse globale des résultats théoriques, empiriques et appliqués sous horizon fixé T.
+-->
+
+# Références
+
+- **Cocozza-Thivent, C. (1997).** *Processus stochastiques et fiabilité des systèmes*, volume 28. Springer.
+- **Crow, L. H. (1974).** *Reliability analysis for complex, repairable systems*. Reliability and Biometry: Statistical Analysis of Lifelength, SIAM, pages 379–410.
+- **Møller, S. K. (1976).** *The Rasch-Weibull process*. *Scandinavian Journal of Statistics*, pages 107–115.
+- **Proschan, F. (1963).** *Theoretical explanation of observed decreasing failure rate*. *Technometrics*, 5(3):375–383.

@@ -10,6 +10,9 @@
 *_files/
 *.synctex.gz
 
+# Misc
+*.md
+
 # LaTeX build artifacts
 *.aux
 *.log
@@ -22,4 +25,3 @@
 .DS_Store
 *tmp/*
 Thumbs.db
-
