@@ -33,10 +33,16 @@ knitr::opts_knit$set(root.dir = root_dir)
 library(ggplot2)
 library(patchwork)
 
-# Libs pr les parties numériques
-source(file.path(root_dir, "src", "01_convergences_emv.R"))
-source(file.path(root_dir, "src", "02_intervalles_confiance.R"))
-source(file.path(root_dir, "src", "03_test_adequation.R"))
+# Paramètres des études (config.R), formules du modèle (power_law.R), puis études
+src_files <- file.path(root_dir, "src", c(
+  "config.R", "power_law.R",
+  "01_convergences_emv.R", "02_intervalles_confiance.R", "03_test_adequation.R"
+))
+for (f in src_files) source(f)
+
+# Empreinte du code et des paramètres : toute modification de src/*.R invalide
+# le cache des chunks de simulation (option cache.extra).
+src_hash <- unname(tools::md5sum(src_files))
 ```
 
 
@@ -144,7 +150,7 @@ cat("Premiers temps d'arrivée W_i :", round(head(w_test, 6), 3), "...\n")
 
 Conformément à la consigne du BE, nous illustrons les différents modes et vitesses de convergence démontrés dans Cocozza-Thivent (1997, Propositions 3.7, 3.11 et 3.12). L'ensemble des calculs et visualisations repose sur les fonctions du module `src/01_convergences_emv.R`.
 
-```{r q6-sim-convergence, cache=TRUE, fig.width=9, fig.height=7}
+```{r q6-sim-convergence, cache=TRUE, cache.extra=src_hash, fig.width=9, fig.height=7}
 sim_outputs <- run_all_illustrations(save_figs = FALSE)
 ```
 
@@ -216,7 +222,7 @@ TODO:
 - Vérifier la validité de l'IC exact même lorsque le nombre de sauts N(T) est faible.
 -->
 
-```{r q7-sim-coverage, cache=TRUE, fig.width=8.5, fig.height=7}
+```{r q7-sim-coverage, cache=TRUE, cache.extra=src_hash, fig.width=8.5, fig.height=7}
 # Exécution de l'étude Monte-Carlo des IC (M = 2000 réplications sur 7 horizons T)
 ci_outputs <- run_all_ci_validation(save_figs = FALSE)
 ```
@@ -257,7 +263,7 @@ Le test d'adéquation repose sur le Théorème 1 de Møller (1976) : sous l'hypo
 $$D_n = \sup_{x > 0} \left| H_n(x) - \left(1 - e^{-\hat{\beta} x}\right) \right|.$$
 L'estimation de $\beta$ rapproche mécaniquement la loi ajustée de la loi empirique : la loi de Kolmogorov n'est plus valide (test « naïf »). La famille $\mathcal{E}(\beta)$ étant une famille d'échelle et $\hat{\beta}$ équivariant, la loi de $D_n$ sous $H_0$ ne dépend que de $n$ : on la tabule par simulation sous $\mathcal{E}(1)$ (correction de Lilliefors, 1969), ce qui équivaut à un bootstrap paramétrique exact. L'ensemble des calculs repose sur le module `src/03_test_adequation.R`.
 
-```{r q8-sim-gof, cache=TRUE}
+```{r q8-sim-gof, cache=TRUE, cache.extra=src_hash}
 # Niveau : M = 2000 réplications sous H0 (beta = 0.5, 1, 2 ; E[N(T)] de 5 à 150)
 # Puissance : M = 1000 réplications par alternative et par E[N(T)]
 gof_outputs <- run_all_gof_validation(save_figs = FALSE)
