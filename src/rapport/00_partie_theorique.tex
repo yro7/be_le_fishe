@@ -1,0 +1,477 @@
+% =============================================================================
+%  00_partie_theorique.tex -- Partie théorique du BE "Power law process"
+% -----------------------------------------------------------------------------
+%  Fragment LaTeX (sans préambule) inclus dans rapport.Rmd par le chunk
+%  `partie-theorique` :
+%    - sortie HTML : converti à la volée par pandoc (LaTeX -> Markdown) ;
+%    - sortie PDF  : inclus par \input (ajouter \usepackage{amsthm} dans les
+%      header-includes du YAML).
+%  Contraintes pour rester compatible avec le lecteur LaTeX de pandoc :
+%  pas de \eqref (on utilise \tag), pas d'options sur les listes.
+%
+%  Notations : celles du poly de M. Albert (2026-2027), avec les abréviations
+%  hPP (homogeneous Poisson process) et iPP (inhomogeneous Poisson process).
+% =============================================================================
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theoreme}[proposition]{Théorème}
+\newtheorem{lemme}[proposition]{Lemme}
+\newtheorem{corollaire}[proposition]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{definition}[proposition]{Définition}
+\theoremstyle{remark}
+\newtheorem{remarque}[proposition]{Remarque}
+
+\section{Résultats théoriques à horizon $T$ fixé (Cocozza-Thivent, 1997)}\label{sec:theorie}
+
+Cette partie reprend la Section 3.2.3 de [CT97] (observation sur une fenêtre fixe $[0,T]$), complète les démonstrations qui y sont esquissées ou renvoyées à des outils hors programme, et les relie aux résultats du poly (chapitres 1 à 4).
+
+\subsection{Notations et modèle}\label{sec:modele}
+
+On suit les notations du poly.
+\begin{itemize}
+\item \textbf{Processus.} $N=(N_t)_{t\in\mathbb{R}_+}$ est un processus de comptage, $(T_n)_{n\in\mathbb{N}^*}$ ses temps d'arrivée et $W_1=T_1$, $W_i=T_i-T_{i-1}$ ($i\ge2$) ses temps d'inter-arrivée (Définition 2.17). On écrit \emph{hPP} pour un processus de Poisson homogène et \emph{iPP} pour un processus de Poisson inhomogène. Attention : [Møl76] note $W_n$ les temps d'arrivée ; ici $W_n$ désigne toujours une inter-arrivée.
+\item \textbf{Intensité.} Un iPP d'intensité $\lambda$ a pour intensité cumulée $\Lambda(t)=\int_0^t\lambda(x)\,dx$ (Définition 4.1). Quand l'intensité dépend d'un paramètre $\theta$, on la note $\lambda_\theta$ et la probabilité correspondante $\mathbb{P}_\theta$.
+\item \textbf{Lois.} $\mathcal{P}(\mu)$ est la loi de Poisson, $\mathcal{E}(\lambda)$ la loi exponentielle, $\Gamma(a,\lambda)$ la loi gamma de forme $a$ et d'\emph{intensité} $\lambda$ (densité $x\mapsto\frac{(\lambda x)^{a-1}}{\Gamma(a)}\lambda e^{-\lambda x}\mathbf{1}_{\{x>0\}}$, Définition 1.17), $\mathcal{W}(\alpha,\beta)$ la loi de Weibull (Feuille 1, Exercice 4), $\mathcal{U}([0,t])$ la loi uniforme et $\chi^2(d)$ la loi du khi-deux. Pour $Y_1,\dots,Y_n$, on note $Y_{(1)}\le\dots\le Y_{(n)}$ la statistique d'ordre (Définition 2.20).
+\item \textbf{Quantiles.} $x_{d,\eta}$ est le quantile d'ordre $\eta$ de $\chi^2(d)$ et $F_d$ sa fonction de répartition ; $z_\eta$ est le quantile d'ordre $\eta$ de $\mathcal{N}(0,1)$ et $\Phi$ sa fonction de répartition.
+\item \textbf{Niveau.} Le poly note $1-\alpha$ le niveau de confiance. Ici $\alpha$ est le paramètre d'échelle du modèle : on note donc $1-\delta$ le niveau de confiance, avec $\delta\in(0,1)$.
+\item \textbf{Références.} « Poly » désigne le cours de M. Albert, dont on reprend la numérotation (Proposition 4.12, etc.). [CT97] désigne Cocozza-Thivent (1997), [Møl76] Møller (1976) et [Pro63] Proschan (1963).
+\end{itemize}
+
+\begin{definition}[Processus de loi de puissance, Exemple 4.2 du poly]\label{def:plp}
+Soient $\alpha>0$ et $\beta>0$. Le \emph{processus de loi de puissance} (\emph{power law process}, ou processus de Weibull) de paramètres $(\alpha,\beta)$ est l'iPP d'intensité
+\[
+\lambda_{\alpha,\beta}(x)=\frac{\beta}{\alpha}\Big(\frac{x}{\alpha}\Big)^{\beta-1},\qquad x>0,
+\qquad\text{d'intensité cumulée}\qquad
+\Lambda_{\alpha,\beta}(t)=\Big(\frac{t}{\alpha}\Big)^{\beta}.
+\]
+Le paramètre $\alpha$ est un paramètre d'échelle (homogène à un temps) et $\beta$ un paramètre de forme (sans dimension).
+\end{definition}
+
+Dans toute la suite, $(\alpha,\beta)$ désigne la vraie valeur des paramètres et l'on abrège $\lambda=\lambda_{\alpha,\beta}$ et $\Lambda=\Lambda_{\alpha,\beta}$ quand il n'y a pas d'ambiguïté. En fiabilité, $N_t$ compte les défaillances d'un système réparable sur $[0,t]$. Le modèle iPP correspond à des \emph{réparations minimales} : à chaque panne, le système est remis dans l'état où il était juste avant la panne, et la durée de réparation est négligée.
+
+\begin{proposition}[Premières propriétés]\label{prop:proprietes}
+Soit $N$ un processus de loi de puissance de paramètres $(\alpha,\beta)$.
+\begin{enumerate}
+\item Pour tout $t>0$, $N_t\sim\mathcal{P}\big((t/\alpha)^\beta\big)$ et $\mathbb{E}[N_t]=\Lambda(t)=(t/\alpha)^\beta$.
+\item Le premier temps d'arrivée suit la loi de Weibull : $T_1\sim\mathcal{W}(\alpha,\beta)$, de taux de hasard $\lambda$.
+\item Le sens de variation du taux de défaillance (ROCOF) $\lambda$ est donné par le signe de $\beta-1$ :
+ si $\beta<1$, $\lambda$ décroît (rodage, croissance de fiabilité) ;
+ si $\beta=1$, $\lambda\equiv1/\alpha$ et $N$ est un hPP d'intensité $1/\alpha$ ;
+ si $\beta>1$, $\lambda$ croît (usure, vieillissement).
+\item (Changement de temps.) Les variables $S_n=\Lambda(T_n)=(T_n/\alpha)^\beta$, $n\in\mathbb{N}^*$, sont les temps d'arrivée d'un hPP d'intensité $1$. Réciproquement, si $(S_n)$ sont les temps d'arrivée d'un hPP d'intensité $1$, alors $T_n=\alpha S_n^{1/\beta}$ définit un processus de loi de puissance de paramètres $(\alpha,\beta)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Preuve]
+Le point 1 découle de la Définition 4.1 et de l'Exemple 4.2. Pour le point 2, la Propriété 4.10 donne $\mathbb{P}(T_1>s)=e^{-\Lambda(s)}=\exp(-(s/\alpha)^\beta)$, qui est la fonction de survie de $\mathcal{W}(\alpha,\beta)$ ; par la Proposition 1.15, son taux de hasard est $\lambda$. Le point 3 vient de $\lambda'(x)=\frac{\beta(\beta-1)}{\alpha^2}(x/\alpha)^{\beta-2}$. Pour le point 4, $\Lambda$ est continue, strictement croissante et bijective de $\mathbb{R}_+$ dans $\mathbb{R}_+$, d'inverse $\Lambda^{-1}(s)=\alpha s^{1/\beta}$. On applique alors la Proposition 4.8 dans les deux sens.
+\end{proof}
+
+\begin{remarque}
+Plusieurs intensités vues en cours sont des cas particuliers. L'intensité $x\mapsto2\theta x$ (examen 2025, Exercice 2) correspond à $\beta=2$ et $\alpha=\theta^{-1/2}$. L'intensité $x\mapsto\frac{\alpha'}{2\sqrt{x}}$ (Feuille 4, Exercice 3) correspond à $\beta=1/2$ et une échelle égale à $\alpha'^{-2}$. Quand $\beta\neq1$, les inter-arrivées $W_i$ ne sont ni indépendantes ni de même loi : un processus de loi de puissance n'est \emph{pas} un processus de renouvellement, et il ne faut pas le confondre avec le processus de renouvellement à inter-arrivées de Weibull ([Møl76], résumé).
+\end{remarque}
+
+Le résultat suivant est central pour toute la suite. Il traduit la Proposition 4.12 du poly dans le cas de la loi de puissance.
+
+\begin{proposition}[Loi conditionnelle des temps d'arrivée]\label{prop:loicond}
+Soient $T>0$ et $n\in\mathbb{N}^*$. Conditionnellement à $\{N_T=n\}$ :
+\begin{enumerate}
+\item $(T_1,\dots,T_n)$ a pour densité
+\[
+(t_1,\dots,t_n)\mapsto\frac{n!\,\beta^n}{T^{n\beta}}\Big(\prod_{i=1}^n t_i^{\beta-1}\Big)\mathbf{1}_{\{0<t_1<\dots<t_n\le T\}} ;
+\]
+c'est la statistique d'ordre de $n$ variables i.i.d. de densité $f_{\beta,T}(s)=\frac{\beta s^{\beta-1}}{T^\beta}\mathbf{1}_{\{0<s\le T\}}$, c'est-à-dire de fonction de répartition $s\mapsto(s/T)^\beta$ sur $[0,T]$. Cette loi \emph{ne dépend pas de} $\alpha$.
+\item $\big((T_1/T)^\beta,\dots,(T_n/T)^\beta\big)\overset{(d)}{=}(U_{(1)},\dots,U_{(n)})$, où $U_1,\dots,U_n$ sont i.i.d. de loi $\mathcal{U}([0,1])$.
+\item $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)\overset{(d)}{=}(Y_{(1)},\dots,Y_{(n)})$, où $Y_1,\dots,Y_n$ sont i.i.d. de loi $\mathcal{E}(\beta)$.
+\end{enumerate}
+En particulier, la statistique $S_T:=\sum_{i=1}^{N_T}\ln(T/T_i)$ vérifie $S_T\mid\{N_T=n\}\sim\Gamma(n,\beta)$.
+\end{proposition}
+
+\begin{proof}[Preuve]
+\emph{Point 1.} Par la Proposition 4.12, la densité conditionnelle est $\frac{n!}{\Lambda(T)^n}\prod_i\lambda(t_i)\mathbf{1}_{\{0<t_1<\dots<t_n\le T\}}$, et
+\[
+\frac{\lambda(s)}{\Lambda(T)}=\frac{\frac{\beta}{\alpha}\big(\frac{s}{\alpha}\big)^{\beta-1}}{\big(\frac{T}{\alpha}\big)^{\beta}}=\frac{\beta s^{\beta-1}}{T^\beta}=f_{\beta,T}(s) :
+\]
+les puissances de $\alpha$ se simplifient.
+
+\emph{Points 2 et 3.} Soient $X_1,\dots,X_n$ i.i.d. de densité $f_{\beta,T}$. Une application strictement croissante préserve l'ordre et une application strictement décroissante le renverse. Donc $\big((X_{(i)}/T)^\beta\big)_i$ est la statistique d'ordre des $(X_i/T)^\beta$, et $\big(\ln(T/X_{(n+1-i)})\big)_i$ celle des $\ln(T/X_i)$. Or, pour $u\in[0,1]$ et $y\ge0$,
+\[
+\mathbb{P}\big((X_1/T)^\beta\le u\big)=\mathbb{P}\big(X_1\le Tu^{1/\beta}\big)=u,
+\qquad
+\mathbb{P}\big(\ln(T/X_1)>y\big)=\mathbb{P}\big(X_1<Te^{-y}\big)=e^{-\beta y}.
+\]
+
+Enfin, une somme est invariante par permutation, donc $S_T\overset{(d)}{=}\sum_{i=1}^n Y_i$ sachant $\{N_T=n\}$. Cette somme suit la loi $\Gamma(n,\beta)$ par la Proposition 1.19 iii).
+\end{proof}
+
+\begin{remarque}[Simulation]\label{rem:simulation}
+Les simulations de la partie numérique reposent sur deux constructions du cours.
+\begin{itemize}
+\item \emph{Changement de temps} (Proposition 4.8 et point 4 de la Proposition~\ref{prop:proprietes}). On simule les temps d'arrivée $S_k=E_1+\dots+E_k$ d'un hPP d'intensité 1, avec $E_j$ i.i.d. de loi $\mathcal{E}(1)$, puis on pose $T_k=\alpha S_k^{1/\beta}$. Sur $[0,T]$, on garde les $T_k\le T$, c'est-à-dire les $S_k\le(T/\alpha)^\beta$. Pour $n$ fixé, on garde $T_1,\dots,T_n$.
+\item \emph{Construction conditionnelle} (Proposition 4.13 et Proposition~\ref{prop:loicond}). On tire $N_T\sim\mathcal{P}\big((T/\alpha)^\beta\big)$. Sachant $N_T=n$, on tire $U_1,\dots,U_n$ i.i.d. de loi $\mathcal{U}([0,1])$ et on pose $T_i=T\,U_{(i)}^{1/\beta}$, par inversion de la fonction de répartition $s\mapsto(s/T)^\beta$.
+\end{itemize}
+\end{remarque}
+
+\subsection{Vraisemblance et estimateurs du maximum de vraisemblance}\label{sec:emv}
+
+On observe $(N_t)_{t\in[0,T]}$, c'est-à-dire $N_T$ et $T_1<\dots<T_{N_T}$, avec $T$ fixé et $(\alpha,\beta)$ inconnus.
+
+\begin{proposition}[Vraisemblance et EMV, {[CT97, §3.2.3]}]\label{prop:emv}
+La vraisemblance des paramètres $(\alpha,\beta)$ vaut
+\[
+L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)=\Big(\frac{\beta}{\alpha^\beta}\Big)^{N_T}\Big(\prod_{i=1}^{N_T}T_i^{\beta-1}\Big)\exp\Big(-\Big(\frac{T}{\alpha}\Big)^\beta\Big),
+\]
+d'où la log-vraisemblance
+\[
+\ell(\alpha,\beta)=N_T\big(\ln\beta-\beta\ln\alpha\big)+(\beta-1)\sum_{i=1}^{N_T}\ln T_i-\Big(\frac{T}{\alpha}\Big)^\beta.
+\]
+Si $N_T=0$, l'EMV n'existe pas. Si $N_T\ge1$, l'EMV existe, il est unique et vaut
+\[
+\hat\beta_T=\frac{N_T}{\sum_{i=1}^{N_T}\ln(T/T_i)}=\frac{N_T}{S_T},
+\qquad
+\hat\alpha_T=\frac{T}{N_T^{1/\hat\beta_T}}.
+\]
+De manière équivalente : $\frac{1}{\hat\beta_T}=\ln T-\frac{1}{N_T}\sum_{i=1}^{N_T}\ln T_i$ et $\ln\hat\alpha_T=\ln T-\frac{1}{\hat\beta_T}\ln N_T$, qui sont les formules de [CT97].
+\end{proposition}
+
+\begin{proof}[Preuve]
+\emph{Vraisemblance.} La Proposition 4.14 du poly donne $L=\big(\prod_{i=1}^{N_T}\lambda_{\alpha,\beta}(T_i)\big)e^{-\Lambda_{\alpha,\beta}(T)}$. On y remplace $\lambda_{\alpha,\beta}(T_i)=\beta\alpha^{-\beta}T_i^{\beta-1}$ et $\Lambda_{\alpha,\beta}(T)=(T/\alpha)^\beta$.
+
+\emph{Cas $N_T=0$.} Alors $\ell(\alpha,\beta)=-(T/\alpha)^\beta$ croît strictement vers $0$ quand $\alpha\to+\infty$, sans atteindre son supremum : il n'y a pas de maximum.
+
+\emph{Équations du score ($N_T\ge1$).} On a
+\[
+\frac{\partial\ell}{\partial\alpha}=\frac{\beta}{\alpha}\Big[\Big(\frac{T}{\alpha}\Big)^\beta-N_T\Big],
+\qquad
+\frac{\partial\ell}{\partial\beta}=\frac{N_T}{\beta}-N_T\ln\alpha+\sum_{i=1}^{N_T}\ln T_i-\Big(\frac{T}{\alpha}\Big)^\beta\ln\frac{T}{\alpha}.
+\]
+La première équation s'annule si et seulement si $(T/\alpha)^\beta=N_T$, c'est-à-dire $\alpha=\alpha(\beta):=TN_T^{-1/\beta}$. En reportant dans la seconde, avec $\ln\alpha(\beta)=\ln T-\frac1\beta\ln N_T$ et $\ln\frac{T}{\alpha(\beta)}=\frac1\beta\ln N_T$, on obtient
+\[
+\frac{N_T}{\beta}-N_T\ln T+\frac{N_T}{\beta}\ln N_T+\sum_{i=1}^{N_T}\ln T_i-\frac{N_T}{\beta}\ln N_T=\frac{N_T}{\beta}-S_T=0
+\iff\beta=\frac{N_T}{S_T}.
+\]
+On a bien $S_T>0$ p.s., car $T_i<T$ p.s.
+
+\emph{Maximum global.} À $\beta$ fixé, $\partial\ell/\partial\alpha$ a le signe de $(T/\alpha)^\beta-N_T$ : elle est positive pour $\alpha<\alpha(\beta)$ et négative ensuite. Donc $\alpha(\beta)$ maximise $\alpha\mapsto\ell(\alpha,\beta)$. La vraisemblance profilée vaut
+\[
+\ell(\alpha(\beta),\beta)=N_T\ln\beta-\beta S_T+\big(N_T\ln N_T-N_T-\textstyle\sum_i\ln T_i\big).
+\]
+Elle est strictement concave en $\beta$ (dérivée seconde $-N_T/\beta^2<0$) et atteint son maximum en $\hat\beta_T=N_T/S_T$. Donc $(\hat\alpha_T,\hat\beta_T)=(\alpha(\hat\beta_T),\hat\beta_T)$ est l'unique maximum global.
+\end{proof}
+
+\begin{remarque}[Factorisation de la vraisemblance]\label{rem:factorisation}
+Comme pour le hPP (remarque qui suit la Proposition 3.1 du poly), la vraisemblance se factorise :
+\[
+L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)
+=\underbrace{\frac{N_T!\,\beta^{N_T}}{T^{N_T\beta}}\prod_{i=1}^{N_T}T_i^{\beta-1}}_{\text{loi de }(T_i)_i\mid N_T\text{ : dépend de }\beta\text{ seul}}
+\times
+\underbrace{\frac{\mu^{N_T}}{N_T!}e^{-\mu}}_{\text{loi }\mathcal{P}(\mu)\text{ de }N_T},
+\qquad\mu:=\Lambda(T)=\Big(\frac{T}{\alpha}\Big)^\beta.
+\]
+Dans le paramétrage $(\mu,\beta)$, qui est en bijection avec $(\alpha,\beta)$ à $T$ fixé, les deux facteurs se maximisent séparément. On retrouve ainsi directement $\hat\mu_T=N_T$, puis $\hat\beta_T=N_T/S_T$, puis $\hat\alpha_T=T\hat\mu_T^{-1/\hat\beta_T}$. En particulier, $\hat\Lambda(T)=(T/\hat\alpha_T)^{\hat\beta_T}=N_T$ est l'estimateur sans biais de $\Lambda(T)$ déjà vu dans le cas homogène.
+
+Cette factorisation explique les résultats qui suivent. Conditionnellement à $N_T$, l'information sur $\beta$ est portée par $S_T$, dont la loi est explicite : on obtiendra une inférence exacte sur $\beta$. Au contraire, l'information sur $\alpha$ n'arrive que par $N_T$, mélangée à $\beta$ via $\mu=(T/\alpha)^\beta$ : il n'existe pas de pivot exact simple pour $\alpha$, et l'on devra passer par l'asymptotique.
+\end{remarque}
+
+\subsection{Loi exacte de $\hat\beta_T$, biais et intervalle de confiance exact}\label{sec:exact}
+
+\begin{proposition}[{[CT97, Prop.~3.5]}]\label{prop:loiexacte}
+Soit $n\ge1$. Conditionnellement à $\{N_T=n\}$,
+\[
+\frac{\beta}{\hat\beta_T}\sim\Gamma(n,n)
+\qquad\text{et}\qquad
+\frac{2n\beta}{\hat\beta_T}=2\beta S_T\sim\Gamma\big(n,\tfrac12\big)\overset{(d)}{=}\chi^2(2n).
+\]
+Cette loi ne dépend ni de $\alpha$, ni de $\beta$, ni de $T$ : $2\beta S_T$ est un pivot conditionnel.
+\end{proposition}
+
+\begin{proof}[Preuve]
+La démonstration de [CT97] se termine par « un calcul sans difficulté » sur la fonction caractéristique. On le détaille. Par la Proposition~\ref{prop:loicond}, sachant $\{N_T=n\}$ on a $S_T\sim\Gamma(n,\beta)$. La Proposition 1.19 i) donne alors $\frac{\beta}{\hat\beta_T}=\frac{\beta}{n}S_T\sim\Gamma\big(n,\frac{\beta}{\beta/n}\big)=\Gamma(n,n)$ et $2\beta S_T\sim\Gamma\big(n,\frac{\beta}{2\beta}\big)=\Gamma\big(n,\frac12\big)$, qui est la loi $\chi^2(2n)$ par la Proposition 1.19 iv).
+
+Vérification par la fonction caractéristique, comme dans [CT97]. Soit $Z_n=\frac{\beta}{n}\sum_{i=1}^nY_i$ avec $Y_i$ i.i.d. de loi $\mathcal{E}(\beta)$. Comme $\beta Y_i\sim\mathcal{E}(1)$, on a $\mathbb{E}\big[e^{iu\beta Y_1/n}\big]=(1-iu/n)^{-1}$. Par indépendance, $\mathbb{E}\big[e^{iuZ_n}\big]=(1-iu/n)^{-n}$, qui est la fonction caractéristique de $\Gamma(n,n)$ ([CT97, Prop.~1.11]).
+\end{proof}
+
+\begin{corollaire}[Biais, estimateur sans biais et efficacité]\label{cor:biais}
+Pour $n\ge2$, $\mathbb{E}\big[\hat\beta_T\mid N_T=n\big]=\frac{n}{n-1}\beta$, alors que $\mathbb{E}\big[\hat\beta_T\mid N_T=1\big]=+\infty$. L'estimateur
+\[
+\tilde\beta_T=\frac{N_T-1}{N_T}\hat\beta_T=\frac{N_T-1}{S_T}
+\]
+est conditionnellement sans biais : $\mathbb{E}[\tilde\beta_T\mid N_T=n]=\beta$ pour $n\ge2$. Pour $n\ge3$,
+\[
+\mathrm{Var}\big(\tilde\beta_T\mid N_T=n\big)=\frac{\beta^2}{n-2}>\frac{\beta^2}{n}=\frac{1}{I_n(\beta)},
+\]
+où $I_n(\beta)=n/\beta^2$ est l'information de Fisher de la loi conditionnelle. L'estimateur $\tilde\beta_T$ est donc sans biais mais pas efficace. C'est exactement la situation de $\tilde\lambda_n=(n-1)/T_n$ pour le hPP à $n$ fixé (« Take home message » du chapitre 3).
+\end{corollaire}
+
+\begin{proof}[Preuve]
+Sachant $\{N_T=n\}$, on écrit $\hat\beta_T=n\beta/G$ avec $G:=\beta S_T\sim\Gamma(n,1)$. Pour $k<n$,
+\[
+\mathbb{E}\big[G^{-k}\big]=\int_0^{+\infty}\frac{x^{n-k-1}}{(n-1)!}e^{-x}\,dx=\frac{\Gamma(n-k)}{\Gamma(n)} ,
+\]
+d'où $\mathbb{E}[G^{-1}]=\frac{1}{n-1}$ et $\mathbb{E}[G^{-2}]=\frac{1}{(n-1)(n-2)}$. Pour $n=1$, l'intégrale $\int_0^{+\infty}x^{-1}e^{-x}\,dx$ diverge. Ensuite, $\tilde\beta_T=(n-1)\beta/G$ donne $\mathbb{E}[\tilde\beta_T\mid N_T=n]=\beta$ et
+\[
+\mathrm{Var}(\tilde\beta_T\mid N_T=n)=\frac{(n-1)^2\beta^2}{(n-1)(n-2)}-\beta^2=\frac{\beta^2}{n-2}.
+\]
+Enfin, la log-vraisemblance conditionnelle $\ell_c(\beta)=\ln(n!)+n\ln\beta-n\beta\ln T+(\beta-1)\sum_i\ln T_i$ vérifie $\partial^2_\beta\ell_c=-n/\beta^2$, d'où $I_n(\beta)=n/\beta^2$.
+\end{proof}
+
+\begin{remarque}
+Les énoncés portent sur des lois \emph{conditionnelles} à $N_T$. Sans conditionnement, $\hat\beta_T$ n'est pas défini sur $\{N_T=0\}$ et n'est pas intégrable car $\mathbb{P}(N_T=1)>0$. C'est pourquoi on travaille sachant $N_T$, ce que [Møl76] justifie par le caractère ancillaire de $N_T$ vis-à-vis de $\beta$.
+\end{remarque}
+
+\begin{corollaire}[Intervalles de confiance exacts pour $\beta$, {[CT97, Cor.~3.6]}]\label{cor:icexact}
+Soit $\delta\in(0,1)$. Si l'on observe $N_T=n\ge1$, l'intervalle
+\[
+I_\delta(n)=\Big[\frac{\hat\beta_T}{2n}x_{2n,\delta/2}\;;\;\frac{\hat\beta_T}{2n}x_{2n,1-\delta/2}\Big]
+=\Big[\frac{x_{2n,\delta/2}}{2S_T}\;;\;\frac{x_{2n,1-\delta/2}}{2S_T}\Big]
+\]
+vérifie $\mathbb{P}\big(\beta\in I_\delta(n)\mid N_T=n\big)=1-\delta$, et donc $\mathbb{P}\big(\beta\in I_\delta(N_T)\mid N_T\ge1\big)=1-\delta$. Les intervalles unilatéraux $\big[0;\frac{\hat\beta_T}{2n}x_{2n,1-\delta}\big]$ et $\big[\frac{\hat\beta_T}{2n}x_{2n,\delta};+\infty\big[$ sont aussi de niveau exact $1-\delta$.
+\end{corollaire}
+
+\begin{proof}[Preuve]
+Par la Proposition~\ref{prop:loiexacte},
+\[
+\mathbb{P}\big(\beta\in I_\delta(n)\mid N_T=n\big)=\mathbb{P}\big(x_{2n,\delta/2}\le2\beta S_T\le x_{2n,1-\delta/2}\mid N_T=n\big)=1-\delta.
+\]
+On en déduit
+\[
+\mathbb{P}\big(\beta\in I_\delta(N_T)\mid N_T\ge1\big)=\sum_{n\ge1}\mathbb{P}\big(\beta\in I_\delta(n)\mid N_T=n\big)\frac{\mathbb{P}(N_T=n)}{\mathbb{P}(N_T\ge1)}=1-\delta.
+\]
+Les cas unilatéraux sont identiques.
+\end{proof}
+
+\begin{remarque}
+Cet intervalle est l'analogue exact de l'intervalle non asymptotique $\big[\frac{x_{2n,\alpha/2}}{2T_n};\frac{x_{2n,1-\alpha/2}}{2T_n}\big]$ du hPP observé jusqu'au $n$-ième point (poly, §III.4.A du chapitre 3). Sachant $N_T=n$, la statistique $S_T$ joue le rôle de $T_n$ et $\beta$ celui de l'intensité, puisque $S_T\sim\Gamma(n,\beta)$ comme $T_n\sim\Gamma(n,\lambda)$.
+\end{remarque}
+
+\begin{proposition}[Tests exacts sur $\beta$, {[CT97, Prop.~3.25]}]\label{prop:testbeta}
+Soient $\beta_0>0$ et $\delta\in(0,1)$. On observe $N_T=n\ge1$ et l'on note $X_T:=2\beta_0S_T$ la statistique de test.
+\begin{enumerate}
+\item Pour tester $H_0:\beta\le\beta_0$ contre $H_1:\beta>\beta_0$ (usure plus marquée que $\beta_0$), le test qui rejette $H_0$ si $X_T\le x_{2n,\delta}$ est de niveau $\delta$, avec $\sup_{\beta\le\beta_0}\mathbb{P}_\beta(\text{rejet}\mid N_T=n)=\delta$. Sa p-valeur vaut $F_{2n}(X_T^{\mathrm{obs}})$.
+\item Pour tester $H_0:\beta\ge\beta_0$ contre $H_1:\beta<\beta_0$, on rejette si $X_T\ge x_{2n,1-\delta}$. La p-valeur vaut $1-F_{2n}(X_T^{\mathrm{obs}})$.
+\item Pour tester $H_0:\beta=\beta_0$ contre $H_1:\beta\neq\beta_0$, on rejette si $X_T\notin[x_{2n,\delta/2};x_{2n,1-\delta/2}]$, ce qui équivaut à $\beta_0\notin I_\delta(n)$.
+\end{enumerate}
+Pour $\beta_0=1$, le point 3 teste « $N$ est un hPP » contre « l'intensité est une puissance non constante », au sein du modèle. C'est un test d'absence de tendance (voir aussi Crow, 1974). On l'utilise dans la partie application pour chaque avion.
+\end{proposition}
+
+\begin{proof}[Preuve]
+Sous $\mathbb{P}_\beta$, $2\beta S_T\mid\{N_T=n\}\sim\chi^2(2n)$ par la Proposition~\ref{prop:loiexacte}, et $X_T=\frac{\beta_0}{\beta}(2\beta S_T)$. Pour $\beta\le\beta_0$,
+\[
+\mathbb{P}_\beta\big(X_T\le x_{2n,\delta}\mid N_T=n\big)=F_{2n}\Big(\frac{\beta}{\beta_0}x_{2n,\delta}\Big)\le F_{2n}(x_{2n,\delta})=\delta,
+\]
+car $F_{2n}$ est croissante (même argument que le Lemme 3.7 du poly), avec égalité pour $\beta=\beta_0$. Les points 2 et 3 se traitent de la même façon. [CT97] montre de plus, par le rapport de vraisemblance monotone en $\sum_i\ln T_i$, que les tests unilatéraux sont uniformément plus puissants.
+\end{proof}
+
+\subsection{Comportement asymptotique quand $T\to+\infty$}\label{sec:asymptotique}
+
+Comme $\beta>0$, on a $\Lambda(T)=(T/\alpha)^\beta\to+\infty$ quand $T\to+\infty$. Les convergences en loi indexées par le paramètre continu $T$ s'entendent le long de toute suite $T_k\to+\infty$. Le lemme de Slutsky et la méthode delta (Lemme 3.8 du poly) s'appliquent donc tels quels.
+
+\begin{lemme}[Comportement de $N_T$]\label{lem:NT}
+Quand $T\to+\infty$ :
+\[
+N_T\xrightarrow[T\to+\infty]{\text{p.s.}}+\infty,\qquad
+\frac{N_T}{\Lambda(T)}\xrightarrow[T\to+\infty]{\text{p.s.}}1,\qquad
+\sqrt{\Lambda(T)}\Big(\frac{N_T}{\Lambda(T)}-1\Big)\xrightarrow[T\to+\infty]{\mathcal{L}}\mathcal{N}(0,1),
+\]
+et par conséquent $\sqrt{\Lambda(T)}\ln\big(N_T/\Lambda(T)\big)\xrightarrow[T\to+\infty]{\mathcal{L}}\mathcal{N}(0,1)$ (sur $\{N_T\ge1\}$, dont la probabilité tend vers 1).
+\end{lemme}
+
+\begin{proof}[Preuve]
+Par la Proposition 4.8, $\tilde N_u:=N_{\Lambda^{-1}(u)}$ définit un hPP d'intensité 1, et $N_T=\tilde N_{\Lambda(T)}$. Le Théorème 3.4 du poly, avec la remarque qui le suit pour la version presque sûre, appliqué à $\tilde N$ quand $u=\Lambda(T)\to+\infty$, donne les trois convergences. La dernière s'obtient par la méthode delta avec $f=\ln$ en $1$.
+\end{proof}
+
+\begin{proposition}[Consistance, {[CT97, Prop.~3.7]}]\label{prop:consistance}
+Quand $T\to+\infty$, $\hat\beta_T\xrightarrow{\mathbb{P}}\beta$ et $\hat\alpha_T\xrightarrow{\mathbb{P}}\alpha$. Plus précisément, $\ln(T/\alpha)\big(\frac{\beta}{\hat\beta_T}-1\big)\xrightarrow{\mathbb{P}}0$.
+\end{proposition}
+
+\begin{proof}[Preuve]
+[CT97] démontre la convergence presque sûre avec des outils de martingales qui ne sont pas au programme (sa Proposition F.40). On donne ici une preuve élémentaire de la convergence en probabilité, qui n'utilise que la loi exacte (Proposition~\ref{prop:loiexacte}) et l'inégalité de Bienaymé-Tchebychev.
+
+Soient $E_1,E_2,\dots$ i.i.d. de loi $\mathcal{E}(1)$ et $\bar E_n=\frac1n\sum_{j=1}^nE_j$. Par les Propositions 1.19 iii) et i), $\bar E_n\sim\Gamma(n,n)$. Sachant $\{N_T=n\}$, on a donc $\beta/\hat\beta_T\overset{(d)}{=}\bar E_n$, avec $\mathrm{Var}(\bar E_n)=1/n$. Soient $\varepsilon>0$ et $c_T>0$ une quantité déterministe. Notons $\Lambda=\Lambda(T)$. En découpant selon que $N_T<\Lambda/2$ ou non,
+\[
+\begin{aligned}
+\mathbb{P}\Big(N_T\ge1,\;c_T\Big|\frac{\beta}{\hat\beta_T}-1\Big|>\varepsilon\Big)
+&=\sum_{n\ge1}\mathbb{P}(N_T=n)\,\mathbb{P}\Big(|\bar E_n-1|>\frac{\varepsilon}{c_T}\Big)\\
+&\le\mathbb{P}\Big(N_T<\frac{\Lambda}{2}\Big)+\sup_{n\ge\Lambda/2}\frac{c_T^2}{n\varepsilon^2}
+\le\frac{\mathrm{Var}(N_T)}{(\Lambda/2)^2}+\frac{2c_T^2}{\Lambda\varepsilon^2}
+=\frac{4}{\Lambda}+\frac{2c_T^2}{\Lambda\varepsilon^2}.
+\end{aligned}
+\]
+Avec $c_T=1$, ce majorant tend vers $0$, donc $\beta/\hat\beta_T\to1$ en probabilité, puis $\hat\beta_T\to\beta$ par continuité de $x\mapsto\beta/x$. Avec $c_T=\ln(T/\alpha)$ (pour $T>\alpha$), on a $c_T^2/\Lambda=\ln^2(T/\alpha)\,(T/\alpha)^{-\beta}\to0$, ce qui prouve la dernière assertion.
+
+Pour $\alpha$, on part de $\ln\hat\alpha_T=\ln T-\frac{1}{\hat\beta_T}\ln N_T$ et de $\ln\alpha=\ln T-\frac1\beta\ln\Lambda(T)$. Comme $\ln\Lambda(T)=\beta\ln(T/\alpha)$,
+\[
+\ln\hat\alpha_T-\ln\alpha=-\frac{1}{\hat\beta_T}\ln\frac{N_T}{\Lambda(T)}-\Big(\frac{\beta}{\hat\beta_T}-1\Big)\ln\frac{T}{\alpha}. \tag{D}
+\]
+Le premier terme tend vers $0$ par le Lemme~\ref{lem:NT} et la consistance de $\hat\beta_T$. Le second tend vers $0$ par ce qui précède. On conclut par continuité de l'exponentielle.
+\end{proof}
+
+\begin{remarque}
+La décomposition (D) montre pourquoi l'estimation de $\alpha$ est difficile. L'erreur relative sur $\beta$, d'ordre $1/\sqrt{\Lambda(T)}$, est multipliée par $\ln(T/\alpha)\to+\infty$. En effet, $\hat\alpha_T=TN_T^{-1/\hat\beta_T}$, donc une petite erreur sur l'exposant $1/\hat\beta_T$ est amplifiée par $\ln N_T\approx\beta\ln(T/\alpha)$. Elle domine alors les fluctuations de $N_T$ elles-mêmes.
+\end{remarque}
+
+\begin{theoreme}[Normalité asymptotique, {[CT97, Prop.~3.11]}]\label{thm:tcl}
+Quand $T\to+\infty$ :
+\begin{enumerate}
+\item $\sqrt{\Lambda(T)}\Big(\dfrac{\beta}{\hat\beta_T}-1\Big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)$ et $\sqrt{\Lambda(T)}\big(\hat\beta_T-\beta\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,\beta^2)$ ;
+\item $\dfrac{\sqrt{\Lambda(T)}}{\ln T}\big(\ln\hat\alpha_T-\ln\alpha\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)$ et $\dfrac{\sqrt{\Lambda(T)}}{\ln T}\big(\hat\alpha_T-\alpha\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,\alpha^2)$ ;
+\item conjointement, $\Big(\dfrac{\sqrt{\Lambda(T)}}{\ln T}\ln\dfrac{\hat\alpha_T}{\alpha}\,,\;\sqrt{\Lambda(T)}\Big(\dfrac{\beta}{\hat\beta_T}-1\Big)\Big)\xrightarrow{\mathcal{L}}(X,-X)$ avec $X\sim\mathcal{N}(0,1)$. C'est une loi gaussienne dégénérée de matrice de covariance $\begin{pmatrix}1&-1\\-1&1\end{pmatrix}$. De même, $\Big(\dfrac{\sqrt{\Lambda(T)}}{\ln T}(\hat\alpha_T-\alpha),\sqrt{\Lambda(T)}(\hat\beta_T-\beta)\Big)$ converge vers une loi gaussienne centrée de covariance $\begin{pmatrix}\alpha^2&\alpha\beta\\\alpha\beta&\beta^2\end{pmatrix}$.
+\end{enumerate}
+\end{theoreme}
+
+\begin{proof}[Preuve]
+On note $\Lambda=\Lambda(T)$.
+
+\emph{Point 1.} On suit la méthode de la preuve du Théorème 3.4 du poly, comme le fait [CT97]. Posons $Z_T:=\frac{N_T}{\sqrt{\Lambda}}\big(\frac{\beta}{\hat\beta_T}-1\big)$ sur $\{N_T\ge1\}$ et $Z_T:=0$ sur $\{N_T=0\}$. Le facteur $N_T/\Lambda$ rend le calcul explicite. Sachant $\{N_T=n\}$, avec $n\ge1$, la Proposition 1.19 i) appliquée à la Proposition~\ref{prop:loiexacte} donne $n\beta/\hat\beta_T\sim\Gamma(n,1)$, dont la fonction caractéristique est $v\mapsto(1-iv)^{-n}$. Donc, pour tout $n\ge0$,
+\[
+\mathbb{E}\big[e^{iuZ_T}\mid N_T=n\big]=e^{-iun/\sqrt\Lambda}\Big(1-\frac{iu}{\sqrt\Lambda}\Big)^{-n}=q_T^{\,n},
+\qquad q_T:=\frac{e^{-iu/\sqrt\Lambda}}{1-iu/\sqrt\Lambda}.
+\]
+Comme $N_T\sim\mathcal{P}(\Lambda)$,
+\[
+\mathbb{E}\big[e^{iuZ_T}\big]=\sum_{n\ge0}e^{-\Lambda}\frac{\Lambda^n}{n!}q_T^{\,n}=\exp\big(\Lambda(q_T-1)\big).
+\]
+Avec $h=1/\sqrt\Lambda\to0$, un développement de Taylor donne $\ln q_T=-iuh-\ln(1-iuh)=-iuh+iuh+\frac{(iuh)^2}{2}+O(h^3)=-\frac{u^2h^2}{2}+O(h^3)$, donc $q_T-1=-\frac{u^2}{2\Lambda}+O(\Lambda^{-3/2})$. Ainsi $\mathbb{E}[e^{iuZ_T}]\to e^{-u^2/2}$ et $Z_T\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)$. Comme $\sqrt\Lambda(\beta/\hat\beta_T-1)=\frac{\Lambda}{N_T}Z_T$ sur $\{N_T\ge1\}$ et que $\Lambda/N_T\xrightarrow{\mathbb{P}}1$ (Lemme~\ref{lem:NT}), le lemme de Slutsky donne la première convergence. La méthode delta avec $f(x)=1/x$ en $1$, où $f'(1)=-1$, donne $\sqrt\Lambda(\hat\beta_T/\beta-1)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)$, d'où la seconde.
+
+\emph{Point 2.} En divisant (D) par $\ln T/\sqrt\Lambda$,
+\[
+\frac{\sqrt\Lambda}{\ln T}\ln\frac{\hat\alpha_T}{\alpha}
+=\underbrace{-\frac{1}{\hat\beta_T\ln T}\,\sqrt\Lambda\ln\frac{N_T}{\Lambda}}_{=:H_T}
+-\underbrace{\frac{\ln(T/\alpha)}{\ln T}}_{=:c_T\to1}\,Y_T,
+\qquad Y_T:=\sqrt\Lambda\Big(\frac{\beta}{\hat\beta_T}-1\Big).
+\]
+Dans $H_T$, le facteur $\sqrt\Lambda\ln(N_T/\Lambda)$ converge en loi (Lemme~\ref{lem:NT}) et $1/(\hat\beta_T\ln T)\xrightarrow{\mathbb{P}}0$ : le produit tend vers $0$ en probabilité ([CT97, Prop.~3.8]). Par le point 1 et le lemme de Slutsky, le membre de gauche converge en loi vers $-X\overset{(d)}{=}X$. La méthode delta avec $f=\exp$ en $0$ donne la version $\hat\alpha_T/\alpha-1$, que l'on multiplie par $\alpha$.
+
+\emph{Point 3.} Le vecteur s'écrit $\big(H_T+(1-c_T)Y_T,0\big)+(-Y_T,Y_T)$. Le premier terme tend vers $0$ en probabilité et le second converge en loi vers $(-X,X)$, qui a même loi que $(X,-X)$. La seconde forme s'en déduit par la méthode delta composante par composante ([CT97, Prop.~3.10]), car $\hat\beta_T-\beta\approx-\beta(\beta/\hat\beta_T-1)$ et $\hat\alpha_T-\alpha\approx\alpha\ln(\hat\alpha_T/\alpha)$.
+\end{proof}
+
+Les vitesses $\sqrt{\Lambda(T)}$ dépendent des paramètres inconnus. On les remplace par $\sqrt{N_T}$ grâce à $N_T/\Lambda(T)\to1$ et au lemme de Slutsky.
+
+\begin{corollaire}[Versions auto-normalisées, {[CT97, Prop.~3.12]}]\label{cor:autonorm}
+Quand $T\to+\infty$, chacune des variables
+\[
+\sqrt{N_T}\Big(\frac{\beta}{\hat\beta_T}-1\Big),\quad
+\sqrt{N_T}\Big(\frac{\hat\beta_T}{\beta}-1\Big),\quad
+\frac{\sqrt{N_T}}{\ln T}\ln\frac{\hat\alpha_T}{\alpha},\quad
+\frac{\sqrt{N_T}}{\ln T}\Big(\frac{\hat\alpha_T}{\alpha}-1\Big)
+\]
+converge en loi vers $\mathcal{N}(0,1)$.
+\end{corollaire}
+
+\begin{remarque}[Lien avec l'information de Fisher]\label{rem:fisher}
+Ces vitesses inhabituelles se lisent sur l'information de Fisher $I_T(\alpha,\beta)=\mathbb{E}\big[-\nabla^2\ell(\alpha,\beta)\big]$. Avec $L_T:=\ln(T/\alpha)$ et $\mathbb{E}[N_T]=\Lambda(T)$, les dérivées secondes de $\ell$ donnent
+\[
+I_T(\alpha,\beta)=\Lambda(T)\begin{pmatrix}\dfrac{\beta^2}{\alpha^2}&-\dfrac{\beta}{\alpha}L_T\\[2mm]-\dfrac{\beta}{\alpha}L_T&\dfrac{1}{\beta^2}+L_T^2\end{pmatrix},
+\qquad
+I_T(\alpha,\beta)^{-1}=\frac{1}{\Lambda(T)}\begin{pmatrix}\alpha^2\Big(\dfrac{1}{\beta^2}+L_T^2\Big)&\alpha\beta L_T\\[2mm]\alpha\beta L_T&\beta^2\end{pmatrix}.
+\]
+On a en effet $\mathbb{E}[\partial^2_\alpha\ell]=-\frac{\beta^2}{\alpha^2}\Lambda(T)$, $\mathbb{E}[\partial_\alpha\partial_\beta\ell]=\frac{\beta}{\alpha}\Lambda(T)L_T$ et $\mathbb{E}[\partial^2_\beta\ell]=-\Lambda(T)\big(\frac{1}{\beta^2}+L_T^2\big)$, et le déterminant de la matrice entre parenthèses vaut $1/\alpha^2$. On retrouve les résultats précédents :
+\begin{itemize}
+\item la variance asymptotique de $\hat\beta_T$ est $\beta^2/\Lambda(T)$ (point 1 du Théorème~\ref{thm:tcl}) ;
+\item celle de $\hat\alpha_T$ est $\alpha^2(\beta^{-2}+L_T^2)/\Lambda(T)\sim\alpha^2\ln^2T/\Lambda(T)$ (point 2) ;
+\item la corrélation $L_T/\sqrt{\beta^{-2}+L_T^2}$ tend vers $1$, d'où la loi limite dégénérée du point 3.
+\end{itemize}
+Le paramétrage orthogonal $(\mu,\beta)$ de la Remarque~\ref{rem:factorisation} donne la même conclusion plus simplement : $I(\mu)=1/\mu$, $I(\beta)=\mu/\beta^2$, sans terme croisé. La méthode delta appliquée à $\ln\alpha=\ln T-\frac1\beta\ln\mu$ donne alors une variance asymptotique de $\ln\hat\alpha_T$ égale à $\frac{1}{\Lambda(T)}\big(\frac{1}{\beta^2}+L_T^2\big)$.
+\end{remarque}
+
+\begin{corollaire}[Intervalles de confiance asymptotiques, {[CT97, Cor.~3.13]}]\label{cor:icasympt}
+Soit $\delta\in(0,1)$ et $z=z_{1-\delta/2}$. Les intervalles suivants sont de niveau asymptotique $1-\delta$ quand $T\to+\infty$ :
+\begin{itemize}
+\item pour $\beta$ : $\Big[\hat\beta_T\Big(1-\dfrac{z}{\sqrt{N_T}}\Big)\;;\;\hat\beta_T\Big(1+\dfrac{z}{\sqrt{N_T}}\Big)\Big]$ ;
+\item pour $\alpha$ (forme logarithmique, bornes toujours positives) : $\Big[\hat\alpha_T\exp\Big(-\dfrac{z\ln T}{\sqrt{N_T}}\Big)\;;\;\hat\alpha_T\exp\Big(\dfrac{z\ln T}{\sqrt{N_T}}\Big)\Big]$ ;
+\item pour $\alpha$ (forme linéaire) : $\Big[\hat\alpha_T\Big(1-\dfrac{z\ln T}{\sqrt{N_T}}\Big)\;;\;\hat\alpha_T\Big(1+\dfrac{z\ln T}{\sqrt{N_T}}\Big)\Big]$.
+\end{itemize}
+\end{corollaire}
+
+\begin{proof}[Preuve]
+Pour $\beta$, on a $-z\le\sqrt{N_T}(\beta/\hat\beta_T-1)\le z\iff\hat\beta_T(1-z/\sqrt{N_T})\le\beta\le\hat\beta_T(1+z/\sqrt{N_T})$, et l'on conclut par le Corollaire~\ref{cor:autonorm}, comme au §II.4 du chapitre 3 du poly. Pour la forme logarithmique, on isole $\alpha$ dans $-z\le\frac{\sqrt{N_T}}{\ln T}\ln\frac{\hat\alpha_T}{\alpha}\le z$. Pour la forme linéaire, $\alpha/\hat\alpha_T\xrightarrow{\mathbb{P}}1$ et le lemme de Slutsky donnent $\frac{\sqrt{N_T}}{\hat\alpha_T\ln T}(\hat\alpha_T-\alpha)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)$.
+\end{proof}
+
+\begin{remarque}[Deux points de vigilance]\label{rem:vigilance}
+\begin{enumerate}
+\item Les formes linéaires (d)--(f) du Corollaire 3.13 de [CT97] sont écrites $\hat\alpha\pm\frac{\ln t}{\sqrt{N(t)}}n_\gamma$ et $\hat\beta\pm\frac{n_\gamma}{\sqrt{N(t)}}$. Il y manque le facteur $\hat\alpha$ (respectivement $\hat\beta$) : ces bornes ne sont pas homogènes à un temps et ne sont correctes que si $\alpha=1$ (respectivement $\beta=1$). Les formes correctes sont celles du Corollaire~\ref{cor:icasympt}.
+\item La normalisation par $\ln T$ dépend de l'unité de temps : passer des heures aux milliers d'heures change $\ln T$, mais ni $\hat\alpha_T/\alpha$ ni $N_T$. Asymptotiquement, $\ln T\sim\ln(T/\alpha)\sim\ln(T/\hat\alpha_T)$. La Remarque~\ref{rem:fisher} suggère donc la demi-largeur $z\sqrt{\hat\beta_T^{-2}+\ln^2(T/\hat\alpha_T)}/\sqrt{N_T}$ pour $\ln\alpha$. Elle est invariante par changement d'unité (car $\ln(T/\hat\alpha_T)=\ln(N_T)/\hat\beta_T$), asymptotiquement équivalente à celle de [CT97], et conserve le terme $\beta^{-2}$ que cette dernière néglige. Son intérêt à distance finie reste à vérifier par simulation.
+\end{enumerate}
+\end{remarque}
+
+\section{Test d'adéquation (Møller, 1976)}\label{sec:adequation}
+
+On veut tester l'hypothèse $H_0$ : « $N$ est un processus de loi de puissance, pour des paramètres $(\alpha,\beta)$ inconnus ». [Møl76] fonde un tel test sur une caractérisation du modèle parmi les iPP. On en donne d'abord la version à horizon $T$ fixé, adaptée à ce rapport, puis la version d'origine à nombre de points fixé, qui est celle qu'utilise [Møl76] sur les données de [Pro63].
+
+\subsection{Caractérisation du processus de loi de puissance}\label{sec:caracterisation}
+
+\begin{theoreme}[Caractérisation à horizon fixé]\label{thm:caracT}
+Soit $N$ un iPP d'intensité cumulée $\Lambda$ continue et strictement croissante. Soient $T>0$ et $n\ge1$.
+\begin{enumerate}
+\item Conditionnellement à $\{N_T=n\}$, $(T_1/T,\dots,T_n/T)$ est la statistique d'ordre de $n$ variables i.i.d. de fonction de répartition $F_T(x)=\Lambda(Tx)/\Lambda(T)$, $x\in[0,1]$.
+\item $N$ est un processus de loi de puissance de forme $\beta$ si et seulement si, pour tout $T>0$, conditionnellement à $\{N_T=n\}$, $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{E}(\beta)$. De manière équivalente, $\big((T_i/T)^\beta\big)_{1\le i\le n}$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{U}([0,1])$.
+\item $N$ est un processus de loi de puissance (pour un certain couple $(\alpha,\beta)$) si et seulement si la loi conditionnelle du point 1 ne dépend pas de $T$.
+\end{enumerate}
+\end{theoreme}
+
+\begin{proof}[Preuve]
+\begin{enumerate}
+\item Par la Proposition 4.12, sachant $\{N_T=n\}$, $(T_i)_i$ est la statistique d'ordre de $n$ variables i.i.d. $X_i$ de densité $\lambda(s)/\Lambda(T)$ sur $]0,T]$. L'application $s\mapsto s/T$ est croissante, et $\mathbb{P}(X_1/T\le x)=\Lambda(Tx)/\Lambda(T)$.
+\item Le sens direct est la Proposition~\ref{prop:loicond}. Réciproquement, la loi de la statistique d'ordre détermine la loi commune, par exemple via $F_T(x)=\mathbb{E}\big[\frac1n\sum_i\mathbf{1}_{\{T_i/T\le x\}}\mid N_T=n\big]$. Comme dans la preuve de la Proposition~\ref{prop:loicond}, l'hypothèse donne $F_T(x)=x^\beta$, c'est-à-dire $\Lambda(Tx)=\Lambda(T)x^\beta$ pour tous $T>0$ et $x\in[0,1]$. Pour $t\le1$, on prend $T=1$ et $x=t$ ; pour $t>1$, on prend $T=t$ et $x=1/t$. Dans les deux cas, $\Lambda(t)=\Lambda(1)t^\beta=(t/\alpha)^\beta$ avec $\alpha:=\Lambda(1)^{-1/\beta}$.
+\item Le sens direct est clair, car $F_T(x)=x^\beta$. Réciproquement, si $F_T=F_1$ pour tout $T$, alors $\Lambda(Tx)\Lambda(1)=\Lambda(T)\Lambda(x)$ pour $T>0$ et $x\in\,]0,1]$. On pose $g(u)=\Lambda(e^u)/\Lambda(1)$ pour $u\in\mathbb{R}$ : $g$ est continue, strictement positive, $g(0)=1$, et $g(u+v)=g(u)g(v)$ pour $u\in\mathbb{R}$ et $v\le0$. Avec $v>0$, on écrit $1=g(0)=g(v)g(-v)$ et $g(u)=g(u+v)g(-v)$, d'où $g(u+v)=g(u)g(v)$ pour tous $u,v\in\mathbb{R}$. Par le Lemme 1.13 du poly et son extension à $\mathbb{R}$ (Annexe A.III.1), $g(u)=e^{\beta u}$ pour un réel $\beta$, et $\beta>0$ car $\Lambda$ est croissante. Donc $\Lambda(t)=\Lambda(1)t^\beta$. C'est la même équation fonctionnelle que dans [Møl76] : $m(wx)m(1)=m(w)m(x)$.
+\end{enumerate}
+\end{proof}
+
+\begin{theoreme}[Théorème 1 de {[Møl76]}, nombre de points fixé]\label{thm:moller}
+Soit $n\ge2$. Le vecteur $\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)$ a la loi de la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{E}(\beta)$ si et seulement si $N$ est un processus de loi de puissance de forme $\beta$. Ce vecteur est alors indépendant de $T_n$.
+\end{theoreme}
+
+\begin{proof}[Preuve (sens direct)]
+Par le point 4 de la Proposition~\ref{prop:proprietes}, $S_i=(T_i/\alpha)^\beta$ sont les temps d'arrivée d'un hPP d'intensité 1. Par le Lemme 2.19, $(S_1,\dots,S_n)$ a pour densité $e^{-s_n}\mathbf{1}_{\{0<s_1<\dots<s_n\}}$, et $S_n\sim\Gamma(n,1)$ (Proposition 2.18). Sachant $\{S_n=s\}$, la densité de $(S_1,\dots,S_{n-1})$ vaut donc
+\[
+\frac{e^{-s}\mathbf{1}_{\{0<s_1<\dots<s_{n-1}<s\}}}{s^{n-1}e^{-s}/(n-1)!}=\frac{(n-1)!}{s^{n-1}}\mathbf{1}_{\{0<s_1<\dots<s_{n-1}<s\}}.
+\]
+C'est la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{U}([0,s])$ (Propriété 2.22). Ainsi $\big(S_i/S_n\big)_{i<n}=\big((T_i/T_n)^\beta\big)_{i<n}$ a la loi de la statistique d'ordre de $n-1$ variables uniformes sur $[0,1]$, indépendante de $S_n$, donc de $T_n$. On conclut comme pour la Proposition~\ref{prop:loicond} avec $\ln(T_n/T_i)=-\frac1\beta\ln(S_i/S_n)$. La réciproque utilise la même équation fonctionnelle que le point 3 du Théorème~\ref{thm:caracT} ([Møl76], §II).
+\end{proof}
+
+\begin{remarque}[Inférence à nombre de points fixé et données de Proschan]\label{rem:nfixe}
+Dans [Pro63], seuls les intervalles entre pannes sont donnés et la fin de l'observation n'est pas connue. [Møl76], à la suite de Cox et Lewis, traite donc ces données à $n$ fixé : on observe $T_1<\dots<T_n$. La vraisemblance (Proposition 4.15 du poly) a la même forme que dans la Proposition~\ref{prop:emv}, avec $T$ remplacé par $T_n$ et $N_T$ par $n$ ([CT97, Rem.~3.24]). On obtient
+\[
+\hat\beta_n=\frac{n}{\sum_{i=1}^{n-1}\ln(T_n/T_i)},\qquad\hat\alpha_n=\frac{T_n}{n^{1/\hat\beta_n}},
+\]
+car le terme $i=n$ est nul. Le Théorème~\ref{thm:moller} donne $\sum_{i<n}\ln(T_n/T_i)\sim\Gamma(n-1,\beta)$, d'où $2n\beta/\hat\beta_n\sim\chi^2(2n-2)$ ([CT97, Cor.~3.20]). L'estimateur sans biais est $\frac{n-2}{n}\hat\beta_n$ ([Møl76]). \emph{Attention :} appliquer les formules à $T$ fixé avec $T:=T_n$ ferait utiliser à tort $\chi^2(2n)$ au lieu de $\chi^2(2n-2)$. Le dernier point coïncide avec la fin de l'observation et n'apporte aucune information sur $\beta$ : seuls les $n-1$ rapports $T_i/T_n$ en apportent.
+\end{remarque}
+
+\subsection{Construction du test}\label{sec:test}
+
+On se place à horizon $T$ fixé et l'on observe $N_T=n\ge2$. On pose $V_i:=\ln(T/T_i)$ pour $1\le i\le n$, $\hat\beta_T=n/\sum_iV_i$, et l'on note $\hat F_n(x)=\frac1n\sum_{i=1}^n\mathbf{1}_{\{V_i\le x\}}$ la fonction de répartition empirique des $V_i$. Par le Théorème~\ref{thm:caracT}, sous $H_0$ et sachant $\{N_T=n\}$, les $V_i$ forment (à l'ordre près) un échantillon de loi $\mathcal{E}(\beta)$, avec $\beta$ inconnu. On compare donc $\hat F_n$ à la loi exponentielle ajustée par la statistique de Kolmogorov-Smirnov
+\[
+D_n:=\sup_{x\ge0}\Big|\hat F_n(x)-\big(1-e^{-\hat\beta_Tx}\big)\Big|.
+\]
+
+\begin{proposition}[Loi de $D_n$ sous $H_0$]\label{prop:pivot}
+Sous $H_0$ et conditionnellement à $\{N_T=n\}$, la loi de $D_n$ ne dépend ni de $\alpha$, ni de $\beta$, ni de $T$. C'est la loi $K_n$ de la statistique $D_n$ calculée sur $n$ variables i.i.d. de loi $\mathcal{E}(1)$. On note $k_{n,1-\delta}$ son quantile d'ordre $1-\delta$. Le test qui rejette $H_0$ si $D_n>k_{n,1-\delta}$ vérifie, pour tous $(\alpha,\beta)$,
+\[
+\mathbb{P}_{\alpha,\beta}\big(\text{rejet}\mid N_T=n\big)=\delta\quad(n\ge2),\qquad\text{donc}\qquad\mathbb{P}_{\alpha,\beta}\big(\text{rejet}\mid N_T\ge2\big)=\delta.
+\]
+En pratique, $k_{n,1-\delta}$ est approché par simulation (Remarque~\ref{rem:miseenoeuvre}).
+\end{proposition}
+
+\begin{proof}[Preuve]
+Sous $H_0$, sachant $\{N_T=n\}$, $(V_i)_i\overset{(d)}{=}(E_i/\beta)_i$ à l'ordre près, avec $E_i$ i.i.d. de loi $\mathcal{E}(1)$ (Théorème~\ref{thm:caracT}). Or $D_n$ ne dépend pas de l'ordre des $V_i$ et est invariante par changement d'échelle $V_i\mapsto cV_i$, $c>0$. En effet, $\hat\beta_T$ devient $\hat\beta_T/c$ et $\hat F_n(x)$ devient $\hat F_n(x/c)$, donc le changement de variable $y=x/c$ laisse le supremum inchangé. Ainsi $D_n(V_1,\dots,V_n)\overset{(d)}{=}D_n(E_1,\dots,E_n)\sim K_n$. Le niveau conditionnel en découle, et l'on déconditionne comme dans la preuve du Corollaire~\ref{cor:icexact}.
+\end{proof}
+
+\begin{remarque}[Mise en œuvre]\label{rem:miseenoeuvre}
+\begin{enumerate}
+\item \emph{Quantiles de Lilliefors.} Comme $\beta$ est estimé, les quantiles usuels de Kolmogorov-Smirnov, prévus pour une loi entièrement spécifiée, ne conviennent pas : ils sont trop grands et rendent le test conservatif, comme le signale déjà [Pro63, §2]. Il faut utiliser $K_n$, tabulée par Lilliefors (1969) pour l'exponentielle de moyenne inconnue. Comme $K_n$ ne dépend d'aucun paramètre, elle se simule exactement : on tire $M$ échantillons de $n$ variables i.i.d. $\mathcal{E}(1)$, on calcule $D_n^{(1)},\dots,D_n^{(M)}$, et la p-valeur vaut $\big(1+\#\{m:D_n^{(m)}\ge D_n^{\mathrm{obs}}\}\big)/(M+1)$. C'est un bootstrap paramétrique exact, puisque simuler sous $(\hat\alpha_T,\hat\beta_T)$ ou sous $(1,1)$ donne la même loi.
+\item \emph{Calcul.} Avec $V_{(1)}\le\dots\le V_{(n)}$ (soit $V_{(k)}=\ln(T/T_{n+1-k})$) et $\hat p_k:=1-e^{-\hat\beta_TV_{(k)}}$, on a $D_n=\max_{1\le k\le n}\max\big(\frac kn-\hat p_k,\;\hat p_k-\frac{k-1}{n}\big)$.
+\item \emph{Forme uniforme équivalente.} Comme $1-e^{-\hat\beta_TV_i}=1-(T_i/T)^{\hat\beta_T}$ et que $x\mapsto e^{-\hat\beta_Tx}$ est décroissante, $D_n$ est aussi la distance de Kolmogorov-Smirnov entre la fonction de répartition empirique des $\hat U_i:=(T_i/T)^{\hat\beta_T}$ et celle de $\mathcal{U}([0,1])$. C'est le point 2 du Théorème~\ref{thm:caracT}, avec $\beta$ remplacé par $\hat\beta_T$.
+\item \emph{Diagnostic graphique.} Le diagramme de fractiles de [Møl76] trace les points $\big(V_{(k)},-\ln(1-\frac{k-1/2}{n})\big)$, $1\le k\le n$. Sous $H_0$, ils s'alignent sur une droite passant par l'origine, de pente $\beta$ (estimée par $\hat\beta_T$).
+\item \emph{Version à $n$ fixé.} On remplace $(V_i)_{i\le n}$ par les $n-1$ variables $\ln(T_n/T_i)$, $i<n$, et $\hat\beta_T$ par l'estimateur $(n-1)/\sum_{i<n}\ln(T_n/T_i)$ de [Møl76]. Le Théorème~\ref{thm:moller} assure que la loi nulle est $K_{n-1}$. C'est le test appliqué par [Møl76, Table 4] aux 13 avions de [Pro63].
+\end{enumerate}
+\end{remarque}
+
+\begin{remarque}[Ce que le test détecte, et ce qu'il ne détecte pas]\label{rem:portee}
+Le test est conditionnel à $N_T$. Il contrôle donc la \emph{forme} $x\mapsto\Lambda(Tx)/\Lambda(T)$ de l'intensité cumulée, et non la loi de $N_T$.
+\begin{itemize}
+\item Le hPP ($\beta=1$) appartient à $H_0$ : il ne peut pas servir d'alternative dans une étude de puissance. Pour tester $\beta=1$ à l'intérieur du modèle, on utilise la Proposition~\ref{prop:testbeta}.
+\item Des alternatives naturelles sont les iPP dont l'intensité n'est pas une puissance. Par exemple, l'intensité log-linéaire $\lambda(t)=e^{a+bt}$ de Cox et Lewis (1966), à laquelle [Møl76, §IV] compare le modèle, ou une intensité « en baignoire » (poly, §IV du chapitre 1).
+\item Une hétérogénéité sur l'échelle $\alpha$ (par exemple un $\alpha$ aléatoire, différent d'un avion à l'autre, avec $\beta$ commun) laisse la loi conditionnelle inchangée, puisque celle-ci ne dépend pas de $\alpha$ (Proposition~\ref{prop:loicond}). Le test ne la détecte pas. C'est pourquoi l'analyse se fait avion par avion : le mélange de flottes est précisément ce qui crée, chez [Pro63], un taux de défaillance décroissant apparent sur les données regroupées.
+\end{itemize}
+\end{remarque}
