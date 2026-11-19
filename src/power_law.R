@@ -208,10 +208,10 @@ gof_null_distribution <- function(m, B = CONFIG$gof$B) {
 #' @param w     Vecteur des instants de sauts observés
 #' @param T_end Horizon d'observation T (NULL = troncature par le n-ième défaut)
 #' @param B     Nombre de simulations pour la calibration de Lilliefors
-#' @param level Niveau du test (pour la valeur critique renvoyée)
+#' @param risk  Risque de première espèce du test (défaut : 1 - CONFIG$conf_level)
 #' @return Liste : m, beta_hat, D, p-valeur calibrée, p-valeur naïve (loi de
-#'         Kolmogorov sans correction), valeur critique calibrée au niveau level
-gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, level = 1 - CONFIG$conf_level) {
+#'         Kolmogorov sans correction), valeur critique calibrée au risque risk
+gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, risk = 1 - CONFIG$conf_level) {
   y <- gof_transform(w, T_end)
   m <- length(y)
   if (m < CONFIG$gof$min_m) {
@@ -235,6 +235,6 @@ gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, level = 1 - CONFIG$
     D = st$D,
     p_value = p_value,
     p_value_naive = p_value_naive,
-    crit_value = unname(quantile(d_null, 1 - level, type = 1))
+    crit_value = unname(quantile(d_null, 1 - risk, type = 1))
   )
 }

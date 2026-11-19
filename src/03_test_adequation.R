@@ -94,10 +94,10 @@ sim_weibull_renewal <- function(shape, T_end) {
 #' @param T_end   Horizon d'observation
 #' @param M       Nombre de réplications
 #' @param B       Taille de la table de calibration
-#' @param level   Niveau du test
+#' @param risk    Risque de première espèce du test
 #' @param min_n   Nombre minimal d'événements (rejet des trajectoires trop courtes)
 #' @return Liste : résumé (taux de rejet, n moyen) et p-valeurs brutes
-rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, level = 1 - CONFIG$conf_level,
+rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, risk = 1 - CONFIG$conf_level,
                            min_n = CONFIG$gof$min_n) {
   p_cal <- numeric(M)
   p_naive <- numeric(M)
@@ -105,7 +105,7 @@ rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, level = 1 - CONF
   for (r in seq_len(M)) {
     w <- sim_fun()
     while (length(w) < min_n) w <- sim_fun()
-    res <- gof_power_law(w, T_end = T_end, B = B, level = level)
+    res <- gof_power_law(w, T_end = T_end, B = B, risk = risk)
     p_cal[r] <- res$p_value
     p_naive[r] <- res$p_value_naive
     n_obs[r] <- res$m
@@ -113,8 +113,8 @@ rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, level = 1 - CONF
   list(
     summary = data.frame(
       mean_n = mean(n_obs),
-      reject_cal = mean(p_cal <= level),
-      reject_naive = mean(p_naive <= level)
+      reject_cal = mean(p_cal <= risk),
+      reject_naive = mean(p_naive <= risk)
     ),
     p_cal = p_cal,
     p_naive = p_naive
@@ -126,7 +126,7 @@ monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
                                   beta_values = CONFIG$gof$level_beta_values,
                                   mean_N_values = CONFIG$gof$mean_N_values,
                                   M = CONFIG$gof$M_level, B = CONFIG$gof$B,
-                                  level = 1 - CONFIG$conf_level,
+                                  risk = 1 - CONFIG$conf_level,
                                   seed = CONFIG$gof$seed_level) {
   set.seed(seed)
   summary_records <- list()
@@ -137,7 +137,7 @@ monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
       T_curr <- alpha_true * mean_N^(1 / beta_true)
       rr <- rejection_rate(
         function() sim_power_law_process(alpha_true, beta_true, T_curr),
-        T_end = T_curr, M = M, B = B, level = level
+        T_end = T_curr, M = M, B = B, risk = risk
       )
       summary_records[[length(summary_records) + 1]] <- cbind(
         data.frame(beta = beta_true, mean_N = mean_N, T_val = T_curr), rr$summary
@@ -152,7 +152,7 @@ monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
   list(
     summary = do.call(rbind, summary_records),
     pvalues = do.call(rbind, pval_records),
-    M = M, level = level
+    M = M, risk = risk
   )
 }
 
@@ -162,7 +162,7 @@ monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
                                   rho_values = CONFIG$gof$rho_values,
                                   shape_values = CONFIG$gof$shape_values,
                                   M = CONFIG$gof$M_power, B = CONFIG$gof$B,
-                                  level = 1 - CONFIG$conf_level,
+                                  risk = 1 - CONFIG$conf_level,
                                   seed = CONFIG$gof$seed_power) {
   set.seed(seed)
   T_fix <- CONFIG$gof$T_alt  # sans effet pour les alternatives normalisées (log-linéaire, rupture)
@@ -175,18 +175,18 @@ monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
   for (mean_N in mean_N_values) {
     for (delta in delta_values) {
       rr <- rejection_rate(function() sim_loglinear_process(delta, mean_N, T_fix),
-                           T_end = T_fix, M = M, B = B, level = level)
+                           T_end = T_fix, M = M, B = B, risk = risk)
       add("Intensité log-linéaire", paste0("delta = ", delta), mean_N, rr)
     }
     for (rho in rho_values) {
       rr <- rejection_rate(function() sim_changepoint_process(rho, mean_N, T_fix),
-                           T_end = T_fix, M = M, B = B, level = level)
+                           T_end = T_fix, M = M, B = B, risk = risk)
       add("Rupture d'intensité en T/2", paste0("rho = ", rho), mean_N, rr)
     }
     for (k in shape_values) {
       # Inter-arrivées d'espérance 1 : T = mean_N donne E[N(T)] ~ mean_N
       rr <- rejection_rate(function() sim_weibull_renewal(k, mean_N),
-                           T_end = mean_N, M = M, B = B, level = level)
+                           T_end = mean_N, M = M, B = B, risk = risk)
       add("Renouvellement de Weibull", paste0("k = ", k), mean_N, rr)
     }
   }
@@ -194,7 +194,7 @@ monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
   df$family <- factor(df$family, levels = c("Intensité log-linéaire",
                                             "Rupture d'intensité en T/2",
                                             "Renouvellement de Weibull"))
-  list(summary = df, M = M, level = level)
+  list(summary = df, M = M, risk = risk)
 }
 
 # ------------------------------------------------------------------------------
@@ -213,9 +213,9 @@ theme_gof <- function() {
 #' Niveau empirique (calibré vs naïf) et histogrammes des p-valeurs sous H0
 plot_gof_level <- function(level_res, mean_N_hist = CONFIG$gof$mean_N_hist) {
   df <- level_res$summary
-  level <- level_res$level
+  risk <- level_res$risk
   M <- level_res$M
-  mc_band <- 1.96 * sqrt(level * (1 - level) / M)
+  mc_band <- 1.96 * sqrt(risk * (1 - risk) / M)
 
   df_long <- rbind(
     data.frame(df[, c("beta", "mean_n")], method = "Calibré (Lilliefors MC)", reject = df$reject_cal),
@@ -226,16 +226,16 @@ plot_gof_level <- function(level_res, mean_N_hist = CONFIG$gof$mean_N_hist) {
   p_level <- ggplot(df_long, aes(x = mean_n, y = reject * 100, color = method,
                                  linetype = beta_lab, shape = beta_lab)) +
     annotate("rect", xmin = min(df$mean_n), xmax = max(df$mean_n),
-             ymin = (level - mc_band) * 100, ymax = (level + mc_band) * 100,
+             ymin = (risk - mc_band) * 100, ymax = (risk + mc_band) * 100,
              fill = "grey80", alpha = 0.5) +
-    geom_hline(yintercept = level * 100, linetype = "dotted", linewidth = 0.8) +
+    geom_hline(yintercept = risk * 100, linetype = "dotted", linewidth = 0.8) +
     geom_line(linewidth = 0.9) +
     geom_point(size = 2.3) +
     scale_x_log10() +
     scale_color_manual(values = c("Calibré (Lilliefors MC)" = "#31a354",
                                   "Naïf (loi de Kolmogorov)" = "firebrick")) +
     labs(
-      title = paste0("Niveau empirique du test sous H0 (nominal ", 100 * level, "%)"),
+      title = paste0("Niveau empirique du test sous H0 (nominal ", 100 * risk, "%)"),
       subtitle = paste0("M = ", M, " réplications par point ; bande grise : fluctuation Monte-Carlo à 95%"),
       x = expression("Nombre moyen d'événements observés " ~ bar(n) ~ " (échelle log)"),
       y = "Taux de rejet (%)",
@@ -264,16 +264,16 @@ plot_gof_level <- function(level_res, mean_N_hist = CONFIG$gof$mean_N_hist) {
 #' Puissance du test calibré contre les trois familles d'alternatives
 plot_gof_power <- function(power_res) {
   df <- power_res$summary
-  level <- power_res$level
+  risk <- power_res$risk
   ggplot(df, aes(x = mean_n, y = reject_cal * 100, color = param)) +
-    geom_hline(yintercept = level * 100, linetype = "dotted", linewidth = 0.8) +
+    geom_hline(yintercept = risk * 100, linetype = "dotted", linewidth = 0.8) +
     geom_line(linewidth = 0.9) +
     geom_point(size = 2.2) +
     facet_wrap(~ family, ncol = 3) +
     scale_x_log10() +
     ylim(0, 100) +
     labs(
-      title = paste0("Puissance empirique du test calibré (niveau ", 100 * level, "%)"),
+      title = paste0("Puissance empirique du test calibré (niveau ", 100 * risk, "%)"),
       subtitle = paste0("M = ", power_res$M, " réplications par point"),
       x = expression("Nombre moyen d'événements observés " ~ bar(n) ~ " (échelle log)"),
       y = "Taux de rejet (%)",
@@ -287,15 +287,15 @@ plot_gof_power <- function(power_res) {
 #'
 #' Points : (quantile Exp(1) théorique, beta_hat * Y_(i)) ; sous H0 ils sont
 #' alignés sur la première bissectrice. La bande correspond à la valeur critique
-#' calibrée du test au niveau level (inversion de la bande de Kolmogorov).
+#' calibrée du test au risque risk (inversion de la bande de Kolmogorov).
 #'
 #' @param w     Instants de sauts
 #' @param T_end Horizon (NULL = troncature par le n-ième défaut)
 #' @param title Titre du graphique
 plot_gof_fractile <- function(w, T_end = NULL, title = NULL, B = CONFIG$gof$B,
-                              level = 1 - CONFIG$conf_level) {
+                              risk = 1 - CONFIG$conf_level) {
   y <- gof_transform(w, T_end)
-  res <- gof_power_law(w, T_end = T_end, B = B, level = level)
+  res <- gof_power_law(w, T_end = T_end, B = B, risk = risk)
   m <- res$m
   i <- seq_len(m)
   p_i <- (i - 0.5) / m
