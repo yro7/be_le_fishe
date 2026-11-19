@@ -35,7 +35,9 @@ library(patchwork)
 
 # Libs pr les parties numériques
 source(file.path(root_dir, "src", "01_convergences_emv.R"))
+source(file.path(root_dir, "src", "02_intervalles_confiance.R"))
 ```
+
 
 
 
@@ -53,6 +55,7 @@ TODO:
 ```{r q1-model-exploration}
 # TODO: Tracé des profils d'intensité instantanée lambda(t) pour différentes valeurs de beta
 ```
+
 
 
 
@@ -81,6 +84,7 @@ mle_power_law
 
 
 
+
 ## Propriétés d'échantillonnage et Intervalles de Confiance
 
 <!-- 
@@ -93,8 +97,11 @@ TODO:
 -->
 
 ```{r q3-confint-fixed-T}
-# TODO: Fonctions de calcul des intervalles de confiance exacts (Chi-2) et asymptotiques
+# La fonction de calcul des intervalles de confiance exacts et asymptotiques
+# est importée depuis src/02_intervalles_confiance.R
+confint_power_law
 ```
+
 
 
 
@@ -114,6 +121,7 @@ TODO:
 
 
 
+
 # Simulations Numériques
 
 ## Simulation du Processus Loi de Puissance sur $[0, T]$
@@ -128,13 +136,14 @@ TODO:
 
 ```{r q5-sim-function}
 # Algo de simulation :
-# 1. N(T) ~ Poisson((T / alpha)^beta)
+# 1. N(T) ~ Poisson((T / alpha)^beta) TODO
 # 2. Conditionnellement à N(T) = n, W_i = T*U_(i)^(1 / beta) avec U_i ~ U(0, 1) iid
 set.seed(42)
 w_test <- sim_power_law_process(alpha = 1.0, beta = 1.5, T_end = 50)
 cat("Nombre d'événements simulés N(50) :", length(w_test), "\n")
 cat("Premiers temps d'arrivée W_i :", round(head(w_test, 6), 3), "...\n")
 ```
+
 
 
 
@@ -148,6 +157,7 @@ sim_outputs <- run_all_illustrations(save_figs = FALSE)
 
 
 
+
 ### Convergence Presque-Sûre (Proposition 3.7)
 
 La Proposition 3.7 garantit que le long d'une même trajectoire observée jusqu'à $t \to +\infty$, les estimateurs $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent presque-sûrement vers leurs vraies valeurs.
@@ -155,6 +165,7 @@ La Proposition 3.7 garantit que le long d'une même trajectoire observée jusqu'
 ```{r q6-fig-ps, fig.width=8.5, fig.height=6.5}
 sim_outputs$plots$p_as
 ```
+
 
 
 
@@ -171,12 +182,14 @@ sim_outputs$plots$p_beta_norm
 
 
 
+
 2. **Pour $\alpha$** : la vitesse est ralentie par un facteur $\ln t$ :
 $$Z_{\alpha}(t) = \frac{\sqrt{N(t)}}{\ln t}\left(\frac{\hat{\alpha}}{\alpha} - 1\right) \xrightarrow{\mathcal{L}} \mathcal{N}(0, 1)$$
 
 ```{r q6-fig-alpha-norm, fig.width=8.5, fig.height=7}
 sim_outputs$plots$p_alpha_norm
 ```
+
 
 
 
@@ -190,6 +203,7 @@ sim_outputs$plots$p_joint
 
 
 
+
 ### Biais à Taille Finie de $\hat{\beta}$ et Correction
 
 Conditionnellement à $N(T) = n$, la statistique suit une loi du $\chi^2$, ce qui induit un biais positif $\mathbb{E}[\hat{\beta} \mid N(T) = n] = \frac{n}{n-1}\beta$. L'estimateur $\tilde{\beta} = \frac{n-1}{n}\hat{\beta}$ corrige ce biais dès $n \ge 2$.
@@ -197,6 +211,7 @@ Conditionnellement à $N(T) = n$, la statistique suit une loi du $\chi^2$, ce qu
 ```{r q6-fig-bias, fig.width=8, fig.height=4.5}
 sim_outputs$plots$p_bias
 ```
+
 
 
 
@@ -208,9 +223,38 @@ TODO:
 - Vérifier la validité de l'IC exact même lorsque le nombre de sauts N(T) est faible.
 -->
 
-```{r q7-sim-coverage}
-# TODO: Simulation du taux de couverture à T fixé
+```{r q7-sim-coverage, cache=TRUE, fig.width=8.5, fig.height=7}
+# Exécution de l'étude Monte-Carlo des IC (M = 2000 réplications sur 7 horizons T)
+ci_outputs <- run_all_ci_validation(save_figs = FALSE)
 ```
+
+
+### Couverture et Largeur pour $\beta$ : Exact vs Asymptotique
+
+Confrontation de l'intervalle de confiance exact du $\chi^2(2n)$ (Corollaire 3.6) et de l'intervalle asymptotique gaussien (Corollaire 3.13) au niveau nominal 95%.
+
+```{r q7-fig-beta, fig.width=8.5, fig.height=7}
+ci_outputs$plots$p_beta
+```
+
+
+### Couverture et Largeur pour $\alpha$ : Log-exponentielle vs Linéaire
+
+Confrontation de la forme log-exponentielle (garantissant des bornes strictement positives) et de la forme linéaire issue du Corollaire 3.13.
+
+```{r q7-fig-alpha, fig.width=8.5, fig.height=7}
+ci_outputs$plots$p_alpha
+```
+
+
+### Visualisation des Segments d'Intervalles à Petit Échantillon
+
+Sur $T = 5$ ($\mathbb{E}[N(T)] \approx 11$), visualisation des réalisations d'intervalles de confiance pour $\beta$ sur 45 réplications :
+
+```{r q7-fig-segments, fig.width=9.5, fig.height=4.5}
+ci_outputs$plots$p_segments
+```
+
 
 
 
@@ -228,6 +272,7 @@ TODO:
 
 
 
+
 # Application aux Données Réelles (Proschan, 1963)
 
 ## Préparation des données et définition de l'horizon $T$
@@ -239,6 +284,7 @@ head(df_proschan)
 
 # Pour chaque avion, l'horizon d'observation T peut être pris comme la durée totale cumulée de suivi
 ```
+
 
 
 
@@ -257,6 +303,7 @@ TODO:
 
 
 
+
 ## Test d'adéquation et Diagnostics graphiques
 
 <!-- 
@@ -268,6 +315,7 @@ TODO:
 ```{r q11-proschan-diagnostics}
 # TODO: Diagnostics graphiques et p-valeurs du test d'adéquation
 ```
+
 
 
 
