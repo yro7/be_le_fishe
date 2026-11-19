@@ -36,7 +36,7 @@ library(patchwork)
 # Paramètres des études (config.R), formules du modèle (power_law.R), puis études
 src_files <- file.path(root_dir, "src", c(
   "config.R", "power_law.R",
-  "01_convergences_emv.R", "02_intervalles_confiance.R", "03_test_adequation.R"
+  "01_convergences_mle.R", "02_intervalles_confiance.R", "03_test_adequation.R"
 ))
 for (f in src_files) source(f)
 
@@ -53,7 +53,7 @@ src_hash <- unname(tools::md5sum(src_files))
 <!-- 
 TODO: 
 - Présenter le problème de fiabilité des systèmes réparables sous observation temporelle tronquée [0, T].
-- Définir le Processus de Poisson Non-Homogène de Weibull (Loi de puissance) :
+- Définir le processus de Weibull (iPP) :
     Intensité instantanée : lambda(s) = (beta / alpha) * (s / alpha)^(beta - 1)
     Moyenne cumulée : Lambda(t) = (t / alpha)^beta
 - Discuter de la signification physique de beta (beta < 1 : rodage / fiabilisation, beta = 1 : PPH sans mémoire, beta > 1 : usure / vieillissement).
@@ -91,10 +91,10 @@ if (knitr::is_latex_output()) {
 
 ## Implémentation des estimateurs, des intervalles de confiance et du test
 
-Les formules de la partie théorique sont implémentées dans `src/01_convergences_emv.R`, `src/02_intervalles_confiance.R` et `src/03_test_adequation.R`.
+Les formules de la partie théorique sont implémentées dans `src/01_convergences_mle.R`, `src/02_intervalles_confiance.R` et `src/03_test_adequation.R`.
 
 ```{r q2-mle-fixed-T}
-# L'implémentation de l'EMV et de l'estimateur débiaisé est importée depuis src/01_convergences_emv.R
+# L'implémentation du MLE et de l'estimateur débiaisé est importée depuis src/01_convergences_mle.R
 # Formules :
 #   beta_hat = n / sum_{i=1}^n ln(T / W_i)
 #   alpha_hat = T / (n^(1 / beta_hat))
@@ -123,7 +123,7 @@ gof_power_law
 
 
 
-## Simulation du Processus Loi de Puissance sur $[0, T]$
+## Simulation du Processus de Weibull sur $[0, T]$
 
 <!-- 
 TODO:
@@ -146,9 +146,9 @@ cat("Premiers temps d'arrivée W_i :", round(head(w_test, 6), 3), "...\n")
 
 
 
-## Convergence et Biais de l'EMV
+## Convergence et Biais du MLE
 
-Conformément à la consigne du BE, nous illustrons les différents modes et vitesses de convergence démontrés dans Cocozza-Thivent (1997, Propositions 3.7, 3.11 et 3.12). L'ensemble des calculs et visualisations repose sur les fonctions du module `src/01_convergences_emv.R`.
+Conformément à la consigne du BE, nous illustrons les différents modes et vitesses de convergence démontrés dans Cocozza-Thivent (1997, Propositions 3.7, 3.11 et 3.12). L'ensemble des calculs et visualisations repose sur les fonctions du module `src/01_convergences_mle.R`.
 
 ```{r q6-sim-convergence, cache=TRUE, cache.extra=src_hash, fig.width=9, fig.height=7}
 sim_outputs <- run_all_illustrations(save_figs = FALSE)
@@ -259,7 +259,7 @@ ci_outputs$plots$p_segments
 
 ## Niveau et Puissance du Test d'Adéquation
 
-Le test d'adéquation repose sur le Théorème 1 de Møller (1976) : sous l'hypothèse $H_0$ « les défaillances suivent un processus loi de puissance », et conditionnellement à $N(T) = n$, les variables $Y_i = \ln(T / W_i)$ sont $n$ observations i.i.d. de loi $\mathcal{E}(\beta)$. On teste leur exponentialité par la statistique de Kolmogorov-Smirnov dans laquelle $\beta$ est remplacé par son EMV $\hat{\beta}$ :
+Le test d'adéquation repose sur le Théorème 1 de Møller (1976) : sous l'hypothèse $H_0$ « les défaillances suivent un processus de Weibull », et conditionnellement à $N(T) = n$, les variables $Y_i = \ln(T / W_i)$ sont $n$ observations i.i.d. de loi $\mathcal{E}(\beta)$. On teste leur exponentialité par la statistique de Kolmogorov-Smirnov dans laquelle $\beta$ est remplacé par son MLE $\hat{\beta}$ :
 $$D_n = \sup_{x > 0} \left| H_n(x) - \left(1 - e^{-\hat{\beta} x}\right) \right|.$$
 L'estimation de $\beta$ rapproche mécaniquement la loi ajustée de la loi empirique : la loi de Kolmogorov n'est plus valide (test « naïf »). La famille $\mathcal{E}(\beta)$ étant une famille d'échelle et $\hat{\beta}$ équivariant, la loi de $D_n$ sous $H_0$ ne dépend que de $n$ : on la tabule par simulation sous $\mathcal{E}(1)$ (correction de Lilliefors, 1969), ce qui équivaut à un bootstrap paramétrique exact. L'ensemble des calculs repose sur le module `src/03_test_adequation.R`.
 
@@ -272,7 +272,7 @@ gof_outputs <- run_all_gof_validation(save_figs = FALSE)
 
 ### Niveau Empirique sous $H_0$ : Test Calibré vs Test Naïf
 
-Taux de rejet au niveau nominal 5% lorsque les données sont effectivement issues d'un processus loi de puissance, pour trois valeurs de $\beta$ (la statistique étant pivotale, le niveau ne doit pas dépendre de $\beta$). En bas, distribution des p-valeurs pour $\mathbb{E}[N(T)] = 20$ : elle doit être uniforme sur $[0, 1]$ pour un test bien calibré.
+Taux de rejet au niveau nominal 5% lorsque les données sont effectivement issues d'un processus de Weibull, pour trois valeurs de $\beta$ (la statistique étant pivotale, le niveau ne doit pas dépendre de $\beta$). En bas, distribution des p-valeurs pour $\mathbb{E}[N(T)] = 20$ : elle doit être uniforme sur $[0, 1]$ pour un test bien calibré.
 
 ```{r q8-fig-level, fig.width=9, fig.height=8}
 gof_outputs$plots$p_level
@@ -281,11 +281,11 @@ gof_outputs$plots$p_level
 
 ### Puissance contre des Alternatives hors Modèle
 
-Trois familles de processus qui ne sont pas des processus loi de puissance :
+Trois familles de processus qui ne sont pas des processus de Weibull :
 
 - **Intensité log-linéaire** (Cox & Lewis, 1966) : $\lambda(t) = c\, e^{\delta t / T}$, modèle concurrent discuté par Møller ;
 - **Rupture d'intensité** en $T/2$ : intensité $c$ puis $\rho c$, situation typique d'une révision majeure (*major overhaul*) ;
-- **Processus de renouvellement de Weibull** : inter-arrivées i.i.d. de loi de Weibull de forme $k$ et d'espérance 1, que Møller (1976) recommande de ne pas confondre avec le processus loi de puissance. Pour $k = 1$, il s'agit d'un processus de Poisson homogène, donc de $H_0$ ($\beta = 1$).
+- **Processus de renouvellement à inter-arrivées de Weibull** : inter-arrivées i.i.d. de loi de Weibull de forme $k$ et d'espérance 1, que Møller (1976) recommande de ne pas confondre avec le processus de Weibull. Pour $k = 1$, il s'agit d'un processus de Poisson homogène, donc de $H_0$ ($\beta = 1$).
 
 ```{r q8-fig-power, fig.width=11, fig.height=4.5}
 gof_outputs$plots$p_power
@@ -349,7 +349,7 @@ TODO:
 
 
 
-## Discussion : Le processus loi de puissance est-il adapté ?
+## Discussion : Le processus de Weibull est-il adapté ?
 
 <!-- 
 TODO:

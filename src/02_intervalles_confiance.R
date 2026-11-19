@@ -1,19 +1,11 @@
-# ==============================================================================
-# Fichier : src/02_intervalles_confiance.R
-# Projet  : BE Processus Ponctuels & Fiabilité — INSA Toulouse, 5ModIA
-# Auteur  : Marin Décanini
-#
-# Objet   : Validation pratique des Intervalles de Confiance pour le Processus
-#           Loi de Puissance (Power Law / Weibull Process) à horizon T fixé
-#           Références : Cocozza-Thivent (1997), Corollaires 3.6 et 3.13
-# ==============================================================================
+# Partie IC. Refs : Cocozza Thivent (1997), Corollaires 3.6 et 3.13
 
 suppressPackageStartupMessages({
   library(ggplot2)
   library(patchwork)
 })
 
-# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+# Glue config
 if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
@@ -26,9 +18,7 @@ if (!exists("CONFIG") || !exists("mle_power_law")) {
   if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
-# ------------------------------------------------------------------------------
-# 2. Étude Monte-Carlo du Taux de Couverture et de la Largeur
-# ------------------------------------------------------------------------------
+# 2. Monte-Carlo
 
 #' Évalue le taux de couverture et la largeur moyenne sur une grille d'horizons T
 #'
@@ -151,11 +141,8 @@ monte_carlo_ci_study <- function(alpha_true = CONFIG$model$alpha_true,
   ))
 }
 
-# ------------------------------------------------------------------------------
-# 3. Visualisations Graphiques (sans interprétation textuelle)
-# ------------------------------------------------------------------------------
+# 3. graphs
 
-#' Graphique de couverture et de largeur pour beta (Exact Chi-2 vs Asymptotique)
 plot_ci_comparison_beta <- function(ci_res) {
   df <- ci_res$summary
   level <- ci_res$level
@@ -306,14 +293,12 @@ plot_ci_segments_beta <- function(ci_res, T_target = CONFIG$ci$T_segments,
   return(p_combined)
 }
 
-# ------------------------------------------------------------------------------
-# 4. Bloc Principal d'Exécution et Sauvegarde des Figures
-# ------------------------------------------------------------------------------
+# 4. main
 
 run_all_ci_validation <- function(save_figs = TRUE, output_dir = "figures") {
-  cat("====================================================================\n")
-  cat("BE Poisson : Validation pratique des IC (Cocozza-Thivent, 1997)\n")
-  cat("====================================================================\n\n")
+  cat("=====================================\n")
+  cat("🐟 Validation des IC\n")
+  cat("=====================================\n\n")
   
   if (save_figs && !dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)

@@ -1,34 +1,11 @@
-# ==============================================================================
-# Fichier : src/03_test_adequation.R
-# Projet  : BE Processus Ponctuels & Fiabilité — INSA Toulouse, 5ModIA
-# Auteur  : Marin Décanini
-#
-# Objet   : Test d'adéquation au Processus Loi de Puissance basé sur le
-#           Théorème 1 de Møller (1976), et validation pratique (niveau et
-#           puissance) par simulations Monte-Carlo.
-#
-# Principe :
-#   - Horizon T fixé (cadre du rapport) : conditionnellement à N(T) = n, les
-#     Y_i = ln(T / W_i), i = 1..n, sont n v.a. i.i.d. de loi Exp(beta).
-#   - Troncature par le n-ième défaut (cadre original de Møller, Théorème 1) :
-#     les Y_i = ln(W_n / W_i), i = 1..n-1, sont n-1 v.a. i.i.d. de loi Exp(beta).
-#   Dans les deux cas, on teste l'exponentialité des Y_i à paramètre inconnu par
-#   la statistique de Kolmogorov-Smirnov avec beta estimé :
-#       D = sup_x | H_m(x) - (1 - exp(-beta_hat * x)) |,  beta_hat = m / sum(Y_i)
-#   L'estimation de beta rend la loi de Kolmogorov inadaptée (test conservatif) :
-#   on calibre D par simulation (correction de Lilliefors, 1969).
-#   La famille Exp(beta) étant une famille d'échelle et beta_hat équivariant,
-#   la loi de D sous H0 ne dépend que de m (statistique pivotale) : le bootstrap
-#   paramétrique sous beta_hat coïncide avec une simulation sous Exp(1), que l'on
-#   met en cache par valeur de m.
-# ==============================================================================
+# Partie tests d'adéquation
 
 suppressPackageStartupMessages({
   library(ggplot2)
   library(patchwork)
 })
 
-# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+# Glue config
 if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
@@ -41,9 +18,7 @@ if (!exists("CONFIG") || !exists("mle_power_law")) {
   if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
-# ------------------------------------------------------------------------------
-# 2. Simulation de processus alternatifs (hors modèle loi de puissance)
-# ------------------------------------------------------------------------------
+# 2. Simulation de processus différents (qui ne suivent pas une loi de weibull)
 
 #' Processus de Poisson à intensité log-linéaire (Cox & Lewis, 1966)
 #'
@@ -69,7 +44,7 @@ sim_changepoint_process <- function(rho, mean_N, T_end, tau = 0.5) {
   sort(T_end * u)
 }
 
-#' Processus de renouvellement de Weibull (à ne pas confondre avec le PLP)
+#' Processus de renouvellement à inter-arrivées de Weibull (à ne pas confondre avec le processus de Weibull)
 #'
 #' Inter-arrivées i.i.d. Weibull(shape), d'espérance 1 => E[N(T)] ~ T.
 sim_weibull_renewal <- function(shape, T_end) {
@@ -121,7 +96,7 @@ rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, risk = 1 - CONFI
   )
 }
 
-#' Niveau empirique sous H0 (processus loi de puissance) pour plusieurs beta
+#' Niveau empirique sous H0 (processus de Weibull) pour plusieurs beta
 monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
                                   beta_values = CONFIG$gof$level_beta_values,
                                   mean_N_values = CONFIG$gof$mean_N_values,
@@ -332,7 +307,7 @@ plot_gof_examples <- function(ex = CONFIG$gof$examples, T_alt = CONFIG$gof$T_alt
   w_h0 <- sim_power_law_process(alpha = alpha, beta = ex$beta, T_end = T_h0)
   w_ll <- sim_loglinear_process(delta = ex$delta, mean_N = ex$mean_N, T_end = T_alt)
   w_cp <- sim_changepoint_process(rho = ex$rho, mean_N = ex$mean_N, T_end = T_alt)
-  p1 <- plot_gof_fractile(w_h0, T_end = T_h0, title = paste0("H0 : PLP (beta = ", ex$beta, ")"))
+  p1 <- plot_gof_fractile(w_h0, T_end = T_h0, title = paste0("H0 : processus de Weibull (beta = ", ex$beta, ")"))
   p2 <- plot_gof_fractile(w_ll, T_end = T_alt, title = paste0("Log-linéaire (delta = ", ex$delta, ")"))
   p3 <- plot_gof_fractile(w_cp, T_end = T_alt, title = paste0("Rupture (rho = ", ex$rho, ")"))
   p1 + p2 + p3

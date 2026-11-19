@@ -1,22 +1,8 @@
-# ==============================================================================
-# Fichier : src/power_law.R
-# Projet  : BE Processus Ponctuels & Fiabilité — INSA Toulouse, 5ModIA
-#
-# Objet   : Fonctions du modèle "processus de loi de puissance" (iPP d'intensité
-#           lambda(s) = (beta / alpha) * (s / alpha)^(beta - 1)) observé sur [0, T] :
-#           simulation, EMV, intervalles de confiance et test d'adéquation.
-#           Chaque fonction renvoie à son résultat dans la partie théorique
-#           (src/rapport/00_partie_theorique.tex).
-#           Ce fichier ne contient que des formules : aucune étude Monte-Carlo.
-#           Les valeurs par défaut des arguments sont lues dans CONFIG
-#           (src/config.R), qui doit être chargé avant tout appel.
-# ==============================================================================
+# Centralise les formules des papiers (MLE IC etc). La config et les csts sont dans @config.R.
 
-# ------------------------------------------------------------------------------
-# 1. Simulation et EMV (Remarque "Simulation", Proposition "Vraisemblance et EMV")
-# ------------------------------------------------------------------------------
+# 1. Simulation et MLE
 
-# Simule les temps d'arrivée d'un Processus Loi de Puissance sur [0, T]
+# Simule les temps d'arrivée d'un Processus de Weibull sur [0, T]
 #
 # Intensité : lambda(s) = (beta / alpha) * (s / alpha)^(beta - 1)
 # Moyenne cumulée : Lambda(t) = (t / alpha)^beta
@@ -30,7 +16,7 @@ sim_power_law_process <- function(alpha, beta, T_end) {
     stop("alpha, beta et T_end doivent être strictement positifs.")
   }
   
-  # 1. Nombre total d'événements N(T) ~ Poisson( (T / alpha)^beta )
+  # 1. Nombre total d'événements N(T) ~ Poisson( (T / alpha)^beta
   mean_N <- (T_end / alpha)^beta
   n <- rpois(1, lambda = mean_N)
   
@@ -39,16 +25,16 @@ sim_power_law_process <- function(alpha, beta, T_end) {
   }
   
   # 2. Conditionnellement à N(T) = n, (W_i / T)^beta sont des statistiques
-  #    d'ordre de variables uniformes U(0, 1) i.i.d.
+  #    d'ordre de variables uniformes U(0, 1) i.i.d. (cf algo poly cours)
   #    => W_i = T * U_(i)^(1 / beta)
   u <- sort(runif(n, min = 0, max = 1))
   w <- T_end * (u^(1 / beta))
   return(w)
 }
 
-# Calcule les Estimateurs du Maximum de Vraisemblance (EMV) à horizon T
+# MLE à Horizon T
 #
-# Formules issues de Cocozza-Thivent (1997, section 3.2.3) :
+# Cf Cocozza-Thivent (1997, section 3.2.3) :
 #   1 / beta_hat = log(T) - (1 / n) * sum(log(W_i)) = (1 / n) * sum(log(T / W_i))
 #   log(alpha_hat) = log(T) - (1 / beta_hat) * log(n) => alpha_hat = T / (n^(1 / beta_hat))
 #   Estimateur débiaisé : beta_tilde = ((n - 1) / n) * beta_hat
@@ -76,15 +62,13 @@ mle_power_law <- function(w, T_end) {
   ))
 }
 
-# ------------------------------------------------------------------------------
-# 2. Intervalles de confiance (Corollaires "IC exacts" et "IC asymptotiques")
-# ------------------------------------------------------------------------------
+# 2. IC 
 
 #' Calcule les intervalles de confiance exacts et asymptotiques pour alpha et beta
 #'
 #' @param n         Nombre d'événements observés N(T)
-#' @param beta_hat  EMV de beta
-#' @param alpha_hat EMV de alpha
+#' @param beta_hat  MLE de beta
+#' @param alpha_hat MLE de alpha
 #' @param T_end     Horizon d'observation T
 #' @param level     Niveau de confiance nominal (défaut : CONFIG$conf_level)
 #' @return Liste des bornes [lower, upper] pour chaque méthode
@@ -104,7 +88,7 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
   log_T <- log(T_end)
   
   # 1. Intervalle de confiance EXACT pour beta (Corollaire 3.6)
-  # Conditionnellement à N(T) = n, 2*n*beta / beta_hat ~ Chi2(2*n)
+  # Conditionnellement à N(T) = n, 2*n*beta / beta_hat ~ χ²(2*n)
   chi2_lower <- qchisq(alpha_risk / 2, df = 2 * n)
   chi2_upper <- qchisq(1 - alpha_risk / 2, df = 2 * n)
   beta_exact <- c(
@@ -112,14 +96,14 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
     upper = (beta_hat / (2 * n)) * chi2_upper
   )
   
-  # 2. Intervalle de confiance ASYMPTOTIQUE pour beta (Corollaire 3.13-2c)
+  # 2. Intervalle de confiance ASYMPTOTIQUE pour β
   # Basé sur la normalité de sqrt(n) * (beta_hat / beta - 1)
   beta_asymp <- c(
     lower = max(0, beta_hat * (1 - u_val / sqrt_n)),
     upper = beta_hat * (1 + u_val / sqrt_n)
   )
   
-  # 3. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme log (Corollaire 3.13-1c)
+  # 3. Intervalle de confiance ASYMPTOTIQUE pour α : forme log
   # Basé sur la normalité de (sqrt(n) / log(T)) * log(alpha_hat / alpha)
   scale_factor_log <- (log_T / sqrt_n) * u_val
   alpha_log <- c(
@@ -127,11 +111,11 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
     upper = alpha_hat * exp(scale_factor_log)
   )
   
-  # 4. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme linéaire (Corollaire 3.13-1f)
+  # 4. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme linéaire
   # Basé sur (sqrt(n) / log(T)) * (alpha_hat / alpha - 1) -> N(0, 1), d'où par Slutsky
   # alpha dans alpha_hat * (1 -/+ u * log(T) / sqrt(n)).
-  # Attention : [CT97] écrit alpha_hat -/+ u * log(T) / sqrt(n), sans le facteur alpha_hat
-  # (borne non homogène à un temps, correcte seulement si alpha = 1).
+  # NOTE Coquille dans papier CT97 : écrit alpha_hat -/+ u * log(T) / sqrt(n), sans le facteur alpha_hat
+  # (correct seulement si alpha = 1).
   scale_factor_lin <- (log_T / sqrt_n) * u_val
   alpha_lin <- c(
     lower = alpha_hat * (1 - scale_factor_lin),
@@ -146,9 +130,7 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
   ))
 }
 
-# ------------------------------------------------------------------------------
-# 3. Test d'adéquation (Møller, 1976 ; Lilliefors, 1969)
-# ------------------------------------------------------------------------------
+# 3. Test d'adéquation
 
 #' Transforme les instants de défaillance en échantillon exponentiel (Théorème 1)
 #'
@@ -167,10 +149,10 @@ gof_transform <- function(w, T_end = NULL) {
   sort(y)
 }
 
-#' Statistique de Kolmogorov-Smirnov avec paramètre estimé (Lilliefors)
+#' Statistique de Kolmogorov-Smirnov avec paramètre estimé 
 #'
 #' @param y Échantillon (supposé exponentiel)
-#' @return Liste : D (statistique) et beta_hat (EMV du taux exponentiel)
+#' @return Liste : D (statistique) et beta_hat (MLE du taux exponentiel)
 ks_exp_stat <- function(y) {
   y <- sort(y)
   m <- length(y)
@@ -196,7 +178,7 @@ gof_null_distribution <- function(m, B = CONFIG$gof$B) {
   if (!is.null(.gof_null_cache[[key]])) {
     return(.gof_null_cache[[key]])
   }
-  # Graine dédiée : la table ne dépend pas de l'état du générateur appelant
+
   old_seed <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
   set.seed(CONFIG$gof$null_seed_base + m)
   y_mat <- matrix(rexp(m * B), nrow = m)
@@ -206,7 +188,7 @@ gof_null_distribution <- function(m, B = CONFIG$gof$B) {
   d_null
 }
 
-#' Test d'adéquation au Processus Loi de Puissance (Møller, 1976)
+#' Test d'adéquation au Processus de Weibull (Møller, 1976)
 #'
 #' @param w     Vecteur des instants de sauts observés
 #' @param T_end Horizon d'observation T (NULL = troncature par le n-ième défaut)
@@ -224,10 +206,10 @@ gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, risk = 1 - CONFIG$c
   st <- ks_exp_stat(y)
   d_null <- gof_null_distribution(m, B)
 
-  # p-valeur Monte-Carlo (correction +1 pour garantir un test de niveau exact)
+  # p-valeur Monte-Carlo
   p_value <- (1 + sum(d_null >= st$D)) / (B + 1)
 
-  # p-valeur naïve : on fait comme si beta était connu (loi de Kolmogorov)
+  # p-valeur naïve : on fait comme on connaissait β 
   p_value_naive <- suppressWarnings(
     ks.test(y, "pexp", rate = st$beta_hat, exact = (m < 100))$p.value
   )

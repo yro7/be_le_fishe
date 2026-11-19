@@ -1,34 +1,19 @@
-# ==============================================================================
-# Fichier : src/config.R
-# Projet  : BE Processus Ponctuels & Fiabilité — INSA Toulouse, 5ModIA
-#
-# Objet   : Paramètres de TOUTES les études numériques du projet, au même endroit
-#           pour pouvoir les relire et les modifier sans fouiller le code.
-#           Les formules (EMV, IC, test) sont dans src/power_law.R ; les études
-#           (01, 02, 03) lisent leurs valeurs par défaut dans CONFIG.
-#
-# Conventions :
-#   - conf_level est le niveau de confiance des IC ; le risque des tests vaut
-#     toujours 1 - conf_level (jamais de second paramètre "level" ambigu).
-#   - Chaque graine est nommée : changer une étude ne modifie pas les autres.
-#   - Modifier ce fichier invalide le cache knitr des chunks de simulation
-#     (cache.extra dans rapport.Rmd).
-# ==============================================================================
+# Centralise la config et les constantes du proejt. Le modèle (MLE, etc) sont dans @power_lab.R.
 
 CONFIG <- list(
 
-  # --- Vraies valeurs du processus de loi de puissance simulé ----------------
+  # Config processus de Weibull
   model = list(
-    alpha_true = 1.0,   # échelle (alpha = 1 : voir la remarque de monte_carlo_mle)
-    beta_true  = 1.5    # forme (beta > 1 : usure)
+    alpha_true = 1.0,   # param d'échelle
+    beta_true  = 1.5    # param de forme
   ),
-
-  # --- Niveau commun des IC ; risque des tests = 1 - conf_level ---------------
+  
+  # α pour IC
   conf_level = 0.95,
-
-  # --- 01 : convergences de l'EMV (Prop. 3.7, 3.11, 3.12 de Cocozza-Thivent) --
+  
+  # 01_ : mle
   mle = list(
-    # Convergence presque sûre le long de trajectoires
+    # Convergence ps le long de trajectoires
     as_T_max      = 200,   # horizon maximal d'une trajectoire
     as_n_traj     = 3,     # nombre de trajectoires tracées
     as_n_points   = 400,   # points de la grille en t
@@ -41,7 +26,7 @@ CONFIG <- list(
     seed     = 2026
   ),
 
-  # --- 02 : couverture des intervalles de confiance ---------------------------
+  # 02_ : couverture des IC
   ci = list(
     T_values   = c(3, 5, 10, 20, 40, 80, 150),
     M          = 2000,     # réplications par horizon
@@ -52,7 +37,7 @@ CONFIG <- list(
     n_segments = 45        # segments affichés
   ),
 
-  # --- 03 : niveau et puissance du test d'adéquation (Møller, 1976) -----------
+  # 03 : niveau et puissance du test d'adéquation
   gof = list(
     B              = 4000, # taille de la table de Lilliefors (loi nulle de D)
     null_seed_base = 1969, # graine de la table de taille m : null_seed_base + m

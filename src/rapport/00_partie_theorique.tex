@@ -1,17 +1,5 @@
-% =============================================================================
-%  00_partie_theorique.tex -- Partie théorique du BE "Power law process"
-% -----------------------------------------------------------------------------
-%  Fragment LaTeX (sans préambule) inclus dans rapport.Rmd par le chunk
-%  `partie-theorique` :
-%    - sortie HTML : converti à la volée par pandoc (LaTeX -> Markdown) ;
-%    - sortie PDF  : inclus par \input (ajouter \usepackage{amsthm} dans les
-%      header-includes du YAML).
-%  Contraintes pour rester compatible avec le lecteur LaTeX de pandoc :
-%  pas de \eqref (on utilise \tag), pas d'options sur les listes.
-%
-%  Notations : celles du poly de M. Albert (2026-2027), avec les abréviations
-%  hPP (homogeneous Poisson process) et iPP (inhomogeneous Poisson process).
-% =============================================================================
+%  Partie théorique du BE
+%  On utilise les notations du poly, pas celle des papiers
 
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}
@@ -39,8 +27,8 @@ On suit les notations du poly.
 \item \textbf{Références.} « Poly » désigne le cours de M. Albert, dont on reprend la numérotation (Proposition 4.12, etc.). [CT97] désigne Cocozza-Thivent (1997), [Møl76] Møller (1976) et [Pro63] Proschan (1963).
 \end{itemize}
 
-\begin{definition}[Processus de loi de puissance, Exemple 4.2 du poly]\label{def:plp}
-Soient $\alpha>0$ et $\beta>0$. Le \emph{processus de loi de puissance} (\emph{power law process}, ou processus de Weibull) de paramètres $(\alpha,\beta)$ est l'iPP d'intensité
+\begin{definition}[Processus de Weibull, Exemple 4.2 du poly]\label{def:plp}
+Soient $\alpha>0$ et $\beta>0$. Le \emph{processus de Weibull} (\emph{power law process} dans le sujet) de paramètres $(\alpha,\beta)$ est l'iPP d'intensité
 \[
 \lambda_{\alpha,\beta}(x)=\frac{\beta}{\alpha}\Big(\frac{x}{\alpha}\Big)^{\beta-1},\qquad x>0,
 \qquad\text{d'intensité cumulée}\qquad
@@ -52,7 +40,7 @@ Le paramètre $\alpha$ est un paramètre d'échelle (homogène à un temps) et $
 Dans toute la suite, $(\alpha,\beta)$ désigne la vraie valeur des paramètres et l'on abrège $\lambda=\lambda_{\alpha,\beta}$ et $\Lambda=\Lambda_{\alpha,\beta}$ quand il n'y a pas d'ambiguïté. En fiabilité, $N_t$ compte les défaillances d'un système réparable sur $[0,t]$. Le modèle iPP correspond à des \emph{réparations minimales} : à chaque panne, le système est remis dans l'état où il était juste avant la panne, et la durée de réparation est négligée.
 
 \begin{proposition}[Premières propriétés]\label{prop:proprietes}
-Soit $N$ un processus de loi de puissance de paramètres $(\alpha,\beta)$.
+Soit $N$ un processus de Weibull de paramètres $(\alpha,\beta)$.
 \begin{enumerate}
 \item Pour tout $t>0$, $N_t\sim\mathcal{P}\big((t/\alpha)^\beta\big)$ et $\mathbb{E}[N_t]=\Lambda(t)=(t/\alpha)^\beta$.
 \item Le premier temps d'arrivée suit la loi de Weibull : $T_1\sim\mathcal{W}(\alpha,\beta)$, de taux de hasard $\lambda$.
@@ -60,7 +48,7 @@ Soit $N$ un processus de loi de puissance de paramètres $(\alpha,\beta)$.
  si $\beta<1$, $\lambda$ décroît (rodage, croissance de fiabilité) ;
  si $\beta=1$, $\lambda\equiv1/\alpha$ et $N$ est un hPP d'intensité $1/\alpha$ ;
  si $\beta>1$, $\lambda$ croît (usure, vieillissement).
-\item (Changement de temps.) Les variables $S_n=\Lambda(T_n)=(T_n/\alpha)^\beta$, $n\in\mathbb{N}^*$, sont les temps d'arrivée d'un hPP d'intensité $1$. Réciproquement, si $(S_n)$ sont les temps d'arrivée d'un hPP d'intensité $1$, alors $T_n=\alpha S_n^{1/\beta}$ définit un processus de loi de puissance de paramètres $(\alpha,\beta)$.
+\item (Changement de temps.) Les variables $S_n=\Lambda(T_n)=(T_n/\alpha)^\beta$, $n\in\mathbb{N}^*$, sont les temps d'arrivée d'un hPP d'intensité $1$. Réciproquement, si $(S_n)$ sont les temps d'arrivée d'un hPP d'intensité $1$, alors $T_n=\alpha S_n^{1/\beta}$ définit un processus de Weibull de paramètres $(\alpha,\beta)$.
 \end{enumerate}
 \end{proposition}
 
@@ -69,10 +57,10 @@ Le point 1 découle de la Définition 4.1 et de l'Exemple 4.2. Pour le point 2, 
 \end{proof}
 
 \begin{remarque}
-Plusieurs intensités vues en cours sont des cas particuliers. L'intensité $x\mapsto2\theta x$ (examen 2025, Exercice 2) correspond à $\beta=2$ et $\alpha=\theta^{-1/2}$. L'intensité $x\mapsto\frac{\alpha'}{2\sqrt{x}}$ (Feuille 4, Exercice 3) correspond à $\beta=1/2$ et une échelle égale à $\alpha'^{-2}$. Quand $\beta\neq1$, les inter-arrivées $W_i$ ne sont ni indépendantes ni de même loi : un processus de loi de puissance n'est \emph{pas} un processus de renouvellement, et il ne faut pas le confondre avec le processus de renouvellement à inter-arrivées de Weibull ([Møl76], résumé).
+Plusieurs intensités vues en cours sont des cas particuliers. L'intensité $x\mapsto2\theta x$ (examen 2025, Exercice 2) correspond à $\beta=2$ et $\alpha=\theta^{-1/2}$. L'intensité $x\mapsto\frac{\alpha'}{2\sqrt{x}}$ (Feuille 4, Exercice 3) correspond à $\beta=1/2$ et une échelle égale à $\alpha'^{-2}$. Quand $\beta\neq1$, les inter-arrivées $W_i$ ne sont ni indépendantes ni de même loi : un processus de Weibull n'est \emph{pas} un processus de renouvellement, et il ne faut pas le confondre avec le processus de renouvellement à inter-arrivées de Weibull ([Møl76], résumé).
 \end{remarque}
 
-Le résultat suivant est central pour toute la suite. Il traduit la Proposition 4.12 du poly dans le cas de la loi de puissance.
+Le résultat suivant est central pour toute la suite. Il traduit la Proposition 4.12 du poly dans le cas du processus de Weibull.
 
 \begin{proposition}[Loi conditionnelle des temps d'arrivée]\label{prop:loicond}
 Soient $T>0$ et $n\in\mathbb{N}^*$. Conditionnellement à $\{N_T=n\}$ :
@@ -113,11 +101,11 @@ Les simulations de la partie numérique reposent sur deux constructions du cours
 \end{itemize}
 \end{remarque}
 
-\subsection{Vraisemblance et estimateurs du maximum de vraisemblance}\label{sec:emv}
+\subsection{Vraisemblance et estimateurs du maximum de vraisemblance}\label{sec:mle}
 
 On observe $(N_t)_{t\in[0,T]}$, c'est-à-dire $N_T$ et $T_1<\dots<T_{N_T}$, avec $T$ fixé et $(\alpha,\beta)$ inconnus.
 
-\begin{proposition}[Vraisemblance et EMV, {[CT97, §3.2.3]}]\label{prop:emv}
+\begin{proposition}[Vraisemblance et MLE, {[CT97, §3.2.3]}]\label{prop:mle}
 La vraisemblance des paramètres $(\alpha,\beta)$ vaut
 \[
 L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)=\Big(\frac{\beta}{\alpha^\beta}\Big)^{N_T}\Big(\prod_{i=1}^{N_T}T_i^{\beta-1}\Big)\exp\Big(-\Big(\frac{T}{\alpha}\Big)^\beta\Big),
@@ -126,7 +114,7 @@ d'où la log-vraisemblance
 \[
 \ell(\alpha,\beta)=N_T\big(\ln\beta-\beta\ln\alpha\big)+(\beta-1)\sum_{i=1}^{N_T}\ln T_i-\Big(\frac{T}{\alpha}\Big)^\beta.
 \]
-Si $N_T=0$, l'EMV n'existe pas. Si $N_T\ge1$, l'EMV existe, il est unique et vaut
+Si $N_T=0$, le MLE n'existe pas. Si $N_T\ge1$, le MLE existe, il est unique et vaut
 \[
 \hat\beta_T=\frac{N_T}{\sum_{i=1}^{N_T}\ln(T/T_i)}=\frac{N_T}{S_T},
 \qquad
@@ -397,16 +385,16 @@ Pour $\beta$, on a $-z\le\sqrt{N_T}(\beta/\hat\beta_T-1)\le z\iff\hat\beta_T(1-z
 
 \section{Test d'adéquation (Møller, 1976)}\label{sec:adequation}
 
-On veut tester l'hypothèse $H_0$ : « $N$ est un processus de loi de puissance, pour des paramètres $(\alpha,\beta)$ inconnus ». [Møl76] fonde un tel test sur une caractérisation du modèle parmi les iPP. On en donne d'abord la version à horizon $T$ fixé, adaptée à ce rapport, puis la version d'origine à nombre de points fixé, qui est celle qu'utilise [Møl76] sur les données de [Pro63].
+On veut tester l'hypothèse $H_0$ : « $N$ est un processus de Weibull, pour des paramètres $(\alpha,\beta)$ inconnus ». [Møl76] fonde un tel test sur une caractérisation du modèle parmi les iPP. On en donne d'abord la version à horizon $T$ fixé, adaptée à ce rapport, puis la version d'origine à nombre de points fixé, qui est celle qu'utilise [Møl76] sur les données de [Pro63].
 
-\subsection{Caractérisation du processus de loi de puissance}\label{sec:caracterisation}
+\subsection{Caractérisation du processus de Weibull}\label{sec:caracterisation}
 
 \begin{theoreme}[Caractérisation à horizon fixé]\label{thm:caracT}
 Soit $N$ un iPP d'intensité cumulée $\Lambda$ continue et strictement croissante. Soient $T>0$ et $n\ge1$.
 \begin{enumerate}
 \item Conditionnellement à $\{N_T=n\}$, $(T_1/T,\dots,T_n/T)$ est la statistique d'ordre de $n$ variables i.i.d. de fonction de répartition $F_T(x)=\Lambda(Tx)/\Lambda(T)$, $x\in[0,1]$.
-\item $N$ est un processus de loi de puissance de forme $\beta$ si et seulement si, pour tout $T>0$, conditionnellement à $\{N_T=n\}$, $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{E}(\beta)$. De manière équivalente, $\big((T_i/T)^\beta\big)_{1\le i\le n}$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{U}([0,1])$.
-\item $N$ est un processus de loi de puissance (pour un certain couple $(\alpha,\beta)$) si et seulement si la loi conditionnelle du point 1 ne dépend pas de $T$.
+\item $N$ est un processus de Weibull de forme $\beta$ si et seulement si, pour tout $T>0$, conditionnellement à $\{N_T=n\}$, $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{E}(\beta)$. De manière équivalente, $\big((T_i/T)^\beta\big)_{1\le i\le n}$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{U}([0,1])$.
+\item $N$ est un processus de Weibull (pour un certain couple $(\alpha,\beta)$) si et seulement si la loi conditionnelle du point 1 ne dépend pas de $T$.
 \end{enumerate}
 \end{theoreme}
 
@@ -419,7 +407,7 @@ Soit $N$ un iPP d'intensité cumulée $\Lambda$ continue et strictement croissan
 \end{proof}
 
 \begin{theoreme}[Théorème 1 de {[Møl76]}, nombre de points fixé]\label{thm:moller}
-Soit $n\ge2$. Le vecteur $\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)$ a la loi de la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{E}(\beta)$ si et seulement si $N$ est un processus de loi de puissance de forme $\beta$. Ce vecteur est alors indépendant de $T_n$.
+Soit $n\ge2$. Le vecteur $\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)$ a la loi de la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{E}(\beta)$ si et seulement si $N$ est un processus de Weibull de forme $\beta$. Ce vecteur est alors indépendant de $T_n$.
 \end{theoreme}
 
 \begin{proof}[Preuve (sens direct)]
@@ -431,7 +419,7 @@ C'est la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{U}([0,s]
 \end{proof}
 
 \begin{remarque}[Inférence à nombre de points fixé et données de Proschan]\label{rem:nfixe}
-Dans [Pro63], seuls les intervalles entre pannes sont donnés et la fin de l'observation n'est pas connue. [Møl76], à la suite de Cox et Lewis, traite donc ces données à $n$ fixé : on observe $T_1<\dots<T_n$. La vraisemblance (Proposition 4.15 du poly) a la même forme que dans la Proposition~\ref{prop:emv}, avec $T$ remplacé par $T_n$ et $N_T$ par $n$ ([CT97, Rem.~3.24]). On obtient
+Dans [Pro63], seuls les intervalles entre pannes sont donnés et la fin de l'observation n'est pas connue. [Møl76], à la suite de Cox et Lewis, traite donc ces données à $n$ fixé : on observe $T_1<\dots<T_n$. La vraisemblance (Proposition 4.15 du poly) a la même forme que dans la Proposition~\ref{prop:mle}, avec $T$ remplacé par $T_n$ et $N_T$ par $n$ ([CT97, Rem.~3.24]). On obtient
 \[
 \hat\beta_n=\frac{n}{\sum_{i=1}^{n-1}\ln(T_n/T_i)},\qquad\hat\alpha_n=\frac{T_n}{n^{1/\hat\beta_n}},
 \]

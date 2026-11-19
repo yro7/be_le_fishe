@@ -1,13 +1,13 @@
-# Illustrations des différents modes et 
-# vitesses de convergence de l'EMV pour processus de Weibull
-# (cf Cocozza-Thivent, Propositions 3.7, 3.11 et 3.12)
+# Illustrations des différents modes
+# et vitesses de convergence du MLE pour processus de Weibull
+# (cf Cocozza-Thivent, prop 3.7, 3.11 et 3.12)
 
 suppressPackageStartupMessages({
   library(ggplot2)
   library(patchwork)
 })
 
-# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+# Glue config
 if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
@@ -20,15 +20,15 @@ if (!exists("CONFIG") || !exists("mle_power_law")) {
   if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
-# 2. Fig 1 : Convergence presque-sûrement (Proposition 3.7)
+# 2. Fig 1 : convergence ps (Proposition 3.7)
 
-#' Simule le comportement de l'EMV le long d'une même trajectoire quand t croît
+#' Simule le comportement du MLE le long d'un même path quand t croît
 #'
 #' Proposition 3.7 : Lorsque t -> +∞, alpha_hat(t) -> alpha et beta_hat(t) -> beta p.s.
 #'
 #' @param alpha_true Vraie valeur de alpha
 #' @param beta_true  Vraie valeur de beta
-#' @param T_max      Horizon maximal pour la trajectoire
+#' @param T_max      Horizon maximal pour le path
 #' @param n_points   Nombre de points d'évaluation temporelle
 #' @param seed       Graine aléatoire
 #' @return data.frame contenant t, n, beta_hat, alpha_hat
@@ -61,7 +61,7 @@ sim_trajectory_as_convergence <- function(alpha_true, beta_true, T_max,
   do.call(rbind, res)
 }
 
-#' Génère le graphique de convergence presque-sûre pour plusieurs trajectoires
+# Génère le graphique de convergence p-sûrement pour plusieurs trajectoires
 plot_as_convergence <- function(alpha_true = CONFIG$model$alpha_true,
                                 beta_true = CONFIG$model$beta_true,
                                 T_max = CONFIG$mle$as_T_max,
@@ -107,25 +107,10 @@ plot_as_convergence <- function(alpha_true = CONFIG$model$alpha_true,
   return(p_combined)
 }
 
-# ------------------------------------------------------------------------------
-# 3. Simulation Monte-Carlo pour l'étude asymptotique (Prop. 3.11 et 3.12)
-# ------------------------------------------------------------------------------
+# 3. Monte Carlo pour l'asymptotique (Prop. 3.11 et 3.12)
 
 #' Lance une simulation Monte-Carlo sur plusieurs horizons T
-#'
-#' Statistiques normalisées (Cocozza-Thivent 1997, Prop 3.11 & 3.12) :
-#'   Z_beta        = sqrt(N(T)) * (beta_hat / beta - 1)      -> N(0, 1)
-#'   Y_beta        = sqrt(N(T)) * (beta / beta_hat - 1)      -> N(0, 1)
-#'   Z_alpha       = (sqrt(N(T)) / log(T)) * (alpha_hat / alpha - 1) -> N(0, 1)
-#'   Z_alpha_log   = (sqrt(N(T)) / log(T)) * log(alpha_hat / alpha)  -> N(0, 1)
-#'   Z_alpha_naive = sqrt(N(T)) * (alpha_hat / alpha - 1)   (variance explose en log^2(T) !)
-#'
-#' Remarque sur le choix d'alpha_true = 1 :
-#'   Dans la preuve de Cocozza-Thivent (ligne 310), le terme de développement contient :
-#'     - (1 - log(alpha) / log(t)) * sqrt(Lambda(t)) * (beta / beta_hat - 1)
-#'   Lorsque alpha = 1, log(alpha) = 0 exactement, éliminant le biais de vitesse
-#'   logarithmique O(1 / log(T)) à distance finie et révélant la variance unitaire.
-#'
+#' 
 #' @param alpha_true Vrai alpha (défaut : CONFIG$model)
 #' @param beta_true  Vrai beta (défaut : CONFIG$model)
 #' @param T_values   Horizons T testés
@@ -187,9 +172,7 @@ monte_carlo_mle <- function(alpha_true = CONFIG$model$alpha_true,
   return(df_res)
 }
 
-# ------------------------------------------------------------------------------
-# 4. Illustration 2 : Normalité Asymptotique (Proposition 3.11 & 3.12)
-# ------------------------------------------------------------------------------
+# 4. Fig 2 : normalité nsymptotique (Proposition 3.11 & 3.12)
 
 #' Graphique de normalité asymptotique pour beta_hat
 plot_normality_beta <- function(mc_df) {
@@ -277,7 +260,7 @@ plot_normality_alpha <- function(mc_df) {
   return(p_combined)
 }
 
-# 5. figure 3 : Dégénérescence asymptotique conjointe (Prop 3.11 et 3.12)
+# 5. figure 3 : dégénérescence asymptotique conjointe (Prop 3.11 et 3.12)
 
 plot_joint_degeneracy <- function(mc_df) {
   theme_clean <- theme_bw(base_size = 11) +
@@ -328,7 +311,7 @@ plot_joint_degeneracy <- function(mc_df) {
   return(p_combined)
 }
 
-# 6. fig 4 : Biais à Taille Finie de beta_hat vs beta_tilde
+# 6. fig 4 : Biais à taille finie de beta_hat vs beta_tilde
 
 plot_finite_sample_bias <- function(mc_df, beta_true = CONFIG$model$beta_true) {
   theme_clean <- theme_bw(base_size = 11) +
@@ -352,14 +335,14 @@ plot_finite_sample_bias <- function(mc_df, beta_true = CONFIG$model$beta_true) {
   bias_summary$theo_bias_hat <- 1 / (bias_summary$mean_N - 1)
   
   p_bias <- ggplot(bias_summary, aes(x = mean_N)) +
-    geom_line(aes(y = bias_hat * 100, color = "EMV brut hat(beta)"), linewidth = 1) +
-    geom_point(aes(y = bias_hat * 100, color = "EMV brut hat(beta)"), size = 3) +
+    geom_line(aes(y = bias_hat * 100, color = "MLE brut hat(beta)"), linewidth = 1) +
+    geom_point(aes(y = bias_hat * 100, color = "MLE brut hat(beta)"), size = 3) +
     geom_line(aes(y = theo_bias_hat * 100, color = "Courbe théorique 1 / (n - 1)"), linetype = "dotted", linewidth = 1) +
     geom_line(aes(y = bias_tilde * 100, color = "Estimateur débiaisé tilde(beta)"), linewidth = 1) +
     geom_point(aes(y = bias_tilde * 100, color = "Estimateur débiaisé tilde(beta)"), size = 3) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
     scale_color_manual(values = c(
-      "EMV brut hat(beta)" = "firebrick",
+      "MLE brut hat(beta)" = "firebrick",
       "Courbe théorique 1 / (n - 1)" = "black",
       "Estimateur débiaisé tilde(beta)" = "#31a354"
     )) +
@@ -375,7 +358,7 @@ plot_finite_sample_bias <- function(mc_df, beta_true = CONFIG$model$beta_true) {
 }
 
 run_all_illustrations <- function(save_figs = TRUE, output_dir = "figures") {
-  cat("Illustrations des Convergences de l'EMV\n")
+  cat("Illustrations des Convergences du MLE\n")
   
   if (save_figs && !dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)
