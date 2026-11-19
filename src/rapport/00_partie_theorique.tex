@@ -1,5 +1,17 @@
-%  Partie théorique du BE
-%  On utilise les notations du poly, pas celle des papiers
+% =============================================================================
+%  00_partie_theorique.tex -- Partie théorique du BE "Power law process"
+% -----------------------------------------------------------------------------
+%  Fragment LaTeX (sans préambule) inclus dans rapport.Rmd par le chunk
+%  `partie-theorique` :
+%    - sortie HTML : converti à la volée par pandoc (LaTeX -> Markdown) ;
+%    - sortie PDF  : inclus par \input (ajouter \usepackage{amsthm} dans les
+%      header-includes du YAML).
+%  Contraintes pour rester compatible avec le lecteur LaTeX de pandoc :
+%  pas de \eqref (on utilise \tag), pas d'options sur les listes.
+%
+%  Notations : celles du poly de M. Albert (2026-2027), avec les abréviations
+%  hPP (homogeneous Poisson process) et iPP (inhomogeneous Poisson process).
+% =============================================================================
 
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}
@@ -27,8 +39,8 @@ On suit les notations du poly.
 \item \textbf{Références.} « Poly » désigne le cours de M. Albert, dont on reprend la numérotation (Proposition 4.12, etc.). [CT97] désigne Cocozza-Thivent (1997), [Møl76] Møller (1976) et [Pro63] Proschan (1963).
 \end{itemize}
 
-\begin{definition}[Processus de Weibull, Exemple 4.2 du poly]\label{def:plp}
-Soient $\alpha>0$ et $\beta>0$. Le \emph{processus de Weibull} (\emph{power law process} dans le sujet) de paramètres $(\alpha,\beta)$ est l'iPP d'intensité
+\begin{definition}[Processus de loi de puissance, Exemple 4.2 du poly]\label{def:plp}
+Soient $\alpha>0$ et $\beta>0$. Le \emph{processus de loi de puissance} (\emph{power law process}, ou processus de Weibull) de paramètres $(\alpha,\beta)$ est l'iPP d'intensité
 \[
 \lambda_{\alpha,\beta}(x)=\frac{\beta}{\alpha}\Big(\frac{x}{\alpha}\Big)^{\beta-1},\qquad x>0,
 \qquad\text{d'intensité cumulée}\qquad
@@ -40,7 +52,7 @@ Le paramètre $\alpha$ est un paramètre d'échelle (homogène à un temps) et $
 Dans toute la suite, $(\alpha,\beta)$ désigne la vraie valeur des paramètres et l'on abrège $\lambda=\lambda_{\alpha,\beta}$ et $\Lambda=\Lambda_{\alpha,\beta}$ quand il n'y a pas d'ambiguïté. En fiabilité, $N_t$ compte les défaillances d'un système réparable sur $[0,t]$. Le modèle iPP correspond à des \emph{réparations minimales} : à chaque panne, le système est remis dans l'état où il était juste avant la panne, et la durée de réparation est négligée.
 
 \begin{proposition}[Premières propriétés]\label{prop:proprietes}
-Soit $N$ un processus de Weibull de paramètres $(\alpha,\beta)$.
+Soit $N$ un processus de loi de puissance de paramètres $(\alpha,\beta)$.
 \begin{enumerate}
 \item Pour tout $t>0$, $N_t\sim\mathcal{P}\big((t/\alpha)^\beta\big)$ et $\mathbb{E}[N_t]=\Lambda(t)=(t/\alpha)^\beta$.
 \item Le premier temps d'arrivée suit la loi de Weibull : $T_1\sim\mathcal{W}(\alpha,\beta)$, de taux de hasard $\lambda$.
@@ -48,7 +60,7 @@ Soit $N$ un processus de Weibull de paramètres $(\alpha,\beta)$.
  si $\beta<1$, $\lambda$ décroît (rodage, croissance de fiabilité) ;
  si $\beta=1$, $\lambda\equiv1/\alpha$ et $N$ est un hPP d'intensité $1/\alpha$ ;
  si $\beta>1$, $\lambda$ croît (usure, vieillissement).
-\item (Changement de temps.) Les variables $S_n=\Lambda(T_n)=(T_n/\alpha)^\beta$, $n\in\mathbb{N}^*$, sont les temps d'arrivée d'un hPP d'intensité $1$. Réciproquement, si $(S_n)$ sont les temps d'arrivée d'un hPP d'intensité $1$, alors $T_n=\alpha S_n^{1/\beta}$ définit un processus de Weibull de paramètres $(\alpha,\beta)$.
+\item (Changement de temps.) Les variables $S_n=\Lambda(T_n)=(T_n/\alpha)^\beta$, $n\in\mathbb{N}^*$, sont les temps d'arrivée d'un hPP d'intensité $1$. Réciproquement, si $(S_n)$ sont les temps d'arrivée d'un hPP d'intensité $1$, alors $T_n=\alpha S_n^{1/\beta}$ définit un processus de loi de puissance de paramètres $(\alpha,\beta)$.
 \end{enumerate}
 \end{proposition}
 
@@ -57,10 +69,10 @@ Le point 1 découle de la Définition 4.1 et de l'Exemple 4.2. Pour le point 2, 
 \end{proof}
 
 \begin{remarque}
-Plusieurs intensités vues en cours sont des cas particuliers. L'intensité $x\mapsto2\theta x$ (examen 2025, Exercice 2) correspond à $\beta=2$ et $\alpha=\theta^{-1/2}$. L'intensité $x\mapsto\frac{\alpha'}{2\sqrt{x}}$ (Feuille 4, Exercice 3) correspond à $\beta=1/2$ et une échelle égale à $\alpha'^{-2}$. Quand $\beta\neq1$, les inter-arrivées $W_i$ ne sont ni indépendantes ni de même loi : un processus de Weibull n'est \emph{pas} un processus de renouvellement, et il ne faut pas le confondre avec le processus de renouvellement à inter-arrivées de Weibull ([Møl76], résumé).
+Plusieurs intensités vues en cours sont des cas particuliers. L'intensité $x\mapsto2\theta x$ (examen 2025, Exercice 2) correspond à $\beta=2$ et $\alpha=\theta^{-1/2}$. L'intensité $x\mapsto\frac{\alpha'}{2\sqrt{x}}$ (Feuille 4, Exercice 3) correspond à $\beta=1/2$ et une échelle égale à $\alpha'^{-2}$. Quand $\beta\neq1$, les inter-arrivées $W_i$ ne sont ni indépendantes ni de même loi : un processus de loi de puissance n'est \emph{pas} un processus de renouvellement, et il ne faut pas le confondre avec le processus de renouvellement à inter-arrivées de Weibull ([Møl76], résumé).
 \end{remarque}
 
-Le résultat suivant est central pour toute la suite. Il traduit la Proposition 4.12 du poly dans le cas du processus de Weibull.
+Le résultat suivant est central pour toute la suite. Il traduit la Proposition 4.12 du poly dans le cas de la loi de puissance.
 
 \begin{proposition}[Loi conditionnelle des temps d'arrivée]\label{prop:loicond}
 Soient $T>0$ et $n\in\mathbb{N}^*$. Conditionnellement à $\{N_T=n\}$ :
@@ -101,11 +113,11 @@ Les simulations de la partie numérique reposent sur deux constructions du cours
 \end{itemize}
 \end{remarque}
 
-\subsection{Vraisemblance et estimateurs du maximum de vraisemblance}\label{sec:mle}
+\subsection{Vraisemblance et estimateurs du maximum de vraisemblance}\label{sec:emv}
 
 On observe $(N_t)_{t\in[0,T]}$, c'est-à-dire $N_T$ et $T_1<\dots<T_{N_T}$, avec $T$ fixé et $(\alpha,\beta)$ inconnus.
 
-\begin{proposition}[Vraisemblance et MLE, {[CT97, §3.2.3]}]\label{prop:mle}
+\begin{proposition}[Vraisemblance et EMV, {[CT97, §3.2.3]}]\label{prop:emv}
 La vraisemblance des paramètres $(\alpha,\beta)$ vaut
 \[
 L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)=\Big(\frac{\beta}{\alpha^\beta}\Big)^{N_T}\Big(\prod_{i=1}^{N_T}T_i^{\beta-1}\Big)\exp\Big(-\Big(\frac{T}{\alpha}\Big)^\beta\Big),
@@ -114,7 +126,7 @@ d'où la log-vraisemblance
 \[
 \ell(\alpha,\beta)=N_T\big(\ln\beta-\beta\ln\alpha\big)+(\beta-1)\sum_{i=1}^{N_T}\ln T_i-\Big(\frac{T}{\alpha}\Big)^\beta.
 \]
-Si $N_T=0$, le MLE n'existe pas. Si $N_T\ge1$, le MLE existe, il est unique et vaut
+Si $N_T=0$, l'EMV n'existe pas. Si $N_T\ge1$, l'EMV existe, il est unique et vaut
 \[
 \hat\beta_T=\frac{N_T}{\sum_{i=1}^{N_T}\ln(T/T_i)}=\frac{N_T}{S_T},
 \qquad
@@ -123,44 +135,176 @@ Si $N_T=0$, le MLE n'existe pas. Si $N_T\ge1$, le MLE existe, il est unique et v
 De manière équivalente : $\frac{1}{\hat\beta_T}=\ln T-\frac{1}{N_T}\sum_{i=1}^{N_T}\ln T_i$ et $\ln\hat\alpha_T=\ln T-\frac{1}{\hat\beta_T}\ln N_T$, qui sont les formules de [CT97].
 \end{proposition}
 
-\begin{proof}[Preuve]
-\emph{Vraisemblance.} La Proposition 4.14 du poly donne $L=\big(\prod_{i=1}^{N_T}\lambda_{\alpha,\beta}(T_i)\big)e^{-\Lambda_{\alpha,\beta}(T)}$. On y remplace $\lambda_{\alpha,\beta}(T_i)=\beta\alpha^{-\beta}T_i^{\beta-1}$ et $\Lambda_{\alpha,\beta}(T)=(T/\alpha)^\beta$.
-
-\emph{Cas $N_T=0$.} Alors $\ell(\alpha,\beta)=-(T/\alpha)^\beta$ croît strictement vers $0$ quand $\alpha\to+\infty$, sans atteindre son supremum : il n'y a pas de maximum.
-
-\emph{Équations du score ($N_T\ge1$).} On a
+\textbf{Cadre.} On observe un processus de Poisson non homogène sur $[0,t]$,
+d'intensité de Weibull
 \[
-\frac{\partial\ell}{\partial\alpha}=\frac{\beta}{\alpha}\Big[\Big(\frac{T}{\alpha}\Big)^\beta-N_T\Big],
-\qquad
-\frac{\partial\ell}{\partial\beta}=\frac{N_T}{\beta}-N_T\ln\alpha+\sum_{i=1}^{N_T}\ln T_i-\Big(\frac{T}{\alpha}\Big)^\beta\ln\frac{T}{\alpha}.
+  \lambda(s)=\frac{\beta}{\alpha}\left(\frac{s}{\alpha}\right)^{\beta-1},
+  \qquad \alpha>0,\ \beta>0 .
 \]
-La première équation s'annule si et seulement si $(T/\alpha)^\beta=N_T$, c'est-à-dire $\alpha=\alpha(\beta):=TN_T^{-1/\beta}$. En reportant dans la seconde, avec $\ln\alpha(\beta)=\ln T-\frac1\beta\ln N_T$ et $\ln\frac{T}{\alpha(\beta)}=\frac1\beta\ln N_T$, on obtient
-\[
-\frac{N_T}{\beta}-N_T\ln T+\frac{N_T}{\beta}\ln N_T+\sum_{i=1}^{N_T}\ln T_i-\frac{N_T}{\beta}\ln N_T=\frac{N_T}{\beta}-S_T=0
-\iff\beta=\frac{N_T}{S_T}.
-\]
-On a bien $S_T>0$ p.s., car $T_i<T$ p.s.
+On note $n=N(t)$ le nombre de points observés et $t_1<\dots<t_n<t$ leurs instants.
 
-\emph{Maximum global.} À $\beta$ fixé, $\partial\ell/\partial\alpha$ a le signe de $(T/\alpha)^\beta-N_T$ : elle est positive pour $\alpha<\alpha(\beta)$ et négative ensuite. Donc $\alpha(\beta)$ maximise $\alpha\mapsto\ell(\alpha,\beta)$. La vraisemblance profilée vaut
-\[
-\ell(\alpha(\beta),\beta)=N_T\ln\beta-\beta S_T+\big(N_T\ln N_T-N_T-\textstyle\sum_i\ln T_i\big).
-\]
-Elle est strictement concave en $\beta$ (dérivée seconde $-N_T/\beta^2<0$) et atteint son maximum en $\hat\beta_T=N_T/S_T$. Donc $(\hat\alpha_T,\hat\beta_T)=(\alpha(\hat\beta_T),\hat\beta_T)$ est l'unique maximum global.
-\end{proof}
+%--------------------------------------------------------------------
+\subsection*{1. Vraisemblance}
 
-\begin{remarque}[Factorisation de la vraisemblance]\label{rem:factorisation}
-Comme pour le hPP (remarque qui suit la Proposition 3.1 du poly), la vraisemblance se factorise :
+D'après le théorème 2.27, la vraisemblance de l'observation $(n,t_1,\dots,t_n)$ est
 \[
-L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)
-=\underbrace{\frac{N_T!\,\beta^{N_T}}{T^{N_T\beta}}\prod_{i=1}^{N_T}T_i^{\beta-1}}_{\text{loi de }(T_i)_i\mid N_T\text{ : dépend de }\beta\text{ seul}}
-\times
-\underbrace{\frac{\mu^{N_T}}{N_T!}e^{-\mu}}_{\text{loi }\mathcal{P}(\mu)\text{ de }N_T},
-\qquad\mu:=\Lambda(T)=\Big(\frac{T}{\alpha}\Big)^\beta.
+  \ell(n,t_1,\dots,t_n)
+  = \exp\!\Big(-\int_0^t \lambda(u)\dd u\Big)\prod_{i=1}^n \lambda(t_i).
 \]
-Dans le paramétrage $(\mu,\beta)$, qui est en bijection avec $(\alpha,\beta)$ à $T$ fixé, les deux facteurs se maximisent séparément. On retrouve ainsi directement $\hat\mu_T=N_T$, puis $\hat\beta_T=N_T/S_T$, puis $\hat\alpha_T=T\hat\mu_T^{-1/\hat\beta_T}$. En particulier, $\hat\Lambda(T)=(T/\hat\alpha_T)^{\hat\beta_T}=N_T$ est l'estimateur sans biais de $\Lambda(T)$ déjà vu dans le cas homogène.
 
-Cette factorisation explique les résultats qui suivent. Conditionnellement à $N_T$, l'information sur $\beta$ est portée par $S_T$, dont la loi est explicite : on obtiendra une inférence exacte sur $\beta$. Au contraire, l'information sur $\alpha$ n'arrive que par $N_T$, mélangée à $\beta$ via $\mu=(T/\alpha)^\beta$ : il n'existe pas de pivot exact simple pour $\alpha$, et l'on devra passer par l'asymptotique.
-\end{remarque}
+\medskip
+\noindent\textit{Terme exponentiel.} Pour $\beta>0$,
+\[
+  \int_0^t \lambda(u)\dd u
+  = \frac{\beta}{\alpha^{\beta}}\int_0^t u^{\beta-1}\dd u
+  = \frac{\beta}{\alpha^{\beta}}\left[\frac{u^{\beta}}{\beta}\right]_0^t
+  = \frac{t^{\beta}}{\alpha^{\beta}}
+  = \left(\frac{t}{\alpha}\right)^{\beta}.
+\]
+
+\medskip
+\noindent\textit{Terme produit.}
+\[
+  \prod_{i=1}^n \lambda(t_i)
+  = \prod_{i=1}^n \frac{\beta}{\alpha}\left(\frac{t_i}{\alpha}\right)^{\beta-1}
+  = \left(\frac{\beta}{\alpha}\right)^{n}\frac{1}{\alpha^{n(\beta-1)}}
+    \prod_{i=1}^n t_i^{\beta-1}
+  = \frac{\beta^{n}}{\alpha^{n\beta}}\prod_{i=1}^n t_i^{\beta-1}.
+\]
+
+\medskip
+\noindent\textbf{Conclusion :}
+\[
+  \boxed{\;
+  \ell(\alpha,\beta)
+  = \exp\!\left(-\frac{t^{\beta}}{\alpha^{\beta}}\right)
+    \frac{\beta^{n}}{\alpha^{n\beta}}
+    \prod_{i=1}^n t_i^{\beta-1}\;}
+\]
+
+%--------------------------------------------------------------------
+\subsection*{2. Log-vraisemblance}
+
+En passant au logarithme,
+\begin{align*}
+  \mathcal{L}(\alpha,\beta)=\ln \ell(\alpha,\beta)
+  &= -\frac{t^{\beta}}{\alpha^{\beta}}
+     + \ln\!\left(\frac{\beta^{n}}{\alpha^{n\beta}}\right)
+     + \ln\!\Big(\prod_{i=1}^n t_i^{\beta-1}\Big)\\
+  &= -\frac{t^{\beta}}{\alpha^{\beta}}
+     + n\ln\beta - n\beta\ln\alpha
+     + (\beta-1)\sum_{i=1}^n \ln t_i .
+\end{align*}
+Soit
+\[
+  \boxed{\;
+  \mathcal{L}(\alpha,\beta)
+  = -\left(\frac{t}{\alpha}\right)^{\beta}
+    + n\big(\ln\beta-\beta\ln\alpha\big)
+    + (\beta-1)\sum_{i=1}^n \ln t_i\;}
+\]
+
+%--------------------------------------------------------------------
+\subsection*{3. Points critiques}
+
+On suppose $n\geq 1$ (si $n=0$, $\mathcal{L}(\alpha,\beta)=-(t/\alpha)^\beta$ croît strictement
+vers $0$ quand $\alpha\to+\infty$ sans l'atteindre : il n'y a pas de maximum).
+On pose
+\[
+  S := \sum_{i=1}^n \ln\!\Big(\frac{t}{t_i}\Big) = n\ln t-\sum_{i=1}^n\ln t_i >0,
+\]
+strictement positif car $t_i<t$ pour tout $i$.
+
+\medskip
+\noindent\textbf{Dérivée en $\alpha$.}
+Comme $\dfrac{\partial}{\partial\alpha}\left(\dfrac{t}{\alpha}\right)^{\beta}
+ = -\dfrac{\beta}{\alpha}\left(\dfrac{t}{\alpha}\right)^{\beta}$,
+\[
+  \frac{\partial \mathcal{L}}{\partial\alpha}
+  = \frac{\beta}{\alpha}\left(\frac{t}{\alpha}\right)^{\beta}-\frac{n\beta}{\alpha}
+  = \frac{\beta}{\alpha}\left[\left(\frac{t}{\alpha}\right)^{\beta}-n\right].
+\]
+Puisque $\beta/\alpha>0$,
+\[
+  \frac{\partial \mathcal{L}}{\partial\alpha}=0
+  \iff \left(\frac{t}{\alpha}\right)^{\beta}=n
+  \iff \alpha=\alpha(\beta):=t\,n^{-1/\beta}.
+\]
+
+\medskip
+\noindent\textbf{Dérivée en $\beta$.}
+Comme $\dfrac{\partial}{\partial\beta}\left(\dfrac{t}{\alpha}\right)^{\beta}
+ = \left(\dfrac{t}{\alpha}\right)^{\beta}\ln\dfrac{t}{\alpha}$,
+\[
+  \frac{\partial \mathcal{L}}{\partial\beta}
+  = \frac{n}{\beta}-n\ln\alpha+\sum_{i=1}^n\ln t_i
+    -\left(\frac{t}{\alpha}\right)^{\beta}\ln\frac{t}{\alpha}.
+\]
+
+\medskip
+\noindent\textbf{Système.} Substituons $\alpha=\alpha(\beta)$. On a alors
+$(t/\alpha)^\beta=n$, $\ln\alpha=\ln t-\frac{1}{\beta}\ln n$ et
+$\ln\frac{t}{\alpha}=\frac{1}{\beta}\ln n$, d'où
+\begin{align*}
+  \frac{\partial \mathcal{L}}{\partial\beta}\Big|_{\alpha=\alpha(\beta)}
+  &= \frac{n}{\beta}-n\ln t+\frac{n}{\beta}\ln n+\sum_{i=1}^n\ln t_i-\frac{n}{\beta}\ln n\\
+  &= \frac{n}{\beta}-\Big(n\ln t-\sum_{i=1}^n\ln t_i\Big)
+   = \frac{n}{\beta}-S .
+\end{align*}
+Cette quantité s'annule si et seulement si $\beta=n/S$.
+
+\medskip
+\noindent\textbf{Conclusion :} $\mathcal{L}$ admet un unique point critique
+\[
+  \boxed{\;\hat\beta=\frac{n}{\displaystyle\sum_{i=1}^n\ln\!\Big(\frac{t}{t_i}\Big)},
+  \qquad
+  \hat\alpha=t\,n^{-1/\hat\beta}\;}
+\]
+
+%--------------------------------------------------------------------
+\subsection*{4. Ce point critique est un maximum global}
+
+En $(\alpha,\beta)$, $\mathcal{L}$ n'est pas conjointement concave en général. On effectue donc le changement de variables
+\[
+  \Phi:(\alpha,\beta)\longmapsto(a,\beta),\qquad a=\beta\ln\alpha .
+\]
+C'est un $C^1$-difféomorphisme de $(0,\infty)^2$ sur $\mathbb{R}\times(0,\infty)$, de réciproque
+$\alpha=e^{a/\beta}$. Il préserve donc maxima et unicité.
+Comme $\left(\dfrac{t}{\alpha}\right)^{\beta}=t^{\beta}e^{-a}$, on a
+\[
+  \widetilde{\mathcal{L}}(a,\beta)
+  := \mathcal{L}\big(e^{a/\beta},\beta\big)
+  = n\ln\beta - n\,a + (\beta-1)\sum_{i=1}^n\ln t_i - t^{\beta}e^{-a}.
+\]
+
+\medskip
+\noindent\textbf{Hessienne.} Posons $E(a,\beta):=t^{\beta}e^{-a}=e^{\beta\ln t-a}>0$.
+Les termes $-na$ et $(\beta-1)\sum\ln t_i$ sont affines, donc sans contribution à la hessienne.
+Il reste
+\[
+  \nabla^2\widetilde{\mathcal{L}}(a,\beta)
+  = -\begin{pmatrix} E & -E\ln t\\ -E\ln t & E\ln^2 t+\dfrac{n}{\beta^2}\end{pmatrix}
+  =: -H .
+\]
+On calcule
+\[
+  \operatorname{tr}H = E(1+\ln^2 t)+\frac{n}{\beta^2}>0,
+  \qquad
+  \det H = E\Big(E\ln^2 t+\frac{n}{\beta^2}\Big)-E^2\ln^2 t=\frac{nE}{\beta^2}>0 .
+\]
+Donc $H$ est définie positive en tout point : $\widetilde{\mathcal{L}}$ est
+\emph{strictement concave} sur le convexe $\mathbb{R}\times(0,\infty)$.
+
+\medskip
+\noindent\textbf{Conclusion.} Une fonction strictement concave et différentiable
+admet au plus un point critique, et tout point critique en est l'unique maximum global.
+Le point critique $(\hat\alpha,\hat\beta)$ du §3 correspond à un point critique de
+$\widetilde{\mathcal{L}}$ (le changement de variables est un difféomorphisme),
+c'est donc l'unique maximum global de $\widetilde{\mathcal{L}}$, et donc de $\mathcal{L}$. Ainsi
+\[
+  \boxed{(\hat\alpha,\hat\beta)=\Big(t\,n^{-1/\hat\beta},\ \frac{n}{S}\Big)
+  \text{ est l'unique estimateur du maximum de vraisemblance.}}
+\]
 
 \subsection{Loi exacte de $\hat\beta_T$, biais et intervalle de confiance exact}\label{sec:exact}
 
@@ -385,16 +529,16 @@ Pour $\beta$, on a $-z\le\sqrt{N_T}(\beta/\hat\beta_T-1)\le z\iff\hat\beta_T(1-z
 
 \section{Test d'adéquation (Møller, 1976)}\label{sec:adequation}
 
-On veut tester l'hypothèse $H_0$ : « $N$ est un processus de Weibull, pour des paramètres $(\alpha,\beta)$ inconnus ». [Møl76] fonde un tel test sur une caractérisation du modèle parmi les iPP. On en donne d'abord la version à horizon $T$ fixé, adaptée à ce rapport, puis la version d'origine à nombre de points fixé, qui est celle qu'utilise [Møl76] sur les données de [Pro63].
+On veut tester l'hypothèse $H_0$ : « $N$ est un processus de loi de puissance, pour des paramètres $(\alpha,\beta)$ inconnus ». [Møl76] fonde un tel test sur une caractérisation du modèle parmi les iPP. On en donne d'abord la version à horizon $T$ fixé, adaptée à ce rapport, puis la version d'origine à nombre de points fixé, qui est celle qu'utilise [Møl76] sur les données de [Pro63].
 
-\subsection{Caractérisation du processus de Weibull}\label{sec:caracterisation}
+\subsection{Caractérisation du processus de loi de puissance}\label{sec:caracterisation}
 
 \begin{theoreme}[Caractérisation à horizon fixé]\label{thm:caracT}
 Soit $N$ un iPP d'intensité cumulée $\Lambda$ continue et strictement croissante. Soient $T>0$ et $n\ge1$.
 \begin{enumerate}
 \item Conditionnellement à $\{N_T=n\}$, $(T_1/T,\dots,T_n/T)$ est la statistique d'ordre de $n$ variables i.i.d. de fonction de répartition $F_T(x)=\Lambda(Tx)/\Lambda(T)$, $x\in[0,1]$.
-\item $N$ est un processus de Weibull de forme $\beta$ si et seulement si, pour tout $T>0$, conditionnellement à $\{N_T=n\}$, $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{E}(\beta)$. De manière équivalente, $\big((T_i/T)^\beta\big)_{1\le i\le n}$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{U}([0,1])$.
-\item $N$ est un processus de Weibull (pour un certain couple $(\alpha,\beta)$) si et seulement si la loi conditionnelle du point 1 ne dépend pas de $T$.
+\item $N$ est un processus de loi de puissance de forme $\beta$ si et seulement si, pour tout $T>0$, conditionnellement à $\{N_T=n\}$, $\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{E}(\beta)$. De manière équivalente, $\big((T_i/T)^\beta\big)_{1\le i\le n}$ a la loi de la statistique d'ordre de $n$ variables i.i.d. de loi $\mathcal{U}([0,1])$.
+\item $N$ est un processus de loi de puissance (pour un certain couple $(\alpha,\beta)$) si et seulement si la loi conditionnelle du point 1 ne dépend pas de $T$.
 \end{enumerate}
 \end{theoreme}
 
@@ -407,7 +551,7 @@ Soit $N$ un iPP d'intensité cumulée $\Lambda$ continue et strictement croissan
 \end{proof}
 
 \begin{theoreme}[Théorème 1 de {[Møl76]}, nombre de points fixé]\label{thm:moller}
-Soit $n\ge2$. Le vecteur $\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)$ a la loi de la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{E}(\beta)$ si et seulement si $N$ est un processus de Weibull de forme $\beta$. Ce vecteur est alors indépendant de $T_n$.
+Soit $n\ge2$. Le vecteur $\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)$ a la loi de la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{E}(\beta)$ si et seulement si $N$ est un processus de loi de puissance de forme $\beta$. Ce vecteur est alors indépendant de $T_n$.
 \end{theoreme}
 
 \begin{proof}[Preuve (sens direct)]
@@ -419,7 +563,7 @@ C'est la statistique d'ordre de $n-1$ variables i.i.d. de loi $\mathcal{U}([0,s]
 \end{proof}
 
 \begin{remarque}[Inférence à nombre de points fixé et données de Proschan]\label{rem:nfixe}
-Dans [Pro63], seuls les intervalles entre pannes sont donnés et la fin de l'observation n'est pas connue. [Møl76], à la suite de Cox et Lewis, traite donc ces données à $n$ fixé : on observe $T_1<\dots<T_n$. La vraisemblance (Proposition 4.15 du poly) a la même forme que dans la Proposition~\ref{prop:mle}, avec $T$ remplacé par $T_n$ et $N_T$ par $n$ ([CT97, Rem.~3.24]). On obtient
+Dans [Pro63], seuls les intervalles entre pannes sont donnés et la fin de l'observation n'est pas connue. [Møl76], à la suite de Cox et Lewis, traite donc ces données à $n$ fixé : on observe $T_1<\dots<T_n$. La vraisemblance (Proposition 4.15 du poly) a la même forme que dans la Proposition~\ref{prop:emv}, avec $T$ remplacé par $T_n$ et $N_T$ par $n$ ([CT97, Rem.~3.24]). On obtient
 \[
 \hat\beta_n=\frac{n}{\sum_{i=1}^{n-1}\ln(T_n/T_i)},\qquad\hat\alpha_n=\frac{T_n}{n^{1/\hat\beta_n}},
 \]
