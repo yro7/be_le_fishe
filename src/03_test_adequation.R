@@ -28,8 +28,8 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
-if (!exists("mle_power_law")) {
+# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
   } else if (file.exists("power_law.R")) {
@@ -37,7 +37,8 @@ if (!exists("mle_power_law")) {
   } else {
     file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  source(file.path(src_dir, "power_law.R"))
+  if (!exists("CONFIG")) source(file.path(src_dir, "config.R"))
+  if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
 # ------------------------------------------------------------------------------
@@ -96,7 +97,8 @@ sim_weibull_renewal <- function(shape, T_end) {
 #' @param level   Niveau du test
 #' @param min_n   Nombre minimal d'événements (rejet des trajectoires trop courtes)
 #' @return Liste : résumé (taux de rejet, n moyen) et p-valeurs brutes
-rejection_rate <- function(sim_fun, T_end, M, B = 4000, level = 0.05, min_n = 3) {
+rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, level = 1 - CONFIG$conf_level,
+                           min_n = CONFIG$gof$min_n) {
   p_cal <- numeric(M)
   p_naive <- numeric(M)
   n_obs <- integer(M)
@@ -120,10 +122,12 @@ rejection_rate <- function(sim_fun, T_end, M, B = 4000, level = 0.05, min_n = 3)
 }
 
 #' Niveau empirique sous H0 (processus loi de puissance) pour plusieurs beta
-monte_carlo_gof_level <- function(alpha_true = 1.0,
-                                  beta_values = c(0.5, 1.0, 2.0),
-                                  mean_N_values = c(5, 10, 20, 40, 80, 150),
-                                  M = 2000, B = 4000, level = 0.05, seed = 2026) {
+monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
+                                  beta_values = CONFIG$gof$level_beta_values,
+                                  mean_N_values = CONFIG$gof$mean_N_values,
+                                  M = CONFIG$gof$M_level, B = CONFIG$gof$B,
+                                  level = 1 - CONFIG$conf_level,
+                                  seed = CONFIG$gof$seed_level) {
   set.seed(seed)
   summary_records <- list()
   pval_records <- list()
@@ -153,13 +157,15 @@ monte_carlo_gof_level <- function(alpha_true = 1.0,
 }
 
 #' Puissance contre trois familles d'alternatives
-monte_carlo_gof_power <- function(mean_N_values = c(5, 10, 20, 40, 80, 150),
-                                  delta_values = c(-3, 2, 4),
-                                  rho_values = c(0.25, 4),
-                                  shape_values = c(0.5, 2, 3),
-                                  M = 1000, B = 4000, level = 0.05, seed = 2027) {
+monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
+                                  delta_values = CONFIG$gof$delta_values,
+                                  rho_values = CONFIG$gof$rho_values,
+                                  shape_values = CONFIG$gof$shape_values,
+                                  M = CONFIG$gof$M_power, B = CONFIG$gof$B,
+                                  level = 1 - CONFIG$conf_level,
+                                  seed = CONFIG$gof$seed_power) {
   set.seed(seed)
-  T_fix <- 100  # sans effet pour les alternatives normalisées (log-linéaire, rupture)
+  T_fix <- CONFIG$gof$T_alt  # sans effet pour les alternatives normalisées (log-linéaire, rupture)
   records <- list()
   add <- function(family, param_label, mean_N, rr) {
     records[[length(records) + 1]] <<- cbind(
@@ -205,7 +211,7 @@ theme_gof <- function() {
 }
 
 #' Niveau empirique (calibré vs naïf) et histogrammes des p-valeurs sous H0
-plot_gof_level <- function(level_res, mean_N_hist = 20) {
+plot_gof_level <- function(level_res, mean_N_hist = CONFIG$gof$mean_N_hist) {
   df <- level_res$summary
   level <- level_res$level
   M <- level_res$M
@@ -229,7 +235,7 @@ plot_gof_level <- function(level_res, mean_N_hist = 20) {
     scale_color_manual(values = c("Calibré (Lilliefors MC)" = "#31a354",
                                   "Naïf (loi de Kolmogorov)" = "firebrick")) +
     labs(
-      title = "Niveau empirique du test sous H0 (nominal 5%)",
+      title = paste0("Niveau empirique du test sous H0 (nominal ", 100 * level, "%)"),
       subtitle = paste0("M = ", M, " réplications par point ; bande grise : fluctuation Monte-Carlo à 95%"),
       x = expression("Nombre moyen d'événements observés " ~ bar(n) ~ " (échelle log)"),
       y = "Taux de rejet (%)",
@@ -267,7 +273,7 @@ plot_gof_power <- function(power_res) {
     scale_x_log10() +
     ylim(0, 100) +
     labs(
-      title = "Puissance empirique du test calibré (niveau 5%)",
+      title = paste0("Puissance empirique du test calibré (niveau ", 100 * level, "%)"),
       subtitle = paste0("M = ", power_res$M, " réplications par point"),
       x = expression("Nombre moyen d'événements observés " ~ bar(n) ~ " (échelle log)"),
       y = "Taux de rejet (%)",
@@ -286,7 +292,8 @@ plot_gof_power <- function(power_res) {
 #' @param w     Instants de sauts
 #' @param T_end Horizon (NULL = troncature par le n-ième défaut)
 #' @param title Titre du graphique
-plot_gof_fractile <- function(w, T_end = NULL, title = NULL, B = 4000, level = 0.05) {
+plot_gof_fractile <- function(w, T_end = NULL, title = NULL, B = CONFIG$gof$B,
+                              level = 1 - CONFIG$conf_level) {
   y <- gof_transform(w, T_end)
   res <- gof_power_law(w, T_end = T_end, B = B, level = level)
   m <- res$m
@@ -318,15 +325,16 @@ plot_gof_fractile <- function(w, T_end = NULL, title = NULL, B = 4000, level = 0
 }
 
 #' Illustration : un échantillon sous H0 et deux sous alternatives
-plot_gof_examples <- function(seed = 7) {
-  set.seed(seed)
-  T_h0 <- 30^(1 / 1.5)  # E[N(T)] = (T / alpha)^beta = 30
-  w_h0 <- sim_power_law_process(alpha = 1, beta = 1.5, T_end = T_h0)
-  w_ll <- sim_loglinear_process(delta = -3, mean_N = 30, T_end = 100)
-  w_cp <- sim_changepoint_process(rho = 0.25, mean_N = 30, T_end = 100)
-  p1 <- plot_gof_fractile(w_h0, T_end = T_h0, title = "H0 : PLP (beta = 1.5)")
-  p2 <- plot_gof_fractile(w_ll, T_end = 100, title = "Log-linéaire (delta = -3)")
-  p3 <- plot_gof_fractile(w_cp, T_end = 100, title = "Rupture (rho = 0.25)")
+plot_gof_examples <- function(ex = CONFIG$gof$examples, T_alt = CONFIG$gof$T_alt,
+                              alpha = CONFIG$model$alpha_true) {
+  set.seed(ex$seed)
+  T_h0 <- alpha * ex$mean_N^(1 / ex$beta)  # E[N(T)] = (T / alpha)^beta = mean_N
+  w_h0 <- sim_power_law_process(alpha = alpha, beta = ex$beta, T_end = T_h0)
+  w_ll <- sim_loglinear_process(delta = ex$delta, mean_N = ex$mean_N, T_end = T_alt)
+  w_cp <- sim_changepoint_process(rho = ex$rho, mean_N = ex$mean_N, T_end = T_alt)
+  p1 <- plot_gof_fractile(w_h0, T_end = T_h0, title = paste0("H0 : PLP (beta = ", ex$beta, ")"))
+  p2 <- plot_gof_fractile(w_ll, T_end = T_alt, title = paste0("Log-linéaire (delta = ", ex$delta, ")"))
+  p3 <- plot_gof_fractile(w_cp, T_end = T_alt, title = paste0("Rupture (rho = ", ex$rho, ")"))
   p1 + p2 + p3
 }
 
@@ -335,7 +343,9 @@ plot_gof_examples <- function(seed = 7) {
 # ------------------------------------------------------------------------------
 
 run_all_gof_validation <- function(save_figs = TRUE, output_dir = "figures",
-                                   M_level = 2000, M_power = 1000, B = 4000) {
+                                   M_level = CONFIG$gof$M_level,
+                                   M_power = CONFIG$gof$M_power,
+                                   B = CONFIG$gof$B) {
   cat("====================================================================\n")
   cat("BE Poisson : Validation pratique du test d'adéquation (Møller, 1976)\n")
   cat("====================================================================\n\n")

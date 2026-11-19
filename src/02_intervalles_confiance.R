@@ -13,8 +13,8 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
-if (!exists("mle_power_law")) {
+# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
   } else if (file.exists("power_law.R")) {
@@ -22,7 +22,8 @@ if (!exists("mle_power_law")) {
   } else {
     file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  source(file.path(src_dir, "power_law.R"))
+  if (!exists("CONFIG")) source(file.path(src_dir, "config.R"))
+  if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
 # ------------------------------------------------------------------------------
@@ -36,11 +37,16 @@ if (!exists("mle_power_law")) {
 #' @param T_values   Vecteur d'horizons d'observation
 #' @param M          Nombre de réplications Monte-Carlo par horizon
 #' @param level      Niveau de confiance nominal
+#' @param min_n      Nombre minimal d'événements par trajectoire
+#' @param n_kept     Réplications conservées par horizon (figure des segments)
 #' @param seed       Graine aléatoire
 #' @return Liste contenant le résumé agrégé et les données brutes des réplications
-monte_carlo_ci_study <- function(alpha_true = 1.0, beta_true = 1.5,
-                                T_values = c(3, 5, 10, 20, 40, 80, 150),
-                                M = 2000, level = 0.95, seed = 2026) {
+monte_carlo_ci_study <- function(alpha_true = CONFIG$model$alpha_true,
+                                beta_true = CONFIG$model$beta_true,
+                                T_values = CONFIG$ci$T_values,
+                                M = CONFIG$ci$M, level = CONFIG$conf_level,
+                                min_n = CONFIG$ci$min_n, n_kept = CONFIG$ci$n_kept,
+                                seed = CONFIG$ci$seed) {
   set.seed(seed)
   
   summary_records <- vector("list", length(T_values))
@@ -64,11 +70,11 @@ monte_carlo_ci_study <- function(alpha_true = 1.0, beta_true = 1.5,
     n_negative_lower_alpha_lin <- 0
     
     # Échantillon de quelques réplications pour affichage des segments
-    rep_sample_list <- vector("list", min(M, 60))
+    rep_sample_list <- vector("list", min(M, n_kept))
     
     for (m in seq_len(M)) {
       w <- sim_power_law_process(alpha_true, beta_true, T_curr)
-      while (length(w) < 2) {
+      while (length(w) < min_n) {
         w <- sim_power_law_process(alpha_true, beta_true, T_curr)
       }
       
@@ -100,7 +106,7 @@ monte_carlo_ci_study <- function(alpha_true = 1.0, beta_true = 1.5,
         n_negative_lower_alpha_lin <- n_negative_lower_alpha_lin + 1
       }
       
-      if (m <= 60) {
+      if (m <= n_kept) {
         rep_sample_list[[m]] <- data.frame(
           rep = m,
           T_val = T_curr,
@@ -171,7 +177,7 @@ plot_ci_comparison_beta <- function(ci_res) {
                                   "Asymptotique (Gaussien)" = "firebrick")) +
     ylim(75, 100) +
     labs(
-      title = expression("Taux de couverture empirique pour " ~ beta ~ " (nominal 95%)"),
+      title = bquote("Taux de couverture empirique pour " ~ beta ~ " (nominal " * .(100 * level) * "%)"),
       x = expression("Nombre moyen d'événements " ~ E(N(T))),
       y = "Couverture empirique (%)",
       color = "Méthode"
@@ -220,7 +226,7 @@ plot_ci_comparison_alpha <- function(ci_res) {
                                   "Forme linéaire" = "#e6550d")) +
     ylim(80, 100) +
     labs(
-      title = expression("Taux de couverture empirique pour " ~ alpha ~ " (nominal 95%)"),
+      title = bquote("Taux de couverture empirique pour " ~ alpha ~ " (nominal " * .(100 * level) * "%)"),
       x = expression("Nombre moyen d'événements " ~ E(N(T))),
       y = "Couverture empirique (%)",
       color = "Formulation"
@@ -248,14 +254,17 @@ plot_ci_comparison_alpha <- function(ci_res) {
 }
 
 #' Visualisation des segments d'intervalles de confiance sur un sous-échantillon
-plot_ci_segments_beta <- function(ci_res, T_target = 5) {
+plot_ci_segments_beta <- function(ci_res, T_target = CONFIG$ci$T_segments,
+                                  n_show = CONFIG$ci$n_segments) {
   df_sample <- ci_res$samples[ci_res$samples$T_val == T_target, ]
   if (nrow(df_sample) == 0) {
     df_sample <- ci_res$samples[ci_res$samples$T_val == unique(ci_res$samples$T_val)[1], ]
   }
   
-  df_sample <- df_sample[seq_len(min(45, nrow(df_sample))), ]
+  df_sample <- df_sample[seq_len(min(n_show, nrow(df_sample))), ]
   beta_true <- ci_res$beta_true
+  n_shown <- nrow(df_sample)
+  mean_N_shown <- round((df_sample$T_val[1] / ci_res$alpha_true)^beta_true)
   
   theme_clean <- theme_bw(base_size = 11) +
     theme(
@@ -271,7 +280,7 @@ plot_ci_segments_beta <- function(ci_res, T_target = 5) {
     scale_color_manual(values = c("TRUE" = "#31a354", "FALSE" = "firebrick"),
                        labels = c("TRUE" = "Couvert", "FALSE" = "Non couvert")) +
     labs(
-      title = expression("IC Exacts (Chi-deux) sur 45 réplications (" ~ E(N) ~ " ~ 11)"),
+      title = bquote("IC Exacts (Chi-deux) sur " * .(n_shown) * " réplications (" ~ E(N) ~ " ~ " * .(mean_N_shown) * ")"),
       x = "Indice de réplication",
       y = expression(beta),
       color = "Statut"
@@ -286,7 +295,7 @@ plot_ci_segments_beta <- function(ci_res, T_target = 5) {
     scale_color_manual(values = c("TRUE" = "#31a354", "FALSE" = "firebrick"),
                        labels = c("TRUE" = "Couvert", "FALSE" = "Non couvert")) +
     labs(
-      title = expression("IC Asymptotiques (Gaussiens) sur 45 réplications (" ~ E(N) ~ " ~ 11)"),
+      title = bquote("IC Asymptotiques (Gaussiens) sur " * .(n_shown) * " réplications (" ~ E(N) ~ " ~ " * .(mean_N_shown) * ")"),
       x = "Indice de réplication",
       y = expression(beta),
       color = "Statut"
@@ -310,19 +319,9 @@ run_all_ci_validation <- function(save_figs = TRUE, output_dir = "figures") {
     dir.create(output_dir, recursive = TRUE)
   }
   
-  alpha_true <- 1.0
-  beta_true <- 1.5
-  T_vals <- c(3, 5, 10, 20, 40, 80, 150)
-  
-  cat("1. Simulation Monte-Carlo des IC (M = 2000 réplications sur 7 horizons T)...\n")
-  ci_res <- monte_carlo_ci_study(
-    alpha_true = alpha_true,
-    beta_true = beta_true,
-    T_values = T_vals,
-    M = 2000,
-    level = 0.95,
-    seed = 2026
-  )
+  cat("1. Simulation Monte-Carlo des IC (M =", CONFIG$ci$M, "réplications sur",
+      length(CONFIG$ci$T_values), "horizons T)...\n")
+  ci_res <- monte_carlo_ci_study()
   
   cat("2. Génération de la comparaison de couverture et largeur pour beta...\n")
   p_beta <- plot_ci_comparison_beta(ci_res)
@@ -337,7 +336,7 @@ run_all_ci_validation <- function(save_figs = TRUE, output_dir = "figures") {
   }
   
   cat("4. Génération de la visualisation des segments d'IC pour beta...\n")
-  p_segments <- plot_ci_segments_beta(ci_res, T_target = 5)
+  p_segments <- plot_ci_segments_beta(ci_res)
   if (save_figs) {
     ggsave(file.path(output_dir, "fig08_segments_ic_beta.png"), p_segments, width = 9.5, height = 4.5, dpi = 200)
   }

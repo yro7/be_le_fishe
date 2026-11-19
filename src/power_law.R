@@ -8,6 +8,8 @@
 #           Chaque fonction renvoie à son résultat dans la partie théorique
 #           (src/rapport/00_partie_theorique.tex).
 #           Ce fichier ne contient que des formules : aucune étude Monte-Carlo.
+#           Les valeurs par défaut des arguments sont lues dans CONFIG
+#           (src/config.R), qui doit être chargé avant tout appel.
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -84,9 +86,9 @@ mle_power_law <- function(w, T_end) {
 #' @param beta_hat  EMV de beta
 #' @param alpha_hat EMV de alpha
 #' @param T_end     Horizon d'observation T
-#' @param level     Niveau de confiance nominal (défaut = 0.95)
+#' @param level     Niveau de confiance nominal (défaut : CONFIG$conf_level)
 #' @return Liste des bornes [lower, upper] pour chaque méthode
-confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = 0.95) {
+confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf_level) {
   if (is.na(n) || n < 1 || is.na(beta_hat) || is.na(alpha_hat)) {
     return(list(
       beta_exact = c(lower = NA_real_, upper = NA_real_),
@@ -186,14 +188,14 @@ ks_exp_stat <- function(y) {
 #' @param m Taille de l'échantillon exponentiel
 #' @param B Nombre de simulations
 #' @return Vecteur de B réalisations de D sous H0
-gof_null_distribution <- function(m, B = 4000) {
+gof_null_distribution <- function(m, B = CONFIG$gof$B) {
   key <- paste(m, B, sep = "_")
   if (!is.null(.gof_null_cache[[key]])) {
     return(.gof_null_cache[[key]])
   }
   # Graine dédiée : la table ne dépend pas de l'état du générateur appelant
   old_seed <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
-  set.seed(1969 + m)
+  set.seed(CONFIG$gof$null_seed_base + m)
   y_mat <- matrix(rexp(m * B), nrow = m)
   d_null <- apply(y_mat, 2, function(y) ks_exp_stat(y)$D)
   if (!is.null(old_seed)) assign(".Random.seed", old_seed, envir = globalenv())
@@ -209,10 +211,10 @@ gof_null_distribution <- function(m, B = 4000) {
 #' @param level Niveau du test (pour la valeur critique renvoyée)
 #' @return Liste : m, beta_hat, D, p-valeur calibrée, p-valeur naïve (loi de
 #'         Kolmogorov sans correction), valeur critique calibrée au niveau level
-gof_power_law <- function(w, T_end = NULL, B = 4000, level = 0.05) {
+gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, level = 1 - CONFIG$conf_level) {
   y <- gof_transform(w, T_end)
   m <- length(y)
-  if (m < 3) {
+  if (m < CONFIG$gof$min_m) {
     return(list(m = m, beta_hat = NA_real_, D = NA_real_, p_value = NA_real_,
                 p_value_naive = NA_real_, crit_value = NA_real_))
   }

@@ -7,8 +7,8 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
-if (!exists("mle_power_law")) {
+# Chargement des paramètres (config.R) et des fonctions du modèle (power_law.R)
+if (!exists("CONFIG") || !exists("mle_power_law")) {
   src_dir <- if (file.exists("src/power_law.R")) {
     "src"
   } else if (file.exists("power_law.R")) {
@@ -16,7 +16,8 @@ if (!exists("mle_power_law")) {
   } else {
     file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  source(file.path(src_dir, "power_law.R"))
+  if (!exists("CONFIG")) source(file.path(src_dir, "config.R"))
+  if (!exists("mle_power_law")) source(file.path(src_dir, "power_law.R"))
 }
 
 # 2. Fig 1 : Convergence presque-sûrement (Proposition 3.7)
@@ -31,11 +32,12 @@ if (!exists("mle_power_law")) {
 #' @param n_points   Nombre de points d'évaluation temporelle
 #' @param seed       Graine aléatoire
 #' @return data.frame contenant t, n, beta_hat, alpha_hat
-sim_trajectory_as_convergence <- function(alpha_true, beta_true, T_max, n_points = 400, seed = NULL) {
+sim_trajectory_as_convergence <- function(alpha_true, beta_true, T_max,
+                                          n_points = CONFIG$mle$as_n_points, seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
   
   w_all <- sim_power_law_process(alpha_true, beta_true, T_max)
-  while (length(w_all) < 10) {
+  while (length(w_all) < CONFIG$mle$as_min_events) {
     w_all <- sim_power_law_process(alpha_true, beta_true, T_max)
   }
   
@@ -60,10 +62,13 @@ sim_trajectory_as_convergence <- function(alpha_true, beta_true, T_max, n_points
 }
 
 #' Génère le graphique de convergence presque-sûre pour plusieurs trajectoires
-plot_as_convergence <- function(alpha_true = 1.0, beta_true = 1.5, T_max = 200, n_traj = 3) {
+plot_as_convergence <- function(alpha_true = CONFIG$model$alpha_true,
+                                beta_true = CONFIG$model$beta_true,
+                                T_max = CONFIG$mle$as_T_max,
+                                n_traj = CONFIG$mle$as_n_traj) {
   traj_list <- vector("list", n_traj)
   for (i in seq_len(n_traj)) {
-    df_i <- sim_trajectory_as_convergence(alpha_true, beta_true, T_max, seed = 100 + i)
+    df_i <- sim_trajectory_as_convergence(alpha_true, beta_true, T_max, seed = CONFIG$mle$as_seed_base + i)
     df_i$traj_id <- paste0("Trajectoire ", i)
     traj_list[[i]] <- df_i
   }
@@ -121,15 +126,18 @@ plot_as_convergence <- function(alpha_true = 1.0, beta_true = 1.5, T_max = 200, 
 #'   Lorsque alpha = 1, log(alpha) = 0 exactement, éliminant le biais de vitesse
 #'   logarithmique O(1 / log(T)) à distance finie et révélant la variance unitaire.
 #'
-#' @param alpha_true Vrai alpha (défaut = 1.0)
-#' @param beta_true  Vrai beta (défaut = 1.5)
+#' @param alpha_true Vrai alpha (défaut : CONFIG$model)
+#' @param beta_true  Vrai beta (défaut : CONFIG$model)
 #' @param T_values   Horizons T testés
 #' @param M          Nombre de réplications par horizon
+#' @param min_n      Nombre minimal d'événements par trajectoire
 #' @param seed       Graine aléatoire
 #' @return data.frame structuré
-monte_carlo_mle <- function(alpha_true = 1.0, beta_true = 1.5,
-                            T_values = c(10, 25, 60, 150),
-                            M = 2000, seed = 2026) {
+monte_carlo_mle <- function(alpha_true = CONFIG$model$alpha_true,
+                            beta_true = CONFIG$model$beta_true,
+                            T_values = CONFIG$mle$T_values,
+                            M = CONFIG$mle$M, min_n = CONFIG$mle$min_n,
+                            seed = CONFIG$mle$seed) {
   set.seed(seed)
   
   records <- vector("list", length(T_values) * M)
@@ -141,7 +149,7 @@ monte_carlo_mle <- function(alpha_true = 1.0, beta_true = 1.5,
     
     for (m in seq_len(M)) {
       w <- sim_power_law_process(alpha_true, beta_true, T_curr)
-      while (length(w) < 2) {
+      while (length(w) < min_n) {
         w <- sim_power_law_process(alpha_true, beta_true, T_curr)
       }
       
@@ -322,7 +330,7 @@ plot_joint_degeneracy <- function(mc_df) {
 
 # 6. fig 4 : Biais à Taille Finie de beta_hat vs beta_tilde
 
-plot_finite_sample_bias <- function(mc_df, beta_true = 1.5) {
+plot_finite_sample_bias <- function(mc_df, beta_true = CONFIG$model$beta_true) {
   theme_clean <- theme_bw(base_size = 11) +
     theme(
       plot.title = element_text(face = "bold", size = 12),
@@ -373,16 +381,15 @@ run_all_illustrations <- function(save_figs = TRUE, output_dir = "figures") {
     dir.create(output_dir, recursive = TRUE)
   }
   
-  alpha_true <- 1.0
-  beta_true <- 1.5
+  alpha_true <- CONFIG$model$alpha_true
+  beta_true <- CONFIG$model$beta_true
   
-  p_as <- plot_as_convergence(alpha_true = alpha_true, beta_true = beta_true, T_max = 200, n_traj = 3)
+  p_as <- plot_as_convergence(alpha_true = alpha_true, beta_true = beta_true)
   if (save_figs) {
     ggsave(file.path(output_dir, "fig01_convergence_ps.png"), p_as, width = 8.5, height = 7, dpi = 200)
   }
   
-  T_vals <- c(10, 25, 60, 150)
-  mc_data <- monte_carlo_mle(alpha_true = alpha_true, beta_true = beta_true, T_values = T_vals, M = 2000, seed = 2026)
+  mc_data <- monte_carlo_mle(alpha_true = alpha_true, beta_true = beta_true)
   
   p_beta_norm <- plot_normality_beta(mc_data)
   if (save_figs) {
