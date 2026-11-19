@@ -13,83 +13,16 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# Chargement des fonctions de simulation et d'estimation depuis 01_convergences_emv.R
-if (!exists("sim_power_law_process") || !exists("mle_power_law")) {
-  src_file <- if (file.exists("src/01_convergences_emv.R")) {
-    "src/01_convergences_emv.R"
-  } else if (file.exists("01_convergences_emv.R")) {
-    "01_convergences_emv.R"
+# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
+if (!exists("mle_power_law")) {
+  src_dir <- if (file.exists("src/power_law.R")) {
+    "src"
+  } else if (file.exists("power_law.R")) {
+    "."
   } else {
-    file.path(rprojroot::find_rstudio_root_file(), "src", "01_convergences_emv.R")
+    file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  source(src_file)
-}
-
-# ------------------------------------------------------------------------------
-# 1. Calcul des Intervalles de Confiance (Cocozza-Thivent, 1997)
-# ------------------------------------------------------------------------------
-
-#' Calcule les intervalles de confiance exacts et asymptotiques pour alpha et beta
-#'
-#' @param n         Nombre d'événements observés N(T)
-#' @param beta_hat  EMV de beta
-#' @param alpha_hat EMV de alpha
-#' @param T_end     Horizon d'observation T
-#' @param level     Niveau de confiance nominal (défaut = 0.95)
-#' @return Liste des bornes [lower, upper] pour chaque méthode
-confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = 0.95) {
-  if (is.na(n) || n < 1 || is.na(beta_hat) || is.na(alpha_hat)) {
-    return(list(
-      beta_exact = c(lower = NA_real_, upper = NA_real_),
-      beta_asymp = c(lower = NA_real_, upper = NA_real_),
-      alpha_log   = c(lower = NA_real_, upper = NA_real_),
-      alpha_lin   = c(lower = NA_real_, upper = NA_real_)
-    ))
-  }
-  
-  alpha_risk <- 1 - level
-  u_val <- qnorm(1 - alpha_risk / 2)
-  sqrt_n <- sqrt(n)
-  log_T <- log(T_end)
-  
-  # 1. Intervalle de confiance EXACT pour beta (Corollaire 3.6)
-  # Conditionnellement à N(T) = n, 2*n*beta / beta_hat ~ Chi2(2*n)
-  chi2_lower <- qchisq(alpha_risk / 2, df = 2 * n)
-  chi2_upper <- qchisq(1 - alpha_risk / 2, df = 2 * n)
-  beta_exact <- c(
-    lower = (beta_hat / (2 * n)) * chi2_lower,
-    upper = (beta_hat / (2 * n)) * chi2_upper
-  )
-  
-  # 2. Intervalle de confiance ASYMPTOTIQUE pour beta (Corollaire 3.13-2c)
-  # Basé sur la normalité de sqrt(n) * (beta_hat / beta - 1)
-  beta_asymp <- c(
-    lower = max(0, beta_hat * (1 - u_val / sqrt_n)),
-    upper = beta_hat * (1 + u_val / sqrt_n)
-  )
-  
-  # 3. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme log (Corollaire 3.13-1c)
-  # Basé sur la normalité de (sqrt(n) / log(T)) * log(alpha_hat / alpha)
-  scale_factor_log <- (log_T / sqrt_n) * u_val
-  alpha_log <- c(
-    lower = alpha_hat * exp(-scale_factor_log),
-    upper = alpha_hat * exp(scale_factor_log)
-  )
-  
-  # 4. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme linéaire (Corollaire 3.13-1f)
-  # Basé sur (sqrt(n) / log(T)) * (alpha_hat / alpha - 1)
-  scale_factor_lin <- (log_T / sqrt_n) * u_val
-  alpha_lin <- c(
-    lower = alpha_hat - scale_factor_lin,
-    upper = alpha_hat + scale_factor_lin
-  )
-  
-  return(list(
-    beta_exact = beta_exact,
-    beta_asymp = beta_asymp,
-    alpha_log = alpha_log,
-    alpha_lin = alpha_lin
-  ))
+  source(file.path(src_dir, "power_law.R"))
 }
 
 # ------------------------------------------------------------------------------

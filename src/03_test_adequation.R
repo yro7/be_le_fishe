@@ -28,112 +28,16 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# Chargement des fonctions de simulation et d'estimation depuis 01_convergences_emv.R
-if (!exists("sim_power_law_process") || !exists("mle_power_law")) {
-  src_file <- if (file.exists("src/01_convergences_emv.R")) {
-    "src/01_convergences_emv.R"
-  } else if (file.exists("01_convergences_emv.R")) {
-    "01_convergences_emv.R"
+# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
+if (!exists("mle_power_law")) {
+  src_dir <- if (file.exists("src/power_law.R")) {
+    "src"
+  } else if (file.exists("power_law.R")) {
+    "."
   } else {
-    file.path(rprojroot::find_rstudio_root_file(), "src", "01_convergences_emv.R")
+    file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  source(src_file)
-}
-
-# ------------------------------------------------------------------------------
-# 1. Statistique de test et calibration (Møller, 1976 ; Lilliefors, 1969)
-# ------------------------------------------------------------------------------
-
-#' Transforme les instants de défaillance en échantillon exponentiel (Théorème 1)
-#'
-#' @param w     Vecteur des instants de sauts W_1 < ... < W_n
-#' @param T_end Horizon d'observation T. Si NULL : troncature par le n-ième
-#'              défaut (Møller), on normalise par W_n et on retire ce point.
-#' @return Vecteur trié des Y_i, i.i.d. Exp(beta) sous H0
-gof_transform <- function(w, T_end = NULL) {
-  w <- sort(w)
-  if (is.null(T_end)) {
-    n <- length(w)
-    y <- log(w[n] / w[-n])
-  } else {
-    y <- log(T_end / w)
-  }
-  sort(y)
-}
-
-#' Statistique de Kolmogorov-Smirnov avec paramètre estimé (Lilliefors)
-#'
-#' @param y Échantillon (supposé exponentiel)
-#' @return Liste : D (statistique) et beta_hat (EMV du taux exponentiel)
-ks_exp_stat <- function(y) {
-  y <- sort(y)
-  m <- length(y)
-  beta_hat <- m / sum(y)
-  F_hat <- 1 - exp(-beta_hat * y)
-  i <- seq_len(m)
-  D <- max(i / m - F_hat, F_hat - (i - 1) / m)
-  list(D = D, beta_hat = beta_hat)
-}
-
-# Cache des lois nulles simulées, indexé par (m, B)
-.gof_null_cache <- new.env(parent = emptyenv())
-
-#' Loi nulle de D pour un échantillon exponentiel de taille m (paramètre estimé)
-#'
-#' La loi est pivotale (indépendante de beta) : on simule sous Exp(1).
-#'
-#' @param m Taille de l'échantillon exponentiel
-#' @param B Nombre de simulations
-#' @return Vecteur de B réalisations de D sous H0
-gof_null_distribution <- function(m, B = 4000) {
-  key <- paste(m, B, sep = "_")
-  if (!is.null(.gof_null_cache[[key]])) {
-    return(.gof_null_cache[[key]])
-  }
-  # Graine dédiée : la table ne dépend pas de l'état du générateur appelant
-  old_seed <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
-  set.seed(1969 + m)
-  y_mat <- matrix(rexp(m * B), nrow = m)
-  d_null <- apply(y_mat, 2, function(y) ks_exp_stat(y)$D)
-  if (!is.null(old_seed)) assign(".Random.seed", old_seed, envir = globalenv())
-  .gof_null_cache[[key]] <- d_null
-  d_null
-}
-
-#' Test d'adéquation au Processus Loi de Puissance (Møller, 1976)
-#'
-#' @param w     Vecteur des instants de sauts observés
-#' @param T_end Horizon d'observation T (NULL = troncature par le n-ième défaut)
-#' @param B     Nombre de simulations pour la calibration de Lilliefors
-#' @param level Niveau du test (pour la valeur critique renvoyée)
-#' @return Liste : m, beta_hat, D, p-valeur calibrée, p-valeur naïve (loi de
-#'         Kolmogorov sans correction), valeur critique calibrée au niveau level
-gof_power_law <- function(w, T_end = NULL, B = 4000, level = 0.05) {
-  y <- gof_transform(w, T_end)
-  m <- length(y)
-  if (m < 3) {
-    return(list(m = m, beta_hat = NA_real_, D = NA_real_, p_value = NA_real_,
-                p_value_naive = NA_real_, crit_value = NA_real_))
-  }
-  st <- ks_exp_stat(y)
-  d_null <- gof_null_distribution(m, B)
-
-  # p-valeur Monte-Carlo (correction +1 pour garantir un test de niveau exact)
-  p_value <- (1 + sum(d_null >= st$D)) / (B + 1)
-
-  # p-valeur naïve : on fait comme si beta était connu (loi de Kolmogorov)
-  p_value_naive <- suppressWarnings(
-    ks.test(y, "pexp", rate = st$beta_hat, exact = (m < 100))$p.value
-  )
-
-  list(
-    m = m,
-    beta_hat = st$beta_hat,
-    D = st$D,
-    p_value = p_value,
-    p_value_naive = p_value_naive,
-    crit_value = unname(quantile(d_null, 1 - level, type = 1))
-  )
+  source(file.path(src_dir, "power_law.R"))
 }
 
 # ------------------------------------------------------------------------------

@@ -7,66 +7,16 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-# 1. Lib Simualtion et estimation
-
-# Simule les temps d'arrivée d'un Processus Loi de Puissance sur [0, T]
-#
-# Intensité : lambda(s) = (beta / alpha) * (s / alpha)^(beta - 1)
-# Moyenne cumulée : Lambda(t) = (t / alpha)^beta
-#
-#' @param alpha Paramètre d'échelle (alpha > 0)
-#' @param beta  Paramètre de forme (beta > 0)
-#' @param T_end Horizon d'observation (T_end > 0)
-#' @return Vecteur numérique des instants de sauts W_1 < ... < W_n sur [0, T_end]
-sim_power_law_process <- function(alpha, beta, T_end) {
-  if (alpha <= 0 || beta <= 0 || T_end <= 0) {
-    stop("alpha, beta et T_end doivent être strictement positifs.")
+# Chargement des fonctions du modèle (simulation, EMV, IC, test) depuis power_law.R
+if (!exists("mle_power_law")) {
+  src_dir <- if (file.exists("src/power_law.R")) {
+    "src"
+  } else if (file.exists("power_law.R")) {
+    "."
+  } else {
+    file.path(rprojroot::find_rstudio_root_file(), "src")
   }
-  
-  # 1. Nombre total d'événements N(T) ~ Poisson( (T / alpha)^beta )
-  mean_N <- (T_end / alpha)^beta
-  n <- rpois(1, lambda = mean_N)
-  
-  if (n == 0) {
-    return(numeric(0))
-  }
-  
-  # 2. Conditionnellement à N(T) = n, (W_i / T)^beta sont des statistiques
-  #    d'ordre de variables uniformes U(0, 1) i.i.d.
-  #    => W_i = T * U_(i)^(1 / beta)
-  u <- sort(runif(n, min = 0, max = 1))
-  w <- T_end * (u^(1 / beta))
-  return(w)
-}
-
-# Calcule les Estimateurs du Maximum de Vraisemblance (EMV) à horizon T
-#
-# Formules issues de Cocozza-Thivent (1997, section 3.2.3) :
-#   1 / beta_hat = log(T) - (1 / n) * sum(log(W_i)) = (1 / n) * sum(log(T / W_i))
-#   log(alpha_hat) = log(T) - (1 / beta_hat) * log(n) => alpha_hat = T / (n^(1 / beta_hat))
-#   Estimateur débiaisé : beta_tilde = ((n - 1) / n) * beta_hat
-#
-#' @param w     Vecteur ordonné des instants de sauts observés dans [0, T]
-#' @param T_end Horizon d'observation T
-#' @return Liste contenant n, beta_hat, beta_tilde, alpha_hat (ou NA si n == 0)
-mle_power_law <- function(w, T_end) {
-  n <- length(w)
-  if (n == 0) {
-    return(list(n = 0, beta_hat = NA_real_, beta_tilde = NA_real_, alpha_hat = NA_real_))
-  }
-  
-  sum_log_ratio <- sum(log(T_end / w))
-  
-  beta_hat <- n / sum_log_ratio
-  beta_tilde <- if (n > 1) ((n - 1) / n) * beta_hat else NA_real_
-  alpha_hat <- T_end / (n^(1 / beta_hat))
-  
-  return(list(
-    n = n,
-    beta_hat = beta_hat,
-    beta_tilde = beta_tilde,
-    alpha_hat = alpha_hat
-  ))
+  source(file.path(src_dir, "power_law.R"))
 }
 
 # 2. Fig 1 : Convergence presque-sûrement (Proposition 3.7)
