@@ -128,11 +128,14 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
   )
   
   # 4. Intervalle de confiance ASYMPTOTIQUE pour alpha : forme linéaire (Corollaire 3.13-1f)
-  # Basé sur (sqrt(n) / log(T)) * (alpha_hat / alpha - 1)
+  # Basé sur (sqrt(n) / log(T)) * (alpha_hat / alpha - 1) -> N(0, 1), d'où par Slutsky
+  # alpha dans alpha_hat * (1 -/+ u * log(T) / sqrt(n)).
+  # Attention : [CT97] écrit alpha_hat -/+ u * log(T) / sqrt(n), sans le facteur alpha_hat
+  # (borne non homogène à un temps, correcte seulement si alpha = 1).
   scale_factor_lin <- (log_T / sqrt_n) * u_val
   alpha_lin <- c(
-    lower = alpha_hat - scale_factor_lin,
-    upper = alpha_hat + scale_factor_lin
+    lower = alpha_hat * (1 - scale_factor_lin),
+    upper = alpha_hat * (1 + scale_factor_lin)
   )
   
   return(list(
