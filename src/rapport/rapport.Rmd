@@ -1,6 +1,6 @@
 ---
 title: "The Power Law Process and Reliability (Observation à horizon T fixé)"
-subtitle: "BE Processus Ponctuels & Applications — INSA Toulouse, 5ModIA"
+subtitle: "BE Poisson — INSA Toulouse, 5ModIA"
 author: "Marin Decanini, Amelie Pujol, Hazar Hamouda"
 date: "`r Sys.Date()`"
 output:
@@ -60,7 +60,8 @@ TODO:
 # TODO: Tracé des profils d'intensité instantanée lambda(t) pour différentes valeurs de beta
 ```
 
-```{r partie-theorique, echo=FALSE, results='asis'}
+```{r partie-theorique, echo=FALSE, eval=FALSE, results='asis'}
+# Désactivé pour l'instant : remettre eval=TRUE pour réintégrer la partie théorique.
 # Partie théorique rédigée en LaTeX dans src/rapport/00_partie_theorique.tex
 # (sections "Résultats théoriques à horizon T fixé" et "Test d'adéquation").
 # - sortie PDF  : inclusion directe par \input (nécessite \usepackage{amsthm}) ;

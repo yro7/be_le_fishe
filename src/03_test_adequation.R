@@ -59,9 +59,7 @@ sim_weibull_renewal <- function(shape, T_end) {
   w[w <= T_end]
 }
 
-# ------------------------------------------------------------------------------
 # 3. Études Monte-Carlo : niveau et puissance
-# ------------------------------------------------------------------------------
 
 #' Fonction générique : taux de rejet d'un générateur de trajectoires
 #'
@@ -172,9 +170,7 @@ monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
   list(summary = df, M = M, risk = risk)
 }
 
-# ------------------------------------------------------------------------------
-# 4. Visualisations Graphiques (sans interprétation textuelle)
-# ------------------------------------------------------------------------------
+# 4. graphs
 
 theme_gof <- function() {
   theme_bw(base_size = 11) +
@@ -236,7 +232,7 @@ plot_gof_level <- function(level_res, mean_N_hist = CONFIG$gof$mean_N_hist) {
   p_level / p_hist + plot_layout(heights = c(1.3, 1))
 }
 
-#' Puissance du test calibré contre les trois familles d'alternatives
+#' Puissance du test calibré pr les trois familles
 plot_gof_power <- function(power_res) {
   df <- power_res$summary
   risk <- power_res$risk
@@ -313,17 +309,12 @@ plot_gof_examples <- function(ex = CONFIG$gof$examples, T_alt = CONFIG$gof$T_alt
   p1 + p2 + p3
 }
 
-# ------------------------------------------------------------------------------
-# 5. Bloc Principal d'Exécution et Sauvegarde des Figures
-# ------------------------------------------------------------------------------
 
 run_all_gof_validation <- function(save_figs = TRUE, output_dir = "figures",
                                    M_level = CONFIG$gof$M_level,
                                    M_power = CONFIG$gof$M_power,
                                    B = CONFIG$gof$B) {
-  cat("====================================================================\n")
   cat("BE Poisson : Validation pratique du test d'adéquation (Møller, 1976)\n")
-  cat("====================================================================\n\n")
 
   if (save_figs && !dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)

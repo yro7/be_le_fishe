@@ -11,7 +11,7 @@
 
 <meta name="author" content="Marin Decanini, Amelie Pujol, Hazar Hamouda" />
 
-<meta name="date" content="2026-11-19" />
+<meta name="date" content="2026-11-25" />
 
 <title>The Power Law Process and Reliability (Observation à horizon T fixé)</title>
 
@@ -1677,7 +1677,7 @@ font-size: 0.95em;
 <h3 class="subtitle">BE Processus Ponctuels &amp; Applications — INSA
 Toulouse, 5ModIA</h3>
 <h4 class="author">Marin Decanini, Amelie Pujol, Hazar Hamouda</h4>
-<h4 class="date">2026-11-19</h4>
+<h4 class="date">2026-11-25</h4>
 
 </div>
 
@@ -1695,852 +1695,11 @@ TODO:
 -->
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Tracé des profils d&#39;intensité instantanée lambda(t) pour différentes valeurs de beta</span></span></code></pre></div>
 </div>
-<div id="sec:theorie" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Résultats théoriques à
-horizon <span class="math inline">\(T\)</span> fixé (Cocozza-Thivent,
-1997)</h1>
-<p>Cette partie reprend la Section 3.2.3 de <span class="math display">\[CT97\]</span> (observation sur une fenêtre fixe
-<span class="math inline">\([0,T]\)</span>), complète les démonstrations
-qui y sont esquissées ou renvoyées à des outils hors programme, et les
-relie aux résultats du poly (chapitres 1 à 4).</p>
-<div id="sec:modele" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Notations et
-modèle</h2>
-<p>On suit les notations du poly.</p>
-<ul>
-<li><p><strong>Processus.</strong> <span class="math inline">\(N=(N_t)_{t\in\mathbb{R}_+}\)</span> est un
-processus de comptage, <span class="math inline">\((T_n)_{n\in\mathbb{N}^*}\)</span> ses temps
-d’arrivée et <span class="math inline">\(W_1=T_1\)</span>, <span class="math inline">\(W_i=T_i-T_{i-1}\)</span> (<span class="math inline">\(i\ge2\)</span>) ses temps d’inter-arrivée
-(Définition 2.17). On écrit <em>hPP</em> pour un processus de Poisson
-homogène et <em>iPP</em> pour un processus de Poisson inhomogène.
-Attention : <span class="math display">\[Møl76\]</span> note <span class="math inline">\(W_n\)</span> les temps d’arrivée ; ici <span class="math inline">\(W_n\)</span> désigne toujours une
-inter-arrivée.</p></li>
-<li><p><strong>Intensité.</strong> Un iPP d’intensité <span class="math inline">\(\lambda\)</span> a pour intensité cumulée <span class="math inline">\(\Lambda(t)=\int_0^t\lambda(x)\,dx\)</span>
-(Définition 4.1). Quand l’intensité dépend d’un paramètre <span class="math inline">\(\theta\)</span>, on la note <span class="math inline">\(\lambda_\theta\)</span> et la probabilité
-correspondante <span class="math inline">\(\mathbb{P}_\theta\)</span>.</p></li>
-<li><p><strong>Lois.</strong> <span class="math inline">\(\mathcal{P}(\mu)\)</span> est la loi de Poisson,
-<span class="math inline">\(\mathcal{E}(\lambda)\)</span> la loi
-exponentielle, <span class="math inline">\(\Gamma(a,\lambda)\)</span> la
-loi gamma de forme <span class="math inline">\(a\)</span> et
-d’<em>intensité</em> <span class="math inline">\(\lambda\)</span>
-(densité <span class="math inline">\(x\mapsto\frac{(\lambda
-x)^{a-1}}{\Gamma(a)}\lambda e^{-\lambda
-x}\mathbf{1}_{\{x&gt;0\}}\)</span>, Définition 1.17), <span class="math inline">\(\mathcal{W}(\alpha,\beta)\)</span> la loi de
-Weibull (Feuille 1, Exercice 4), <span class="math inline">\(\mathcal{U}([0,t])\)</span> la loi uniforme et
-<span class="math inline">\(\chi^2(d)\)</span> la loi du khi-deux. Pour
-<span class="math inline">\(Y_1,\dots,Y_n\)</span>, on note <span class="math inline">\(Y_{(1)}\le\dots\le Y_{(n)}\)</span> la statistique
-d’ordre (Définition 2.20).</p></li>
-<li><p><strong>Quantiles.</strong> <span class="math inline">\(x_{d,\eta}\)</span> est le quantile d’ordre <span class="math inline">\(\eta\)</span> de <span class="math inline">\(\chi^2(d)\)</span> et <span class="math inline">\(F_d\)</span> sa fonction de répartition ; <span class="math inline">\(z_\eta\)</span> est le quantile d’ordre <span class="math inline">\(\eta\)</span> de <span class="math inline">\(\mathcal{N}(0,1)\)</span> et <span class="math inline">\(\Phi\)</span> sa fonction de répartition.</p></li>
-<li><p><strong>Niveau.</strong> Le poly note <span class="math inline">\(1-\alpha\)</span> le niveau de confiance. Ici
-<span class="math inline">\(\alpha\)</span> est le paramètre d’échelle
-du modèle : on note donc <span class="math inline">\(1-\delta\)</span>
-le niveau de confiance, avec <span class="math inline">\(\delta\in(0,1)\)</span>.</p></li>
-<li><p><strong>Références.</strong> « Poly » désigne le cours de M.
-Albert, dont on reprend la numérotation (Proposition 4.12, etc.). <span class="math display">\[CT97\]</span> désigne Cocozza-Thivent (1997),
-<span class="math display">\[Møl76\]</span> Møller (1976) et <span class="math display">\[Pro63\]</span> Proschan (1963).</p></li>
-</ul>
-<div id="def:plp" class="definition">
-<p><strong>Définition 1</strong> (Processus de loi de puissance, Exemple
-4.2 du poly). Soient <span class="math inline">\(\alpha&gt;0\)</span> et
-<span class="math inline">\(\beta&gt;0\)</span>. Le <em>processus de loi
-de puissance</em> (<em>power law process</em>, ou processus de Weibull)
-de paramètres <span class="math inline">\((\alpha,\beta)\)</span> est
-l’iPP d’intensité <span class="math display">\[\lambda_{\alpha,\beta}(x)=\frac{\beta}{\alpha}\Big(\frac{x}{\alpha}\Big)^{\beta-1},\qquad
-x&gt;0,
-\qquad\text{d&#39;intensité cumulée}\qquad
-\Lambda_{\alpha,\beta}(t)=\Big(\frac{t}{\alpha}\Big)^{\beta}.\]</span>
-Le paramètre <span class="math inline">\(\alpha\)</span> est un
-paramètre d’échelle (homogène à un temps) et <span class="math inline">\(\beta\)</span> un paramètre de forme (sans
-dimension).</p>
-</div>
-<p>Dans toute la suite, <span class="math inline">\((\alpha,\beta)\)</span> désigne la vraie valeur
-des paramètres et l’on abrège <span class="math inline">\(\lambda=\lambda_{\alpha,\beta}\)</span> et <span class="math inline">\(\Lambda=\Lambda_{\alpha,\beta}\)</span> quand il
-n’y a pas d’ambiguïté. En fiabilité, <span class="math inline">\(N_t\)</span> compte les défaillances d’un système
-réparable sur <span class="math inline">\([0,t]\)</span>. Le modèle iPP
-correspond à des <em>réparations minimales</em> : à chaque panne, le
-système est remis dans l’état où il était juste avant la panne, et la
-durée de réparation est négligée.</p>
-<div id="prop:proprietes" class="proposition">
-<p><strong>Proposition 2</strong> (Premières propriétés). <em>Soit <span class="math inline">\(N\)</span> un processus de loi de puissance de
-paramètres <span class="math inline">\((\alpha,\beta)\)</span>.</em></p>
-<ol style="list-style-type: decimal">
-<li><p><em>Pour tout <span class="math inline">\(t&gt;0\)</span>, <span class="math inline">\(N_t\sim\mathcal{P}\big((t/\alpha)^\beta\big)\)</span>
-et <span class="math inline">\(\mathbb{E}[N_t]=\Lambda(t)=(t/\alpha)^\beta\)</span>.</em></p></li>
-<li><p><em>Le premier temps d’arrivée suit la loi de Weibull : <span class="math inline">\(T_1\sim\mathcal{W}(\alpha,\beta)\)</span>, de taux
-de hasard <span class="math inline">\(\lambda\)</span>.</em></p></li>
-<li><p><em>Le sens de variation du taux de défaillance (ROCOF) <span class="math inline">\(\lambda\)</span> est donné par le signe de <span class="math inline">\(\beta-1\)</span> : si <span class="math inline">\(\beta&lt;1\)</span>, <span class="math inline">\(\lambda\)</span> décroît (rodage, croissance de
-fiabilité) ; si <span class="math inline">\(\beta=1\)</span>, <span class="math inline">\(\lambda\equiv1/\alpha\)</span> et <span class="math inline">\(N\)</span> est un hPP d’intensité <span class="math inline">\(1/\alpha\)</span> ; si <span class="math inline">\(\beta&gt;1\)</span>, <span class="math inline">\(\lambda\)</span> croît (usure,
-vieillissement).</em></p></li>
-<li><p><em>(Changement de temps.) Les variables <span class="math inline">\(S_n=\Lambda(T_n)=(T_n/\alpha)^\beta\)</span>,
-<span class="math inline">\(n\in\mathbb{N}^*\)</span>, sont les temps
-d’arrivée d’un hPP d’intensité <span class="math inline">\(1\)</span>.
-Réciproquement, si <span class="math inline">\((S_n)\)</span> sont les
-temps d’arrivée d’un hPP d’intensité <span class="math inline">\(1\)</span>, alors <span class="math inline">\(T_n=\alpha S_n^{1/\beta}\)</span> définit un
-processus de loi de puissance de paramètres <span class="math inline">\((\alpha,\beta)\)</span>.</em></p></li>
-</ol>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Le point 1 découle de la Définition 4.1 et de
-l’Exemple 4.2. Pour le point 2, la Propriété 4.10 donne <span class="math inline">\(\mathbb{P}(T_1&gt;s)=e^{-\Lambda(s)}=\exp(-(s/\alpha)^\beta)\)</span>,
-qui est la fonction de survie de <span class="math inline">\(\mathcal{W}(\alpha,\beta)\)</span> ; par la
-Proposition 1.15, son taux de hasard est <span class="math inline">\(\lambda\)</span>. Le point 3 vient de <span class="math inline">\(\lambda&#39;(x)=\frac{\beta(\beta-1)}{\alpha^2}(x/\alpha)^{\beta-2}\)</span>.
-Pour le point 4, <span class="math inline">\(\Lambda\)</span> est
-continue, strictement croissante et bijective de <span class="math inline">\(\mathbb{R}_+\)</span> dans <span class="math inline">\(\mathbb{R}_+\)</span>, d’inverse <span class="math inline">\(\Lambda^{-1}(s)=\alpha s^{1/\beta}\)</span>. On
-applique alors la Proposition 4.8 dans les deux sens. ◻</p>
-</div>
-<div class="remarque">
-<p><em>Remarque 3</em>. Plusieurs intensités vues en cours sont des cas
-particuliers. L’intensité <span class="math inline">\(x\mapsto2\theta
-x\)</span> (examen 2025, Exercice 2) correspond à <span class="math inline">\(\beta=2\)</span> et <span class="math inline">\(\alpha=\theta^{-1/2}\)</span>. L’intensité <span class="math inline">\(x\mapsto\frac{\alpha&#39;}{2\sqrt{x}}\)</span>
-(Feuille 4, Exercice 3) correspond à <span class="math inline">\(\beta=1/2\)</span> et une échelle égale à <span class="math inline">\(\alpha&#39;^{-2}\)</span>. Quand <span class="math inline">\(\beta\neq1\)</span>, les inter-arrivées <span class="math inline">\(W_i\)</span> ne sont ni indépendantes ni de même
-loi : un processus de loi de puissance n’est <em>pas</em> un processus
-de renouvellement, et il ne faut pas le confondre avec le processus de
-renouvellement à inter-arrivées de Weibull (<span class="math display">\[Møl76\]</span>, résumé).</p>
-</div>
-<p>Le résultat suivant est central pour toute la suite. Il traduit la
-Proposition 4.12 du poly dans le cas de la loi de puissance.</p>
-<div id="prop:loicond" class="proposition">
-<p><strong>Proposition 4</strong> (Loi conditionnelle des temps
-d’arrivée). <em>Soient <span class="math inline">\(T&gt;0\)</span> et
-<span class="math inline">\(n\in\mathbb{N}^*\)</span>.
-Conditionnellement à <span class="math inline">\(\{N_T=n\}\)</span>
-:</em></p>
-<ol style="list-style-type: decimal">
-<li><p><em><span class="math inline">\((T_1,\dots,T_n)\)</span> a pour
-densité <span class="math display">\[(t_1,\dots,t_n)\mapsto\frac{n!\,\beta^n}{T^{n\beta}}\Big(\prod_{i=1}^n
-t_i^{\beta-1}\Big)\mathbf{1}_{\{0&lt;t_1&lt;\dots&lt;t_n\le T\}}
-;\]</span> c’est la statistique d’ordre de <span class="math inline">\(n\)</span> variables i.i.d. de densité <span class="math inline">\(f_{\beta,T}(s)=\frac{\beta
-s^{\beta-1}}{T^\beta}\mathbf{1}_{\{0&lt;s\le T\}}\)</span>, c’est-à-dire
-de fonction de répartition <span class="math inline">\(s\mapsto(s/T)^\beta\)</span> sur <span class="math inline">\([0,T]\)</span>. Cette loi </em>ne dépend pas de*
-<span class="math inline">\(\alpha\)</span>.*</p></li>
-<li><p><em><span class="math inline">\(\big((T_1/T)^\beta,\dots,(T_n/T)^\beta\big)\overset{(d)}{=}(U_{(1)},\dots,U_{(n)})\)</span>,
-où <span class="math inline">\(U_1,\dots,U_n\)</span> sont i.i.d. de loi
-<span class="math inline">\(\mathcal{U}([0,1])\)</span>.</em></p></li>
-<li><p><em><span class="math inline">\(\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)\overset{(d)}{=}(Y_{(1)},\dots,Y_{(n)})\)</span>,
-où <span class="math inline">\(Y_1,\dots,Y_n\)</span> sont i.i.d. de loi
-<span class="math inline">\(\mathcal{E}(\beta)\)</span>.</em></p></li>
-</ol>
-<p><em>En particulier, la statistique <span class="math inline">\(S_T:=\sum_{i=1}^{N_T}\ln(T/T_i)\)</span> vérifie
-<span class="math inline">\(S_T\mid\{N_T=n\}\sim\Gamma(n,\beta)\)</span>.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> <em>Point 1.</em> Par la Proposition 4.12, la
-densité conditionnelle est <span class="math inline">\(\frac{n!}{\Lambda(T)^n}\prod_i\lambda(t_i)\mathbf{1}_{\{0&lt;t_1&lt;\dots&lt;t_n\le
-T\}}\)</span>, et <span class="math display">\[\frac{\lambda(s)}{\Lambda(T)}=\frac{\frac{\beta}{\alpha}\big(\frac{s}{\alpha}\big)^{\beta-1}}{\big(\frac{T}{\alpha}\big)^{\beta}}=\frac{\beta
-s^{\beta-1}}{T^\beta}=f_{\beta,T}(s) :\]</span> les puissances de <span class="math inline">\(\alpha\)</span> se simplifient.</p>
-<p><em>Points 2 et 3.</em> Soient <span class="math inline">\(X_1,\dots,X_n\)</span> i.i.d. de densité <span class="math inline">\(f_{\beta,T}\)</span>. Une application strictement
-croissante préserve l’ordre et une application strictement décroissante
-le renverse. Donc <span class="math inline">\(\big((X_{(i)}/T)^\beta\big)_i\)</span> est la
-statistique d’ordre des <span class="math inline">\((X_i/T)^\beta\)</span>, et <span class="math inline">\(\big(\ln(T/X_{(n+1-i)})\big)_i\)</span> celle des
-<span class="math inline">\(\ln(T/X_i)\)</span>. Or, pour <span class="math inline">\(u\in[0,1]\)</span> et <span class="math inline">\(y\ge0\)</span>, <span class="math display">\[\mathbb{P}\big((X_1/T)^\beta\le
-u\big)=\mathbb{P}\big(X_1\le Tu^{1/\beta}\big)=u,
-\qquad
-\mathbb{P}\big(\ln(T/X_1)&gt;y\big)=\mathbb{P}\big(X_1&lt;Te^{-y}\big)=e^{-\beta
-y}.\]</span></p>
-<p>Enfin, une somme est invariante par permutation, donc <span class="math inline">\(S_T\overset{(d)}{=}\sum_{i=1}^n Y_i\)</span>
-sachant <span class="math inline">\(\{N_T=n\}\)</span>. Cette somme suit
-la loi <span class="math inline">\(\Gamma(n,\beta)\)</span> par la
-Proposition 1.19 iii). ◻</p>
-</div>
-<div id="rem:simulation" class="remarque">
-<p><em>Remarque 5</em> (Simulation). Les simulations de la partie
-numérique reposent sur deux constructions du cours.</p>
-<ul>
-<li><p><em>Changement de temps</em> (Proposition 4.8 et point 4 de la
-Proposition <a href="#prop:proprietes" reference-type="ref" reference="prop:proprietes">2</a>). On simule les temps d’arrivée <span class="math inline">\(S_k=E_1+\dots+E_k\)</span> d’un hPP d’intensité 1,
-avec <span class="math inline">\(E_j\)</span> i.i.d. de loi <span class="math inline">\(\mathcal{E}(1)\)</span>, puis on pose <span class="math inline">\(T_k=\alpha S_k^{1/\beta}\)</span>. Sur <span class="math inline">\([0,T]\)</span>, on garde les <span class="math inline">\(T_k\le T\)</span>, c’est-à-dire les <span class="math inline">\(S_k\le(T/\alpha)^\beta\)</span>. Pour <span class="math inline">\(n\)</span> fixé, on garde <span class="math inline">\(T_1,\dots,T_n\)</span>.</p></li>
-<li><p><em>Construction conditionnelle</em> (Proposition 4.13 et
-Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a>). On tire <span class="math inline">\(N_T\sim\mathcal{P}\big((T/\alpha)^\beta\big)\)</span>.
-Sachant <span class="math inline">\(N_T=n\)</span>, on tire <span class="math inline">\(U_1,\dots,U_n\)</span> i.i.d. de loi <span class="math inline">\(\mathcal{U}([0,1])\)</span> et on pose <span class="math inline">\(T_i=T\,U_{(i)}^{1/\beta}\)</span>, par inversion
-de la fonction de répartition <span class="math inline">\(s\mapsto(s/T)^\beta\)</span>.</p></li>
-</ul>
-</div>
-</div>
-<div id="sec:emv" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Vraisemblance et
-estimateurs du maximum de vraisemblance</h2>
-<p>On observe <span class="math inline">\((N_t)_{t\in[0,T]}\)</span>,
-c’est-à-dire <span class="math inline">\(N_T\)</span> et <span class="math inline">\(T_1&lt;\dots&lt;T_{N_T}\)</span>, avec <span class="math inline">\(T\)</span> fixé et <span class="math inline">\((\alpha,\beta)\)</span> inconnus.</p>
-<div id="prop:emv" class="proposition">
-<p><strong>Proposition 6</strong> (Vraisemblance et EMV, <span class="math display">\[CT97, §3.2.3\]</span>). <em>La vraisemblance des
-paramètres <span class="math inline">\((\alpha,\beta)\)</span> vaut
-<span class="math display">\[L\big((N_t)_{t\in[0,T]};\alpha,\beta\big)=\Big(\frac{\beta}{\alpha^\beta}\Big)^{N_T}\Big(\prod_{i=1}^{N_T}T_i^{\beta-1}\Big)\exp\Big(-\Big(\frac{T}{\alpha}\Big)^\beta\Big),\]</span>
-d’où la log-vraisemblance <span class="math display">\[\ell(\alpha,\beta)=N_T\big(\ln\beta-\beta\ln\alpha\big)+(\beta-1)\sum_{i=1}^{N_T}\ln
-T_i-\Big(\frac{T}{\alpha}\Big)^\beta.\]</span> Si <span class="math inline">\(N_T=0\)</span>, l’EMV n’existe pas. Si <span class="math inline">\(N_T\ge1\)</span>, l’EMV existe, il est unique et
-vaut <span class="math display">\[\hat\beta_T=\frac{N_T}{\sum_{i=1}^{N_T}\ln(T/T_i)}=\frac{N_T}{S_T},
-\qquad
-\hat\alpha_T=\frac{T}{N_T^{1/\hat\beta_T}}.\]</span> De manière
-équivalente : <span class="math inline">\(\frac{1}{\hat\beta_T}=\ln
-T-\frac{1}{N_T}\sum_{i=1}^{N_T}\ln T_i\)</span> et <span class="math inline">\(\ln\hat\alpha_T=\ln T-\frac{1}{\hat\beta_T}\ln
-N_T\)</span>, qui sont les formules de <span class="math display">\[CT97\]</span>.</em></p>
-</div>
-<p><strong>Cadre.</strong> On observe un processus de Poisson non
-homogène sur <span class="math inline">\([0,t]\)</span>, d’intensité de
-Weibull <span class="math display">\[\lambda(s)=\frac{\beta}{\alpha}\left(\frac{s}{\alpha}\right)^{\beta-1},
-  \qquad \alpha&gt;0,\ \beta&gt;0 .\]</span> On note <span class="math inline">\(n=N(t)\)</span> le nombre de points observés et
-<span class="math inline">\(t_1&lt;\dots&lt;t_n&lt;t\)</span> leurs
-instants.</p>
-</div>
-<div id="vraisemblance" class="section level2 unnumbered">
-<h2 class="unnumbered">1. Vraisemblance</h2>
-<p>D’après le théorème 2.27, la vraisemblance de l’observation <span class="math inline">\((n,t_1,\dots,t_n)\)</span> est <span class="math display">\[\ell(n,t_1,\dots,t_n)
-  = \exp\!\Big(-\int_0^t \lambda(u)\dd u\Big)\prod_{i=1}^n
-\lambda(t_i).\]</span></p>
-<p><em>Terme exponentiel.</em> Pour <span class="math inline">\(\beta&gt;0\)</span>, <span class="math display">\[\int_0^t \lambda(u)\dd u
-  = \frac{\beta}{\alpha^{\beta}}\int_0^t u^{\beta-1}\dd u
-  = \frac{\beta}{\alpha^{\beta}}\left[\frac{u^{\beta}}{\beta}\right]_0^t
-  = \frac{t^{\beta}}{\alpha^{\beta}}
-  = \left(\frac{t}{\alpha}\right)^{\beta}.\]</span></p>
-<p><em>Terme produit.</em> <span class="math display">\[\prod_{i=1}^n
-\lambda(t_i)
-  = \prod_{i=1}^n
-\frac{\beta}{\alpha}\left(\frac{t_i}{\alpha}\right)^{\beta-1}
-  = \left(\frac{\beta}{\alpha}\right)^{n}\frac{1}{\alpha^{n(\beta-1)}}
-    \prod_{i=1}^n t_i^{\beta-1}
-  = \frac{\beta^{n}}{\alpha^{n\beta}}\prod_{i=1}^n
-t_i^{\beta-1}.\]</span></p>
-<p><strong>Conclusion :</strong> <span class="math display">\[\boxed{\;
-  \ell(\alpha,\beta)
-  = \exp\!\left(-\frac{t^{\beta}}{\alpha^{\beta}}\right)
-    \frac{\beta^{n}}{\alpha^{n\beta}}
-    \prod_{i=1}^n t_i^{\beta-1}\;}\]</span></p>
-</div>
-<div id="log-vraisemblance" class="section level2 unnumbered">
-<h2 class="unnumbered">2. Log-vraisemblance</h2>
-<p>En passant au logarithme, <span class="math display">\[\begin{align*}
-  \mathcal{L}(\alpha,\beta)=\ln \ell(\alpha,\beta)
-  &amp;= -\frac{t^{\beta}}{\alpha^{\beta}}
-     + \ln\!\left(\frac{\beta^{n}}{\alpha^{n\beta}}\right)
-     + \ln\!\Big(\prod_{i=1}^n t_i^{\beta-1}\Big)\\
-  &amp;= -\frac{t^{\beta}}{\alpha^{\beta}}
-     + n\ln\beta - n\beta\ln\alpha
-     + (\beta-1)\sum_{i=1}^n \ln t_i .
-\end{align*}\]</span> Soit <span class="math display">\[\boxed{\;
-  \mathcal{L}(\alpha,\beta)
-  = -\left(\frac{t}{\alpha}\right)^{\beta}
-    + n\big(\ln\beta-\beta\ln\alpha\big)
-    + (\beta-1)\sum_{i=1}^n \ln t_i\;}\]</span></p>
-</div>
-<div id="points-critiques" class="section level2 unnumbered">
-<h2 class="unnumbered">3. Points critiques</h2>
-<p>On suppose <span class="math inline">\(n\geq 1\)</span> (si <span class="math inline">\(n=0\)</span>, <span class="math inline">\(\mathcal{L}(\alpha,\beta)=-(t/\alpha)^\beta\)</span>
-croît strictement vers <span class="math inline">\(0\)</span> quand
-<span class="math inline">\(\alpha\to+\infty\)</span> sans l’atteindre :
-il n’y a pas de maximum). On pose <span class="math display">\[S :=
-\sum_{i=1}^n \ln\!\Big(\frac{t}{t_i}\Big) = n\ln t-\sum_{i=1}^n\ln t_i
-&gt;0,\]</span> strictement positif car <span class="math inline">\(t_i&lt;t\)</span> pour tout <span class="math inline">\(i\)</span>.</p>
-<p><strong>Dérivée en <span class="math inline">\(\alpha\)</span>.</strong> Comme <span class="math inline">\(\dfrac{\partial}{\partial\alpha}\left(\dfrac{t}{\alpha}\right)^{\beta}
-= -\dfrac{\beta}{\alpha}\left(\dfrac{t}{\alpha}\right)^{\beta}\)</span>,
-<span class="math display">\[\frac{\partial \mathcal{L}}{\partial\alpha}
-  =
-\frac{\beta}{\alpha}\left(\frac{t}{\alpha}\right)^{\beta}-\frac{n\beta}{\alpha}
-  =
-\frac{\beta}{\alpha}\left[\left(\frac{t}{\alpha}\right)^{\beta}-n\right].\]</span>
-Puisque <span class="math inline">\(\beta/\alpha&gt;0\)</span>, <span class="math display">\[\frac{\partial \mathcal{L}}{\partial\alpha}=0
-  \iff \left(\frac{t}{\alpha}\right)^{\beta}=n
-  \iff \alpha=\alpha(\beta):=t\,n^{-1/\beta}.\]</span></p>
-<p><strong>Dérivée en <span class="math inline">\(\beta\)</span>.</strong> Comme <span class="math inline">\(\dfrac{\partial}{\partial\beta}\left(\dfrac{t}{\alpha}\right)^{\beta}
-= \left(\dfrac{t}{\alpha}\right)^{\beta}\ln\dfrac{t}{\alpha}\)</span>,
-<span class="math display">\[\frac{\partial \mathcal{L}}{\partial\beta}
-  = \frac{n}{\beta}-n\ln\alpha+\sum_{i=1}^n\ln t_i
-    -\left(\frac{t}{\alpha}\right)^{\beta}\ln\frac{t}{\alpha}.\]</span></p>
-<p><strong>Système.</strong> Substituons <span class="math inline">\(\alpha=\alpha(\beta)\)</span>. On a alors <span class="math inline">\((t/\alpha)^\beta=n\)</span>, <span class="math inline">\(\ln\alpha=\ln t-\frac{1}{\beta}\ln n\)</span> et
-<span class="math inline">\(\ln\frac{t}{\alpha}=\frac{1}{\beta}\ln
-n\)</span>, d’où <span class="math display">\[\begin{align*}
-  \frac{\partial \mathcal{L}}{\partial\beta}\Big|_{\alpha=\alpha(\beta)}
-  &amp;= \frac{n}{\beta}-n\ln t+\frac{n}{\beta}\ln n+\sum_{i=1}^n\ln
-t_i-\frac{n}{\beta}\ln n\\
-  &amp;= \frac{n}{\beta}-\Big(n\ln t-\sum_{i=1}^n\ln t_i\Big)
-   = \frac{n}{\beta}-S .
-\end{align*}\]</span> Cette quantité s’annule si et seulement si <span class="math inline">\(\beta=n/S\)</span>.</p>
-<p><strong>Conclusion :</strong> <span class="math inline">\(\mathcal{L}\)</span> admet un unique point
-critique <span class="math display">\[\boxed{\;\hat\beta=\frac{n}{\displaystyle\sum_{i=1}^n\ln\!\Big(\frac{t}{t_i}\Big)},
-  \qquad
-  \hat\alpha=t\,n^{-1/\hat\beta}\;}\]</span></p>
-</div>
-<div id="ce-point-critique-est-un-maximum-global" class="section level2 unnumbered">
-<h2 class="unnumbered">4. Ce point critique est un maximum global</h2>
-<p>En <span class="math inline">\((\alpha,\beta)\)</span>, <span class="math inline">\(\mathcal{L}\)</span> n’est pas conjointement
-concave en général. On effectue donc le changement de variables <span class="math display">\[\Phi:(\alpha,\beta)\longmapsto(a,\beta),\qquad
-a=\beta\ln\alpha .\]</span> C’est un <span class="math inline">\(C^1\)</span>-difféomorphisme de <span class="math inline">\((0,\infty)^2\)</span> sur <span class="math inline">\(\mathbb{R}\times(0,\infty)\)</span>, de réciproque
-<span class="math inline">\(\alpha=e^{a/\beta}\)</span>. Il préserve
-donc maxima et unicité. Comme <span class="math inline">\(\left(\dfrac{t}{\alpha}\right)^{\beta}=t^{\beta}e^{-a}\)</span>,
-on a <span class="math display">\[\widetilde{\mathcal{L}}(a,\beta)
-  := \mathcal{L}\big(e^{a/\beta},\beta\big)
-  = n\ln\beta - n\,a + (\beta-1)\sum_{i=1}^n\ln t_i -
-t^{\beta}e^{-a}.\]</span></p>
-<p><strong>Hessienne.</strong> Posons <span class="math inline">\(E(a,\beta):=t^{\beta}e^{-a}=e^{\beta\ln
-t-a}&gt;0\)</span>. Les termes <span class="math inline">\(-na\)</span>
-et <span class="math inline">\((\beta-1)\sum\ln t_i\)</span> sont
-affines, donc sans contribution à la hessienne. Il reste <span class="math display">\[\nabla^2\widetilde{\mathcal{L}}(a,\beta)
-  = -\begin{pmatrix} E &amp; -E\ln t\\ -E\ln t &amp; E\ln^2
-t+\dfrac{n}{\beta^2}\end{pmatrix}
-  =: -H .\]</span> On calcule <span class="math display">\[\operatorname{tr}H = E(1+\ln^2
-t)+\frac{n}{\beta^2}&gt;0,
-  \qquad
-  \det H = E\Big(E\ln^2 t+\frac{n}{\beta^2}\Big)-E^2\ln^2
-t=\frac{nE}{\beta^2}&gt;0 .\]</span> Donc <span class="math inline">\(H\)</span> est définie positive en tout point :
-<span class="math inline">\(\widetilde{\mathcal{L}}\)</span> est
-<em>strictement concave</em> sur le convexe <span class="math inline">\(\mathbb{R}\times(0,\infty)\)</span>.</p>
-<p><strong>Conclusion.</strong> Une fonction strictement concave et
-différentiable admet au plus un point critique, et tout point critique
-en est l’unique maximum global. Le point critique <span class="math inline">\((\hat\alpha,\hat\beta)\)</span> du §3 correspond à
-un point critique de <span class="math inline">\(\widetilde{\mathcal{L}}\)</span> (le changement de
-variables est un difféomorphisme), c’est donc l’unique maximum global de
-<span class="math inline">\(\widetilde{\mathcal{L}}\)</span>, et donc de
-<span class="math inline">\(\mathcal{L}\)</span>. Ainsi <span class="math display">\[\boxed{(\hat\alpha,\hat\beta)=\Big(t\,n^{-1/\hat\beta},\
-\frac{n}{S}\Big)
-  \text{ est l&#39;unique estimateur du maximum de
-vraisemblance.}}\]</span></p>
-</div>
-<div id="sec:exact" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Loi exacte de <span class="math inline">\(\hat\beta_T\)</span>, biais et intervalle de
-confiance exact</h2>
-<div id="prop:loiexacte" class="proposition">
-<p><strong>Proposition 7</strong> (<span class="math display">\[CT97,
-Prop. 3.5\]</span>). <em>Soit <span class="math inline">\(n\ge1\)</span>. Conditionnellement à <span class="math inline">\(\{N_T=n\}\)</span>, <span class="math display">\[\frac{\beta}{\hat\beta_T}\sim\Gamma(n,n)
-\qquad\text{et}\qquad
-\frac{2n\beta}{\hat\beta_T}=2\beta
-S_T\sim\Gamma\big(n,\tfrac12\big)\overset{(d)}{=}\chi^2(2n).\]</span>
-Cette loi ne dépend ni de <span class="math inline">\(\alpha\)</span>,
-ni de <span class="math inline">\(\beta\)</span>, ni de <span class="math inline">\(T\)</span> : <span class="math inline">\(2\beta
-S_T\)</span> est un pivot conditionnel.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> La démonstration de <span class="math display">\[CT97\]</span> se termine par « un calcul sans
-difficulté » sur la fonction caractéristique. On le détaille. Par la
-Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a>, sachant <span class="math inline">\(\{N_T=n\}\)</span> on a <span class="math inline">\(S_T\sim\Gamma(n,\beta)\)</span>. La Proposition
-1.19 i) donne alors <span class="math inline">\(\frac{\beta}{\hat\beta_T}=\frac{\beta}{n}S_T\sim\Gamma\big(n,\frac{\beta}{\beta/n}\big)=\Gamma(n,n)\)</span>
-et <span class="math inline">\(2\beta
-S_T\sim\Gamma\big(n,\frac{\beta}{2\beta}\big)=\Gamma\big(n,\frac12\big)\)</span>,
-qui est la loi <span class="math inline">\(\chi^2(2n)\)</span> par la
-Proposition 1.19 iv).</p>
-<p>Vérification par la fonction caractéristique, comme dans <span class="math display">\[CT97\]</span>. Soit <span class="math inline">\(Z_n=\frac{\beta}{n}\sum_{i=1}^nY_i\)</span> avec
-<span class="math inline">\(Y_i\)</span> i.i.d. de loi <span class="math inline">\(\mathcal{E}(\beta)\)</span>. Comme <span class="math inline">\(\beta Y_i\sim\mathcal{E}(1)\)</span>, on a <span class="math inline">\(\mathbb{E}\big[e^{iu\beta
-Y_1/n}\big]=(1-iu/n)^{-1}\)</span>. Par indépendance, <span class="math inline">\(\mathbb{E}\big[e^{iuZ_n}\big]=(1-iu/n)^{-n}\)</span>,
-qui est la fonction caractéristique de <span class="math inline">\(\Gamma(n,n)\)</span> (<span class="math display">\[CT97, Prop. 1.11\]</span>). ◻</p>
-</div>
-<div id="cor:biais" class="corollaire">
-<p><strong>Corollaire 8</strong> (Biais, estimateur sans biais et
-efficacité). <em>Pour <span class="math inline">\(n\ge2\)</span>, <span class="math inline">\(\mathbb{E}\big[\hat\beta_T\mid
-N_T=n\big]=\frac{n}{n-1}\beta\)</span>, alors que <span class="math inline">\(\mathbb{E}\big[\hat\beta_T\mid
-N_T=1\big]=+\infty\)</span>. L’estimateur <span class="math display">\[\tilde\beta_T=\frac{N_T-1}{N_T}\hat\beta_T=\frac{N_T-1}{S_T}\]</span>
-est conditionnellement sans biais : <span class="math inline">\(\mathbb{E}[\tilde\beta_T\mid N_T=n]=\beta\)</span>
-pour <span class="math inline">\(n\ge2\)</span>. Pour <span class="math inline">\(n\ge3\)</span>, <span class="math display">\[\mathrm{Var}\big(\tilde\beta_T\mid
-N_T=n\big)=\frac{\beta^2}{n-2}&gt;\frac{\beta^2}{n}=\frac{1}{I_n(\beta)},\]</span>
-où <span class="math inline">\(I_n(\beta)=n/\beta^2\)</span> est
-l’information de Fisher de la loi conditionnelle. L’estimateur <span class="math inline">\(\tilde\beta_T\)</span> est donc sans biais mais
-pas efficace. C’est exactement la situation de <span class="math inline">\(\tilde\lambda_n=(n-1)/T_n\)</span> pour le hPP à
-<span class="math inline">\(n\)</span> fixé (« Take home message » du
-chapitre 3).</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Sachant <span class="math inline">\(\{N_T=n\}\)</span>, on écrit <span class="math inline">\(\hat\beta_T=n\beta/G\)</span> avec <span class="math inline">\(G:=\beta S_T\sim\Gamma(n,1)\)</span>. Pour <span class="math inline">\(k&lt;n\)</span>, <span class="math display">\[\mathbb{E}\big[G^{-k}\big]=\int_0^{+\infty}\frac{x^{n-k-1}}{(n-1)!}e^{-x}\,dx=\frac{\Gamma(n-k)}{\Gamma(n)}
-,\]</span> d’où <span class="math inline">\(\mathbb{E}[G^{-1}]=\frac{1}{n-1}\)</span> et <span class="math inline">\(\mathbb{E}[G^{-2}]=\frac{1}{(n-1)(n-2)}\)</span>.
-Pour <span class="math inline">\(n=1\)</span>, l’intégrale <span class="math inline">\(\int_0^{+\infty}x^{-1}e^{-x}\,dx\)</span> diverge.
-Ensuite, <span class="math inline">\(\tilde\beta_T=(n-1)\beta/G\)</span>
-donne <span class="math inline">\(\mathbb{E}[\tilde\beta_T\mid
-N_T=n]=\beta\)</span> et <span class="math display">\[\mathrm{Var}(\tilde\beta_T\mid
-N_T=n)=\frac{(n-1)^2\beta^2}{(n-1)(n-2)}-\beta^2=\frac{\beta^2}{n-2}.\]</span>
-Enfin, la log-vraisemblance conditionnelle <span class="math inline">\(\ell_c(\beta)=\ln(n!)+n\ln\beta-n\beta\ln
-T+(\beta-1)\sum_i\ln T_i\)</span> vérifie <span class="math inline">\(\partial^2_\beta\ell_c=-n/\beta^2\)</span>, d’où
-<span class="math inline">\(I_n(\beta)=n/\beta^2\)</span>. ◻</p>
-</div>
-<div class="remarque">
-<p><em>Remarque 9</em>. Les énoncés portent sur des lois
-<em>conditionnelles</em> à <span class="math inline">\(N_T\)</span>.
-Sans conditionnement, <span class="math inline">\(\hat\beta_T\)</span>
-n’est pas défini sur <span class="math inline">\(\{N_T=0\}\)</span> et
-n’est pas intégrable car <span class="math inline">\(\mathbb{P}(N_T=1)&gt;0\)</span>. C’est pourquoi on
-travaille sachant <span class="math inline">\(N_T\)</span>, ce que <span class="math display">\[Møl76\]</span> justifie par le caractère
-ancillaire de <span class="math inline">\(N_T\)</span> vis-à-vis de
-<span class="math inline">\(\beta\)</span>.</p>
-</div>
-<div id="cor:icexact" class="corollaire">
-<p><strong>Corollaire 10</strong> (Intervalles de confiance exacts pour
-<span class="math inline">\(\beta\)</span>, <span class="math display">\[CT97, Cor. 3.6\]</span>). <em>Soit <span class="math inline">\(\delta\in(0,1)\)</span>. Si l’on observe <span class="math inline">\(N_T=n\ge1\)</span>, l’intervalle <span class="math display">\[I_\delta(n)=\Big[\frac{\hat\beta_T}{2n}x_{2n,\delta/2}\;;\;\frac{\hat\beta_T}{2n}x_{2n,1-\delta/2}\Big]
-=\Big[\frac{x_{2n,\delta/2}}{2S_T}\;;\;\frac{x_{2n,1-\delta/2}}{2S_T}\Big]\]</span>
-vérifie <span class="math inline">\(\mathbb{P}\big(\beta\in
-I_\delta(n)\mid N_T=n\big)=1-\delta\)</span>, et donc <span class="math inline">\(\mathbb{P}\big(\beta\in I_\delta(N_T)\mid
-N_T\ge1\big)=1-\delta\)</span>. Les intervalles unilatéraux <span class="math inline">\(\big[0;\frac{\hat\beta_T}{2n}x_{2n,1-\delta}\big]\)</span>
-et <span class="math inline">\(\big[\frac{\hat\beta_T}{2n}x_{2n,\delta};+\infty\big[\)</span>
-sont aussi de niveau exact <span class="math inline">\(1-\delta\)</span>.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Par la Proposition <a href="#prop:loiexacte" reference-type="ref" reference="prop:loiexacte">7</a>, <span class="math display">\[\mathbb{P}\big(\beta\in I_\delta(n)\mid
-N_T=n\big)=\mathbb{P}\big(x_{2n,\delta/2}\le2\beta S_T\le
-x_{2n,1-\delta/2}\mid N_T=n\big)=1-\delta.\]</span> On en déduit <span class="math display">\[\mathbb{P}\big(\beta\in I_\delta(N_T)\mid
-N_T\ge1\big)=\sum_{n\ge1}\mathbb{P}\big(\beta\in I_\delta(n)\mid
-N_T=n\big)\frac{\mathbb{P}(N_T=n)}{\mathbb{P}(N_T\ge1)}=1-\delta.\]</span>
-Les cas unilatéraux sont identiques. ◻</p>
-</div>
-<div class="remarque">
-<p><em>Remarque 11</em>. Cet intervalle est l’analogue exact de
-l’intervalle non asymptotique <span class="math inline">\(\big[\frac{x_{2n,\alpha/2}}{2T_n};\frac{x_{2n,1-\alpha/2}}{2T_n}\big]\)</span>
-du hPP observé jusqu’au <span class="math inline">\(n\)</span>-ième
-point (poly, §III.4.A du chapitre 3). Sachant <span class="math inline">\(N_T=n\)</span>, la statistique <span class="math inline">\(S_T\)</span> joue le rôle de <span class="math inline">\(T_n\)</span> et <span class="math inline">\(\beta\)</span> celui de l’intensité, puisque <span class="math inline">\(S_T\sim\Gamma(n,\beta)\)</span> comme <span class="math inline">\(T_n\sim\Gamma(n,\lambda)\)</span>.</p>
-</div>
-<div id="prop:testbeta" class="proposition">
-<p><strong>Proposition 12</strong> (Tests exacts sur <span class="math inline">\(\beta\)</span>, <span class="math display">\[CT97,
-Prop. 3.25\]</span>). <em>Soient <span class="math inline">\(\beta_0&gt;0\)</span> et <span class="math inline">\(\delta\in(0,1)\)</span>. On observe <span class="math inline">\(N_T=n\ge1\)</span> et l’on note <span class="math inline">\(X_T:=2\beta_0S_T\)</span> la statistique de
-test.</em></p>
-<ol style="list-style-type: decimal">
-<li><p><em>Pour tester <span class="math inline">\(H_0:\beta\le\beta_0\)</span> contre <span class="math inline">\(H_1:\beta&gt;\beta_0\)</span> (usure plus marquée
-que <span class="math inline">\(\beta_0\)</span>), le test qui rejette
-<span class="math inline">\(H_0\)</span> si <span class="math inline">\(X_T\le x_{2n,\delta}\)</span> est de niveau <span class="math inline">\(\delta\)</span>, avec <span class="math inline">\(\sup_{\beta\le\beta_0}\mathbb{P}_\beta(\text{rejet}\mid
-N_T=n)=\delta\)</span>. Sa p-valeur vaut <span class="math inline">\(F_{2n}(X_T^{\mathrm{obs}})\)</span>.</em></p></li>
-<li><p><em>Pour tester <span class="math inline">\(H_0:\beta\ge\beta_0\)</span> contre <span class="math inline">\(H_1:\beta&lt;\beta_0\)</span>, on rejette si <span class="math inline">\(X_T\ge x_{2n,1-\delta}\)</span>. La p-valeur vaut
-<span class="math inline">\(1-F_{2n}(X_T^{\mathrm{obs}})\)</span>.</em></p></li>
-<li><p><em>Pour tester <span class="math inline">\(H_0:\beta=\beta_0\)</span> contre <span class="math inline">\(H_1:\beta\neq\beta_0\)</span>, on rejette si <span class="math inline">\(X_T\notin[x_{2n,\delta/2};x_{2n,1-\delta/2}]\)</span>,
-ce qui équivaut à <span class="math inline">\(\beta_0\notin
-I_\delta(n)\)</span>.</em></p></li>
-</ol>
-<p><em>Pour <span class="math inline">\(\beta_0=1\)</span>, le point 3
-teste « <span class="math inline">\(N\)</span> est un hPP » contre «
-l’intensité est une puissance non constante », au sein du modèle. C’est
-un test d’absence de tendance (voir aussi Crow, 1974). On l’utilise dans
-la partie application pour chaque avion.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Sous <span class="math inline">\(\mathbb{P}_\beta\)</span>, <span class="math inline">\(2\beta S_T\mid\{N_T=n\}\sim\chi^2(2n)\)</span> par
-la Proposition <a href="#prop:loiexacte" reference-type="ref" reference="prop:loiexacte">7</a>, et <span class="math inline">\(X_T=\frac{\beta_0}{\beta}(2\beta S_T)\)</span>.
-Pour <span class="math inline">\(\beta\le\beta_0\)</span>, <span class="math display">\[\mathbb{P}_\beta\big(X_T\le x_{2n,\delta}\mid
-N_T=n\big)=F_{2n}\Big(\frac{\beta}{\beta_0}x_{2n,\delta}\Big)\le
-F_{2n}(x_{2n,\delta})=\delta,\]</span> car <span class="math inline">\(F_{2n}\)</span> est croissante (même argument que
-le Lemme 3.7 du poly), avec égalité pour <span class="math inline">\(\beta=\beta_0\)</span>. Les points 2 et 3 se
-traitent de la même façon. <span class="math display">\[CT97\]</span>
-montre de plus, par le rapport de vraisemblance monotone en <span class="math inline">\(\sum_i\ln T_i\)</span>, que les tests unilatéraux
-sont uniformément plus puissants. ◻</p>
-</div>
-</div>
-<div id="sec:asymptotique" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Comportement
-asymptotique quand <span class="math inline">\(T\to+\infty\)</span></h2>
-<p>Comme <span class="math inline">\(\beta&gt;0\)</span>, on a <span class="math inline">\(\Lambda(T)=(T/\alpha)^\beta\to+\infty\)</span>
-quand <span class="math inline">\(T\to+\infty\)</span>. Les convergences
-en loi indexées par le paramètre continu <span class="math inline">\(T\)</span> s’entendent le long de toute suite
-<span class="math inline">\(T_k\to+\infty\)</span>. Le lemme de Slutsky
-et la méthode delta (Lemme 3.8 du poly) s’appliquent donc tels
-quels.</p>
-<div id="lem:NT" class="lemme">
-<p><strong>Lemme 13</strong> (Comportement de <span class="math inline">\(N_T\)</span>). <em>Quand <span class="math inline">\(T\to+\infty\)</span> : <span class="math display">\[N_T\xrightarrow[T\to+\infty]{\text{p.s.}}+\infty,\qquad
-\frac{N_T}{\Lambda(T)}\xrightarrow[T\to+\infty]{\text{p.s.}}1,\qquad
-\sqrt{\Lambda(T)}\Big(\frac{N_T}{\Lambda(T)}-1\Big)\xrightarrow[T\to+\infty]{\mathcal{L}}\mathcal{N}(0,1),\]</span>
-et par conséquent <span class="math inline">\(\sqrt{\Lambda(T)}\ln\big(N_T/\Lambda(T)\big)\xrightarrow[T\to+\infty]{\mathcal{L}}\mathcal{N}(0,1)\)</span>
-(sur <span class="math inline">\(\{N_T\ge1\}\)</span>, dont la
-probabilité tend vers 1).</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Par la Proposition 4.8, <span class="math inline">\(\tilde N_u:=N_{\Lambda^{-1}(u)}\)</span> définit
-un hPP d’intensité 1, et <span class="math inline">\(N_T=\tilde
-N_{\Lambda(T)}\)</span>. Le Théorème 3.4 du poly, avec la remarque qui
-le suit pour la version presque sûre, appliqué à <span class="math inline">\(\tilde N\)</span> quand <span class="math inline">\(u=\Lambda(T)\to+\infty\)</span>, donne les trois
-convergences. La dernière s’obtient par la méthode delta avec <span class="math inline">\(f=\ln\)</span> en <span class="math inline">\(1\)</span>. ◻</p>
-</div>
-<div id="prop:consistance" class="proposition">
-<p><strong>Proposition 14</strong> (Consistance, <span class="math display">\[CT97, Prop. 3.7\]</span>). <em>Quand <span class="math inline">\(T\to+\infty\)</span>, <span class="math inline">\(\hat\beta_T\xrightarrow{\mathbb{P}}\beta\)</span>
-et <span class="math inline">\(\hat\alpha_T\xrightarrow{\mathbb{P}}\alpha\)</span>.
-Plus précisément, <span class="math inline">\(\ln(T/\alpha)\big(\frac{\beta}{\hat\beta_T}-1\big)\xrightarrow{\mathbb{P}}0\)</span>.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> <span class="math display">\[CT97\]</span> démontre
-la convergence presque sûre avec des outils de martingales qui ne sont
-pas au programme (sa Proposition F.40). On donne ici une preuve
-élémentaire de la convergence en probabilité, qui n’utilise que la loi
-exacte (Proposition <a href="#prop:loiexacte" reference-type="ref" reference="prop:loiexacte">7</a>) et l’inégalité de
-Bienaymé-Tchebychev.</p>
-<p>Soient <span class="math inline">\(E_1,E_2,\dots\)</span> i.i.d. de
-loi <span class="math inline">\(\mathcal{E}(1)\)</span> et <span class="math inline">\(\bar E_n=\frac1n\sum_{j=1}^nE_j\)</span>. Par les
-Propositions 1.19 iii) et i), <span class="math inline">\(\bar
-E_n\sim\Gamma(n,n)\)</span>. Sachant <span class="math inline">\(\{N_T=n\}\)</span>, on a donc <span class="math inline">\(\beta/\hat\beta_T\overset{(d)}{=}\bar
-E_n\)</span>, avec <span class="math inline">\(\mathrm{Var}(\bar
-E_n)=1/n\)</span>. Soient <span class="math inline">\(\varepsilon&gt;0\)</span> et <span class="math inline">\(c_T&gt;0\)</span> une quantité déterministe.
-Notons <span class="math inline">\(\Lambda=\Lambda(T)\)</span>. En
-découpant selon que <span class="math inline">\(N_T&lt;\Lambda/2\)</span> ou non, <span class="math display">\[\begin{aligned}
-\mathbb{P}\Big(N_T\ge1,\;c_T\Big|\frac{\beta}{\hat\beta_T}-1\Big|&gt;\varepsilon\Big)
-&amp;=\sum_{n\ge1}\mathbb{P}(N_T=n)\,\mathbb{P}\Big(|\bar
-E_n-1|&gt;\frac{\varepsilon}{c_T}\Big)\\
-&amp;\le\mathbb{P}\Big(N_T&lt;\frac{\Lambda}{2}\Big)+\sup_{n\ge\Lambda/2}\frac{c_T^2}{n\varepsilon^2}
-\le\frac{\mathrm{Var}(N_T)}{(\Lambda/2)^2}+\frac{2c_T^2}{\Lambda\varepsilon^2}
-=\frac{4}{\Lambda}+\frac{2c_T^2}{\Lambda\varepsilon^2}.
-\end{aligned}\]</span> Avec <span class="math inline">\(c_T=1\)</span>,
-ce majorant tend vers <span class="math inline">\(0\)</span>, donc <span class="math inline">\(\beta/\hat\beta_T\to1\)</span> en probabilité,
-puis <span class="math inline">\(\hat\beta_T\to\beta\)</span> par
-continuité de <span class="math inline">\(x\mapsto\beta/x\)</span>. Avec
-<span class="math inline">\(c_T=\ln(T/\alpha)\)</span> (pour <span class="math inline">\(T&gt;\alpha\)</span>), on a <span class="math inline">\(c_T^2/\Lambda=\ln^2(T/\alpha)\,(T/\alpha)^{-\beta}\to0\)</span>,
-ce qui prouve la dernière assertion.</p>
-<p>Pour <span class="math inline">\(\alpha\)</span>, on part de <span class="math inline">\(\ln\hat\alpha_T=\ln T-\frac{1}{\hat\beta_T}\ln
-N_T\)</span> et de <span class="math inline">\(\ln\alpha=\ln
-T-\frac1\beta\ln\Lambda(T)\)</span>. Comme <span class="math inline">\(\ln\Lambda(T)=\beta\ln(T/\alpha)\)</span>, <span class="math display">\[\ln\hat\alpha_T-\ln\alpha=-\frac{1}{\hat\beta_T}\ln\frac{N_T}{\Lambda(T)}-\Big(\frac{\beta}{\hat\beta_T}-1\Big)\ln\frac{T}{\alpha}.
-\tag{D}\]</span> Le premier terme tend vers <span class="math inline">\(0\)</span> par le Lemme <a href="#lem:NT" reference-type="ref" reference="lem:NT">13</a> et la consistance de
-<span class="math inline">\(\hat\beta_T\)</span>. Le second tend vers
-<span class="math inline">\(0\)</span> par ce qui précède. On conclut
-par continuité de l’exponentielle. ◻</p>
-</div>
-<div class="remarque">
-<p><em>Remarque 15</em>. La décomposition (D) montre pourquoi
-l’estimation de <span class="math inline">\(\alpha\)</span> est
-difficile. L’erreur relative sur <span class="math inline">\(\beta\)</span>, d’ordre <span class="math inline">\(1/\sqrt{\Lambda(T)}\)</span>, est multipliée par
-<span class="math inline">\(\ln(T/\alpha)\to+\infty\)</span>. En effet,
-<span class="math inline">\(\hat\alpha_T=TN_T^{-1/\hat\beta_T}\)</span>,
-donc une petite erreur sur l’exposant <span class="math inline">\(1/\hat\beta_T\)</span> est amplifiée par <span class="math inline">\(\ln N_T\approx\beta\ln(T/\alpha)\)</span>. Elle
-domine alors les fluctuations de <span class="math inline">\(N_T\)</span> elles-mêmes.</p>
-</div>
-<div id="thm:tcl" class="theoreme">
-<p><strong>Théorème 16</strong> (Normalité asymptotique, <span class="math display">\[CT97, Prop. 3.11\]</span>). <em>Quand <span class="math inline">\(T\to+\infty\)</span> :</em></p>
-<ol style="list-style-type: decimal">
-<li><p><em><span class="math inline">\(\sqrt{\Lambda(T)}\Big(\dfrac{\beta}{\hat\beta_T}-1\Big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)\)</span>
-et <span class="math inline">\(\sqrt{\Lambda(T)}\big(\hat\beta_T-\beta\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,\beta^2)\)</span>
-;</em></p></li>
-<li><p><em><span class="math inline">\(\dfrac{\sqrt{\Lambda(T)}}{\ln
-T}\big(\ln\hat\alpha_T-\ln\alpha\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)\)</span>
-et <span class="math inline">\(\dfrac{\sqrt{\Lambda(T)}}{\ln
-T}\big(\hat\alpha_T-\alpha\big)\xrightarrow{\mathcal{L}}\mathcal{N}(0,\alpha^2)\)</span>
-;</em></p></li>
-<li><p><em>conjointement, <span class="math inline">\(\Big(\dfrac{\sqrt{\Lambda(T)}}{\ln
-T}\ln\dfrac{\hat\alpha_T}{\alpha}\,,\;\sqrt{\Lambda(T)}\Big(\dfrac{\beta}{\hat\beta_T}-1\Big)\Big)\xrightarrow{\mathcal{L}}(X,-X)\)</span>
-avec <span class="math inline">\(X\sim\mathcal{N}(0,1)\)</span>. C’est
-une loi gaussienne dégénérée de matrice de covariance <span class="math inline">\(\begin{pmatrix}1&amp;-1\\-1&amp;1\end{pmatrix}\)</span>.
-De même, <span class="math inline">\(\Big(\dfrac{\sqrt{\Lambda(T)}}{\ln
-T}(\hat\alpha_T-\alpha),\sqrt{\Lambda(T)}(\hat\beta_T-\beta)\Big)\)</span>
-converge vers une loi gaussienne centrée de covariance <span class="math inline">\(\begin{pmatrix}\alpha^2&amp;\alpha\beta\\\alpha\beta&amp;\beta^2\end{pmatrix}\)</span>.</em></p></li>
-</ol>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> On note <span class="math inline">\(\Lambda=\Lambda(T)\)</span>.</p>
-<p><em>Point 1.</em> On suit la méthode de la preuve du Théorème 3.4 du
-poly, comme le fait <span class="math display">\[CT97\]</span>. Posons
-<span class="math inline">\(Z_T:=\frac{N_T}{\sqrt{\Lambda}}\big(\frac{\beta}{\hat\beta_T}-1\big)\)</span>
-sur <span class="math inline">\(\{N_T\ge1\}\)</span> et <span class="math inline">\(Z_T:=0\)</span> sur <span class="math inline">\(\{N_T=0\}\)</span>. Le facteur <span class="math inline">\(N_T/\Lambda\)</span> rend le calcul explicite.
-Sachant <span class="math inline">\(\{N_T=n\}\)</span>, avec <span class="math inline">\(n\ge1\)</span>, la Proposition 1.19 i) appliquée à
-la Proposition <a href="#prop:loiexacte" reference-type="ref" reference="prop:loiexacte">7</a> donne <span class="math inline">\(n\beta/\hat\beta_T\sim\Gamma(n,1)\)</span>, dont
-la fonction caractéristique est <span class="math inline">\(v\mapsto(1-iv)^{-n}\)</span>. Donc, pour tout
-<span class="math inline">\(n\ge0\)</span>, <span class="math display">\[\mathbb{E}\big[e^{iuZ_T}\mid
-N_T=n\big]=e^{-iun/\sqrt\Lambda}\Big(1-\frac{iu}{\sqrt\Lambda}\Big)^{-n}=q_T^{\,n},
-\qquad q_T:=\frac{e^{-iu/\sqrt\Lambda}}{1-iu/\sqrt\Lambda}.\]</span>
-Comme <span class="math inline">\(N_T\sim\mathcal{P}(\Lambda)\)</span>,
-<span class="math display">\[\mathbb{E}\big[e^{iuZ_T}\big]=\sum_{n\ge0}e^{-\Lambda}\frac{\Lambda^n}{n!}q_T^{\,n}=\exp\big(\Lambda(q_T-1)\big).\]</span>
-Avec <span class="math inline">\(h=1/\sqrt\Lambda\to0\)</span>, un
-développement de Taylor donne <span class="math inline">\(\ln
-q_T=-iuh-\ln(1-iuh)=-iuh+iuh+\frac{(iuh)^2}{2}+O(h^3)=-\frac{u^2h^2}{2}+O(h^3)\)</span>,
-donc <span class="math inline">\(q_T-1=-\frac{u^2}{2\Lambda}+O(\Lambda^{-3/2})\)</span>.
-Ainsi <span class="math inline">\(\mathbb{E}[e^{iuZ_T}]\to
-e^{-u^2/2}\)</span> et <span class="math inline">\(Z_T\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)\)</span>.
-Comme <span class="math inline">\(\sqrt\Lambda(\beta/\hat\beta_T-1)=\frac{\Lambda}{N_T}Z_T\)</span>
-sur <span class="math inline">\(\{N_T\ge1\}\)</span> et que <span class="math inline">\(\Lambda/N_T\xrightarrow{\mathbb{P}}1\)</span>
-(Lemme <a href="#lem:NT" reference-type="ref" reference="lem:NT">13</a>), le lemme de Slutsky donne la première
-convergence. La méthode delta avec <span class="math inline">\(f(x)=1/x\)</span> en <span class="math inline">\(1\)</span>, où <span class="math inline">\(f&#39;(1)=-1\)</span>, donne <span class="math inline">\(\sqrt\Lambda(\hat\beta_T/\beta-1)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)\)</span>,
-d’où la seconde.</p>
-<p><em>Point 2.</em> En divisant (D) par <span class="math inline">\(\ln
-T/\sqrt\Lambda\)</span>, <span class="math display">\[\frac{\sqrt\Lambda}{\ln
-T}\ln\frac{\hat\alpha_T}{\alpha}
-=\underbrace{-\frac{1}{\hat\beta_T\ln
-T}\,\sqrt\Lambda\ln\frac{N_T}{\Lambda}}_{=:H_T}
--\underbrace{\frac{\ln(T/\alpha)}{\ln T}}_{=:c_T\to1}\,Y_T,
-\qquad Y_T:=\sqrt\Lambda\Big(\frac{\beta}{\hat\beta_T}-1\Big).\]</span>
-Dans <span class="math inline">\(H_T\)</span>, le facteur <span class="math inline">\(\sqrt\Lambda\ln(N_T/\Lambda)\)</span> converge en
-loi (Lemme <a href="#lem:NT" reference-type="ref" reference="lem:NT">13</a>) et <span class="math inline">\(1/(\hat\beta_T\ln
-T)\xrightarrow{\mathbb{P}}0\)</span> : le produit tend vers <span class="math inline">\(0\)</span> en probabilité (<span class="math display">\[CT97, Prop. 3.8\]</span>). Par le point 1 et le
-lemme de Slutsky, le membre de gauche converge en loi vers <span class="math inline">\(-X\overset{(d)}{=}X\)</span>. La méthode delta
-avec <span class="math inline">\(f=\exp\)</span> en <span class="math inline">\(0\)</span> donne la version <span class="math inline">\(\hat\alpha_T/\alpha-1\)</span>, que l’on multiplie
-par <span class="math inline">\(\alpha\)</span>.</p>
-<p><em>Point 3.</em> Le vecteur s’écrit <span class="math inline">\(\big(H_T+(1-c_T)Y_T,0\big)+(-Y_T,Y_T)\)</span>. Le
-premier terme tend vers <span class="math inline">\(0\)</span> en
-probabilité et le second converge en loi vers <span class="math inline">\((-X,X)\)</span>, qui a même loi que <span class="math inline">\((X,-X)\)</span>. La seconde forme s’en déduit par
-la méthode delta composante par composante (<span class="math display">\[CT97, Prop. 3.10\]</span>), car <span class="math inline">\(\hat\beta_T-\beta\approx-\beta(\beta/\hat\beta_T-1)\)</span>
-et <span class="math inline">\(\hat\alpha_T-\alpha\approx\alpha\ln(\hat\alpha_T/\alpha)\)</span>. ◻</p>
-</div>
-<p>Les vitesses <span class="math inline">\(\sqrt{\Lambda(T)}\)</span>
-dépendent des paramètres inconnus. On les remplace par <span class="math inline">\(\sqrt{N_T}\)</span> grâce à <span class="math inline">\(N_T/\Lambda(T)\to1\)</span> et au lemme de
-Slutsky.</p>
-<div id="cor:autonorm" class="corollaire">
-<p><strong>Corollaire 17</strong> (Versions auto-normalisées, <span class="math display">\[CT97, Prop. 3.12\]</span>). <em>Quand <span class="math inline">\(T\to+\infty\)</span>, chacune des variables <span class="math display">\[\sqrt{N_T}\Big(\frac{\beta}{\hat\beta_T}-1\Big),\quad
-\sqrt{N_T}\Big(\frac{\hat\beta_T}{\beta}-1\Big),\quad
-\frac{\sqrt{N_T}}{\ln T}\ln\frac{\hat\alpha_T}{\alpha},\quad
-\frac{\sqrt{N_T}}{\ln T}\Big(\frac{\hat\alpha_T}{\alpha}-1\Big)\]</span>
-converge en loi vers <span class="math inline">\(\mathcal{N}(0,1)\)</span>.</em></p>
-</div>
-<div id="rem:fisher" class="remarque">
-<p><em>Remarque 18</em> (Lien avec l’information de Fisher). Ces
-vitesses inhabituelles se lisent sur l’information de Fisher <span class="math inline">\(I_T(\alpha,\beta)=\mathbb{E}\big[-\nabla^2\ell(\alpha,\beta)\big]\)</span>.
-Avec <span class="math inline">\(L_T:=\ln(T/\alpha)\)</span> et <span class="math inline">\(\mathbb{E}[N_T]=\Lambda(T)\)</span>, les dérivées
-secondes de <span class="math inline">\(\ell\)</span> donnent <span class="math display">\[I_T(\alpha,\beta)=\Lambda(T)\begin{pmatrix}\dfrac{\beta^2}{\alpha^2}&amp;-\dfrac{\beta}{\alpha}L_T\\[2mm]-\dfrac{\beta}{\alpha}L_T&amp;\dfrac{1}{\beta^2}+L_T^2\end{pmatrix},
-\qquad
-I_T(\alpha,\beta)^{-1}=\frac{1}{\Lambda(T)}\begin{pmatrix}\alpha^2\Big(\dfrac{1}{\beta^2}+L_T^2\Big)&amp;\alpha\beta
-L_T\\[2mm]\alpha\beta L_T&amp;\beta^2\end{pmatrix}.\]</span> On a en
-effet <span class="math inline">\(\mathbb{E}[\partial^2_\alpha\ell]=-\frac{\beta^2}{\alpha^2}\Lambda(T)\)</span>,
-<span class="math inline">\(\mathbb{E}[\partial_\alpha\partial_\beta\ell]=\frac{\beta}{\alpha}\Lambda(T)L_T\)</span>
-et <span class="math inline">\(\mathbb{E}[\partial^2_\beta\ell]=-\Lambda(T)\big(\frac{1}{\beta^2}+L_T^2\big)\)</span>,
-et le déterminant de la matrice entre parenthèses vaut <span class="math inline">\(1/\alpha^2\)</span>. On retrouve les résultats
-précédents :</p>
-<ul>
-<li><p>la variance asymptotique de <span class="math inline">\(\hat\beta_T\)</span> est <span class="math inline">\(\beta^2/\Lambda(T)\)</span> (point 1 du
-Théorème <a href="#thm:tcl" reference-type="ref" reference="thm:tcl">16</a>) ;</p></li>
-<li><p>celle de <span class="math inline">\(\hat\alpha_T\)</span> est
-<span class="math inline">\(\alpha^2(\beta^{-2}+L_T^2)/\Lambda(T)\sim\alpha^2\ln^2T/\Lambda(T)\)</span>
-(point 2) ;</p></li>
-<li><p>la corrélation <span class="math inline">\(L_T/\sqrt{\beta^{-2}+L_T^2}\)</span> tend vers
-<span class="math inline">\(1\)</span>, d’où la loi limite dégénérée du
-point 3.</p></li>
-</ul>
-<p>Le paramétrage orthogonal <span class="math inline">\((\mu,\beta)\)</span> de la Remarque <a href="#rem:factorisation" reference-type="ref" reference="rem:factorisation"><span class="math display">\[rem:factorisation\]</span></a> donne la même
-conclusion plus simplement : <span class="math inline">\(I(\mu)=1/\mu\)</span>, <span class="math inline">\(I(\beta)=\mu/\beta^2\)</span>, sans terme croisé.
-La méthode delta appliquée à <span class="math inline">\(\ln\alpha=\ln
-T-\frac1\beta\ln\mu\)</span> donne alors une variance asymptotique de
-<span class="math inline">\(\ln\hat\alpha_T\)</span> égale à <span class="math inline">\(\frac{1}{\Lambda(T)}\big(\frac{1}{\beta^2}+L_T^2\big)\)</span>.</p>
-</div>
-<div id="cor:icasympt" class="corollaire">
-<p><strong>Corollaire 19</strong> (Intervalles de confiance
-asymptotiques, <span class="math display">\[CT97, Cor. 3.13\]</span>).
-<em>Soit <span class="math inline">\(\delta\in(0,1)\)</span> et <span class="math inline">\(z=z_{1-\delta/2}\)</span>. Les intervalles
-suivants sont de niveau asymptotique <span class="math inline">\(1-\delta\)</span> quand <span class="math inline">\(T\to+\infty\)</span> :</em></p>
-<ul>
-<li><p><em>pour <span class="math inline">\(\beta\)</span> : <span class="math inline">\(\Big[\hat\beta_T\Big(1-\dfrac{z}{\sqrt{N_T}}\Big)\;;\;\hat\beta_T\Big(1+\dfrac{z}{\sqrt{N_T}}\Big)\Big]\)</span>
-;</em></p></li>
-<li><p><em>pour <span class="math inline">\(\alpha\)</span> (forme
-logarithmique, bornes toujours positives) : <span class="math inline">\(\Big[\hat\alpha_T\exp\Big(-\dfrac{z\ln
-T}{\sqrt{N_T}}\Big)\;;\;\hat\alpha_T\exp\Big(\dfrac{z\ln
-T}{\sqrt{N_T}}\Big)\Big]\)</span> ;</em></p></li>
-<li><p><em>pour <span class="math inline">\(\alpha\)</span> (forme
-linéaire) : <span class="math inline">\(\Big[\hat\alpha_T\Big(1-\dfrac{z\ln
-T}{\sqrt{N_T}}\Big)\;;\;\hat\alpha_T\Big(1+\dfrac{z\ln
-T}{\sqrt{N_T}}\Big)\Big]\)</span>.</em></p></li>
-</ul>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Pour <span class="math inline">\(\beta\)</span>, on
-a <span class="math inline">\(-z\le\sqrt{N_T}(\beta/\hat\beta_T-1)\le
-z\iff\hat\beta_T(1-z/\sqrt{N_T})\le\beta\le\hat\beta_T(1+z/\sqrt{N_T})\)</span>,
-et l’on conclut par le Corollaire <a href="#cor:autonorm" reference-type="ref" reference="cor:autonorm">17</a>, comme au §II.4 du
-chapitre 3 du poly. Pour la forme logarithmique, on isole <span class="math inline">\(\alpha\)</span> dans <span class="math inline">\(-z\le\frac{\sqrt{N_T}}{\ln
-T}\ln\frac{\hat\alpha_T}{\alpha}\le z\)</span>. Pour la forme linéaire,
-<span class="math inline">\(\alpha/\hat\alpha_T\xrightarrow{\mathbb{P}}1\)</span>
-et le lemme de Slutsky donnent <span class="math inline">\(\frac{\sqrt{N_T}}{\hat\alpha_T\ln
-T}(\hat\alpha_T-\alpha)\xrightarrow{\mathcal{L}}\mathcal{N}(0,1)\)</span>. ◻</p>
-</div>
-<div id="rem:vigilance" class="remarque">
-<p><em>Remarque 20</em> (Deux points de vigilance).</p>
-<ol style="list-style-type: decimal">
-<li><p>Les formes linéaires (d)–(f) du Corollaire 3.13 de <span class="math display">\[CT97\]</span> sont écrites <span class="math inline">\(\hat\alpha\pm\frac{\ln
-t}{\sqrt{N(t)}}n_\gamma\)</span> et <span class="math inline">\(\hat\beta\pm\frac{n_\gamma}{\sqrt{N(t)}}\)</span>.
-Il y manque le facteur <span class="math inline">\(\hat\alpha\)</span>
-(respectivement <span class="math inline">\(\hat\beta\)</span>) : ces
-bornes ne sont pas homogènes à un temps et ne sont correctes que si
-<span class="math inline">\(\alpha=1\)</span> (respectivement <span class="math inline">\(\beta=1\)</span>). Les formes correctes sont
-celles du Corollaire <a href="#cor:icasympt" reference-type="ref" reference="cor:icasympt">19</a>.</p></li>
-<li><p>La normalisation par <span class="math inline">\(\ln T\)</span>
-dépend de l’unité de temps : passer des heures aux milliers d’heures
-change <span class="math inline">\(\ln T\)</span>, mais ni <span class="math inline">\(\hat\alpha_T/\alpha\)</span> ni <span class="math inline">\(N_T\)</span>. Asymptotiquement, <span class="math inline">\(\ln
-T\sim\ln(T/\alpha)\sim\ln(T/\hat\alpha_T)\)</span>. La Remarque <a href="#rem:fisher" reference-type="ref" reference="rem:fisher">18</a>
-suggère donc la demi-largeur <span class="math inline">\(z\sqrt{\hat\beta_T^{-2}+\ln^2(T/\hat\alpha_T)}/\sqrt{N_T}\)</span>
-pour <span class="math inline">\(\ln\alpha\)</span>. Elle est invariante
-par changement d’unité (car <span class="math inline">\(\ln(T/\hat\alpha_T)=\ln(N_T)/\hat\beta_T\)</span>),
-asymptotiquement équivalente à celle de <span class="math display">\[CT97\]</span>, et conserve le terme <span class="math inline">\(\beta^{-2}\)</span> que cette dernière néglige.
-Son intérêt à distance finie reste à vérifier par simulation.</p></li>
-</ol>
-</div>
-</div>
-</div>
-<div id="sec:adequation" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Test d’adéquation
-(Møller, 1976)</h1>
-<p>On veut tester l’hypothèse <span class="math inline">\(H_0\)</span> :
-« <span class="math inline">\(N\)</span> est un processus de loi de
-puissance, pour des paramètres <span class="math inline">\((\alpha,\beta)\)</span> inconnus ». <span class="math display">\[Møl76\]</span> fonde un tel test sur une
-caractérisation du modèle parmi les iPP. On en donne d’abord la version
-à horizon <span class="math inline">\(T\)</span> fixé, adaptée à ce
-rapport, puis la version d’origine à nombre de points fixé, qui est
-celle qu’utilise <span class="math display">\[Møl76\]</span> sur les
-données de <span class="math display">\[Pro63\]</span>.</p>
-<div id="sec:caracterisation" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Caractérisation du
-processus de loi de puissance</h2>
-<div id="thm:caracT" class="theoreme">
-<p><strong>Théorème 21</strong> (Caractérisation à horizon fixé).
-<em>Soit <span class="math inline">\(N\)</span> un iPP d’intensité
-cumulée <span class="math inline">\(\Lambda\)</span> continue et
-strictement croissante. Soient <span class="math inline">\(T&gt;0\)</span> et <span class="math inline">\(n\ge1\)</span>.</em></p>
-<ol style="list-style-type: decimal">
-<li><p><em>Conditionnellement à <span class="math inline">\(\{N_T=n\}\)</span>, <span class="math inline">\((T_1/T,\dots,T_n/T)\)</span> est la statistique
-d’ordre de <span class="math inline">\(n\)</span> variables i.i.d. de
-fonction de répartition <span class="math inline">\(F_T(x)=\Lambda(Tx)/\Lambda(T)\)</span>, <span class="math inline">\(x\in[0,1]\)</span>.</em></p></li>
-<li><p><em><span class="math inline">\(N\)</span> est un processus de
-loi de puissance de forme <span class="math inline">\(\beta\)</span> si
-et seulement si, pour tout <span class="math inline">\(T&gt;0\)</span>,
-conditionnellement à <span class="math inline">\(\{N_T=n\}\)</span>,
-<span class="math inline">\(\big(\ln(T/T_n),\dots,\ln(T/T_1)\big)\)</span> a
-la loi de la statistique d’ordre de <span class="math inline">\(n\)</span> variables i.i.d. de loi <span class="math inline">\(\mathcal{E}(\beta)\)</span>. De manière
-équivalente, <span class="math inline">\(\big((T_i/T)^\beta\big)_{1\le
-i\le n}\)</span> a la loi de la statistique d’ordre de <span class="math inline">\(n\)</span> variables i.i.d. de loi <span class="math inline">\(\mathcal{U}([0,1])\)</span>.</em></p></li>
-<li><p><em><span class="math inline">\(N\)</span> est un processus de
-loi de puissance (pour un certain couple <span class="math inline">\((\alpha,\beta)\)</span>) si et seulement si la loi
-conditionnelle du point 1 ne dépend pas de <span class="math inline">\(T\)</span>.</em></p></li>
-</ol>
-</div>
-<div class="proof">
-<p><em>Preuve.</em></p>
-<ol style="list-style-type: decimal">
-<li><p>Par la Proposition 4.12, sachant <span class="math inline">\(\{N_T=n\}\)</span>, <span class="math inline">\((T_i)_i\)</span> est la statistique d’ordre de
-<span class="math inline">\(n\)</span> variables i.i.d. <span class="math inline">\(X_i\)</span> de densité <span class="math inline">\(\lambda(s)/\Lambda(T)\)</span> sur <span class="math inline">\(]0,T]\)</span>. L’application <span class="math inline">\(s\mapsto s/T\)</span> est croissante, et <span class="math inline">\(\mathbb{P}(X_1/T\le
-x)=\Lambda(Tx)/\Lambda(T)\)</span>.</p></li>
-<li><p>Le sens direct est la Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a>. Réciproquement, la
-loi de la statistique d’ordre détermine la loi commune, par exemple via
-<span class="math inline">\(F_T(x)=\mathbb{E}\big[\frac1n\sum_i\mathbf{1}_{\{T_i/T\le
-x\}}\mid N_T=n\big]\)</span>. Comme dans la preuve de la Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a>, l’hypothèse donne <span class="math inline">\(F_T(x)=x^\beta\)</span>, c’est-à-dire <span class="math inline">\(\Lambda(Tx)=\Lambda(T)x^\beta\)</span> pour tous
-<span class="math inline">\(T&gt;0\)</span> et <span class="math inline">\(x\in[0,1]\)</span>. Pour <span class="math inline">\(t\le1\)</span>, on prend <span class="math inline">\(T=1\)</span> et <span class="math inline">\(x=t\)</span> ; pour <span class="math inline">\(t&gt;1\)</span>, on prend <span class="math inline">\(T=t\)</span> et <span class="math inline">\(x=1/t\)</span>. Dans les deux cas, <span class="math inline">\(\Lambda(t)=\Lambda(1)t^\beta=(t/\alpha)^\beta\)</span>
-avec <span class="math inline">\(\alpha:=\Lambda(1)^{-1/\beta}\)</span>.</p></li>
-<li><p>Le sens direct est clair, car <span class="math inline">\(F_T(x)=x^\beta\)</span>. Réciproquement, si <span class="math inline">\(F_T=F_1\)</span> pour tout <span class="math inline">\(T\)</span>, alors <span class="math inline">\(\Lambda(Tx)\Lambda(1)=\Lambda(T)\Lambda(x)\)</span>
-pour <span class="math inline">\(T&gt;0\)</span> et <span class="math inline">\(x\in\,]0,1]\)</span>. On pose <span class="math inline">\(g(u)=\Lambda(e^u)/\Lambda(1)\)</span> pour <span class="math inline">\(u\in\mathbb{R}\)</span> : <span class="math inline">\(g\)</span> est continue, strictement positive,
-<span class="math inline">\(g(0)=1\)</span>, et <span class="math inline">\(g(u+v)=g(u)g(v)\)</span> pour <span class="math inline">\(u\in\mathbb{R}\)</span> et <span class="math inline">\(v\le0\)</span>. Avec <span class="math inline">\(v&gt;0\)</span>, on écrit <span class="math inline">\(1=g(0)=g(v)g(-v)\)</span> et <span class="math inline">\(g(u)=g(u+v)g(-v)\)</span>, d’où <span class="math inline">\(g(u+v)=g(u)g(v)\)</span> pour tous <span class="math inline">\(u,v\in\mathbb{R}\)</span>. Par le Lemme 1.13 du
-poly et son extension à <span class="math inline">\(\mathbb{R}\)</span>
-(Annexe A.III.1), <span class="math inline">\(g(u)=e^{\beta u}\)</span>
-pour un réel <span class="math inline">\(\beta\)</span>, et <span class="math inline">\(\beta&gt;0\)</span> car <span class="math inline">\(\Lambda\)</span> est croissante. Donc <span class="math inline">\(\Lambda(t)=\Lambda(1)t^\beta\)</span>. C’est la
-même équation fonctionnelle que dans <span class="math display">\[Møl76\]</span> : <span class="math inline">\(m(wx)m(1)=m(w)m(x)\)</span>.</p></li>
-</ol>
-<p> ◻</p>
-</div>
-<div id="thm:moller" class="theoreme">
-<p><strong>Théorème 22</strong> (Théorème 1 de <span class="math display">\[Møl76\]</span>, nombre de points fixé). <em>Soit
-<span class="math inline">\(n\ge2\)</span>. Le vecteur <span class="math inline">\(\big(\ln(T_n/T_{n-1}),\ln(T_n/T_{n-2}),\dots,\ln(T_n/T_1)\big)\)</span>
-a la loi de la statistique d’ordre de <span class="math inline">\(n-1\)</span> variables i.i.d. de loi <span class="math inline">\(\mathcal{E}(\beta)\)</span> si et seulement si
-<span class="math inline">\(N\)</span> est un processus de loi de
-puissance de forme <span class="math inline">\(\beta\)</span>. Ce
-vecteur est alors indépendant de <span class="math inline">\(T_n\)</span>.</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve (sens direct).</em> Par le point 4 de la Proposition <a href="#prop:proprietes" reference-type="ref" reference="prop:proprietes">2</a>, <span class="math inline">\(S_i=(T_i/\alpha)^\beta\)</span> sont les temps
-d’arrivée d’un hPP d’intensité 1. Par le Lemme 2.19, <span class="math inline">\((S_1,\dots,S_n)\)</span> a pour densité <span class="math inline">\(e^{-s_n}\mathbf{1}_{\{0&lt;s_1&lt;\dots&lt;s_n\}}\)</span>,
-et <span class="math inline">\(S_n\sim\Gamma(n,1)\)</span> (Proposition
-2.18). Sachant <span class="math inline">\(\{S_n=s\}\)</span>, la
-densité de <span class="math inline">\((S_1,\dots,S_{n-1})\)</span> vaut
-donc <span class="math display">\[\frac{e^{-s}\mathbf{1}_{\{0&lt;s_1&lt;\dots&lt;s_{n-1}&lt;s\}}}{s^{n-1}e^{-s}/(n-1)!}=\frac{(n-1)!}{s^{n-1}}\mathbf{1}_{\{0&lt;s_1&lt;\dots&lt;s_{n-1}&lt;s\}}.\]</span>
-C’est la statistique d’ordre de <span class="math inline">\(n-1\)</span>
-variables i.i.d. de loi <span class="math inline">\(\mathcal{U}([0,s])\)</span> (Propriété 2.22).
-Ainsi <span class="math inline">\(\big(S_i/S_n\big)_{i&lt;n}=\big((T_i/T_n)^\beta\big)_{i&lt;n}\)</span>
-a la loi de la statistique d’ordre de <span class="math inline">\(n-1\)</span> variables uniformes sur <span class="math inline">\([0,1]\)</span>, indépendante de <span class="math inline">\(S_n\)</span>, donc de <span class="math inline">\(T_n\)</span>. On conclut comme pour la
-Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a> avec <span class="math inline">\(\ln(T_n/T_i)=-\frac1\beta\ln(S_i/S_n)\)</span>. La
-réciproque utilise la même équation fonctionnelle que le point 3 du
-Théorème <a href="#thm:caracT" reference-type="ref" reference="thm:caracT">21</a> (<span class="math display">\[Møl76\]</span>, §II). ◻</p>
-</div>
-<div id="rem:nfixe" class="remarque">
-<p><em>Remarque 23</em> (Inférence à nombre de points fixé et données de
-Proschan). Dans <span class="math display">\[Pro63\]</span>, seuls les
-intervalles entre pannes sont donnés et la fin de l’observation n’est
-pas connue. <span class="math display">\[Møl76\]</span>, à la suite de
-Cox et Lewis, traite donc ces données à <span class="math inline">\(n\)</span> fixé : on observe <span class="math inline">\(T_1&lt;\dots&lt;T_n\)</span>. La vraisemblance
-(Proposition 4.15 du poly) a la même forme que dans la Proposition <a href="#prop:emv" reference-type="ref" reference="prop:emv">6</a>, avec
-<span class="math inline">\(T\)</span> remplacé par <span class="math inline">\(T_n\)</span> et <span class="math inline">\(N_T\)</span> par <span class="math inline">\(n\)</span> (<span class="math display">\[CT97,
-Rem. 3.24\]</span>). On obtient <span class="math display">\[\hat\beta_n=\frac{n}{\sum_{i=1}^{n-1}\ln(T_n/T_i)},\qquad\hat\alpha_n=\frac{T_n}{n^{1/\hat\beta_n}},\]</span>
-car le terme <span class="math inline">\(i=n\)</span> est nul. Le
-Théorème <a href="#thm:moller" reference-type="ref" reference="thm:moller">22</a> donne <span class="math inline">\(\sum_{i&lt;n}\ln(T_n/T_i)\sim\Gamma(n-1,\beta)\)</span>,
-d’où <span class="math inline">\(2n\beta/\hat\beta_n\sim\chi^2(2n-2)\)</span>
-(<span class="math display">\[CT97, Cor. 3.20\]</span>). L’estimateur
-sans biais est <span class="math inline">\(\frac{n-2}{n}\hat\beta_n\)</span> (<span class="math display">\[Møl76\]</span>). <em>Attention :</em> appliquer
-les formules à <span class="math inline">\(T\)</span> fixé avec <span class="math inline">\(T:=T_n\)</span> ferait utiliser à tort <span class="math inline">\(\chi^2(2n)\)</span> au lieu de <span class="math inline">\(\chi^2(2n-2)\)</span>. Le dernier point coïncide
-avec la fin de l’observation et n’apporte aucune information sur <span class="math inline">\(\beta\)</span> : seuls les <span class="math inline">\(n-1\)</span> rapports <span class="math inline">\(T_i/T_n\)</span> en apportent.</p>
-</div>
-</div>
-<div id="sec:test" class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Construction du
-test</h2>
-<p>On se place à horizon <span class="math inline">\(T\)</span> fixé et
-l’on observe <span class="math inline">\(N_T=n\ge2\)</span>. On pose
-<span class="math inline">\(V_i:=\ln(T/T_i)\)</span> pour <span class="math inline">\(1\le i\le n\)</span>, <span class="math inline">\(\hat\beta_T=n/\sum_iV_i\)</span>, et l’on note
-<span class="math inline">\(\hat
-F_n(x)=\frac1n\sum_{i=1}^n\mathbf{1}_{\{V_i\le x\}}\)</span> la fonction
-de répartition empirique des <span class="math inline">\(V_i\)</span>.
-Par le Théorème <a href="#thm:caracT" reference-type="ref" reference="thm:caracT">21</a>, sous <span class="math inline">\(H_0\)</span> et sachant <span class="math inline">\(\{N_T=n\}\)</span>, les <span class="math inline">\(V_i\)</span> forment (à l’ordre près) un
-échantillon de loi <span class="math inline">\(\mathcal{E}(\beta)\)</span>, avec <span class="math inline">\(\beta\)</span> inconnu. On compare donc <span class="math inline">\(\hat F_n\)</span> à la loi exponentielle ajustée
-par la statistique de Kolmogorov-Smirnov <span class="math display">\[D_n:=\sup_{x\ge0}\Big|\hat
-F_n(x)-\big(1-e^{-\hat\beta_Tx}\big)\Big|.\]</span></p>
-<div id="prop:pivot" class="proposition">
-<p><strong>Proposition 24</strong> (Loi de <span class="math inline">\(D_n\)</span> sous <span class="math inline">\(H_0\)</span>). <em>Sous <span class="math inline">\(H_0\)</span> et conditionnellement à <span class="math inline">\(\{N_T=n\}\)</span>, la loi de <span class="math inline">\(D_n\)</span> ne dépend ni de <span class="math inline">\(\alpha\)</span>, ni de <span class="math inline">\(\beta\)</span>, ni de <span class="math inline">\(T\)</span>. C’est la loi <span class="math inline">\(K_n\)</span> de la statistique <span class="math inline">\(D_n\)</span> calculée sur <span class="math inline">\(n\)</span> variables i.i.d. de loi <span class="math inline">\(\mathcal{E}(1)\)</span>. On note <span class="math inline">\(k_{n,1-\delta}\)</span> son quantile d’ordre <span class="math inline">\(1-\delta\)</span>. Le test qui rejette <span class="math inline">\(H_0\)</span> si <span class="math inline">\(D_n&gt;k_{n,1-\delta}\)</span> vérifie, pour tous
-<span class="math inline">\((\alpha,\beta)\)</span>, <span class="math display">\[\mathbb{P}_{\alpha,\beta}\big(\text{rejet}\mid
-N_T=n\big)=\delta\quad(n\ge2),\qquad\text{donc}\qquad\mathbb{P}_{\alpha,\beta}\big(\text{rejet}\mid
-N_T\ge2\big)=\delta.\]</span> En pratique, <span class="math inline">\(k_{n,1-\delta}\)</span> est approché par
-simulation (Remarque <a href="#rem:miseenoeuvre" reference-type="ref" reference="rem:miseenoeuvre">25</a>).</em></p>
-</div>
-<div class="proof">
-<p><em>Preuve.</em> Sous <span class="math inline">\(H_0\)</span>,
-sachant <span class="math inline">\(\{N_T=n\}\)</span>, <span class="math inline">\((V_i)_i\overset{(d)}{=}(E_i/\beta)_i\)</span> à
-l’ordre près, avec <span class="math inline">\(E_i\)</span> i.i.d. de
-loi <span class="math inline">\(\mathcal{E}(1)\)</span> (Théorème <a href="#thm:caracT" reference-type="ref" reference="thm:caracT">21</a>).
-Or <span class="math inline">\(D_n\)</span> ne dépend pas de l’ordre des
-<span class="math inline">\(V_i\)</span> et est invariante par
-changement d’échelle <span class="math inline">\(V_i\mapsto
-cV_i\)</span>, <span class="math inline">\(c&gt;0\)</span>. En effet,
-<span class="math inline">\(\hat\beta_T\)</span> devient <span class="math inline">\(\hat\beta_T/c\)</span> et <span class="math inline">\(\hat F_n(x)\)</span> devient <span class="math inline">\(\hat F_n(x/c)\)</span>, donc le changement de
-variable <span class="math inline">\(y=x/c\)</span> laisse le supremum
-inchangé. Ainsi <span class="math inline">\(D_n(V_1,\dots,V_n)\overset{(d)}{=}D_n(E_1,\dots,E_n)\sim
-K_n\)</span>. Le niveau conditionnel en découle, et l’on déconditionne
-comme dans la preuve du Corollaire <a href="#cor:icexact" reference-type="ref" reference="cor:icexact">10</a>. ◻</p>
-</div>
-<div id="rem:miseenoeuvre" class="remarque">
-<p><em>Remarque 25</em> (Mise en œuvre).</p>
-<ol style="list-style-type: decimal">
-<li><p><em>Quantiles de Lilliefors.</em> Comme <span class="math inline">\(\beta\)</span> est estimé, les quantiles usuels de
-Kolmogorov-Smirnov, prévus pour une loi entièrement spécifiée, ne
-conviennent pas : ils sont trop grands et rendent le test conservatif,
-comme le signale déjà <span class="math display">\[Pro63, §2\]</span>.
-Il faut utiliser <span class="math inline">\(K_n\)</span>, tabulée par
-Lilliefors (1969) pour l’exponentielle de moyenne inconnue. Comme <span class="math inline">\(K_n\)</span> ne dépend d’aucun paramètre, elle se
-simule exactement : on tire <span class="math inline">\(M\)</span>
-échantillons de <span class="math inline">\(n\)</span> variables i.i.d.
-<span class="math inline">\(\mathcal{E}(1)\)</span>, on calcule <span class="math inline">\(D_n^{(1)},\dots,D_n^{(M)}\)</span>, et la p-valeur
-vaut <span class="math inline">\(\big(1+\#\{m:D_n^{(m)}\ge
-D_n^{\mathrm{obs}}\}\big)/(M+1)\)</span>. C’est un bootstrap
-paramétrique exact, puisque simuler sous <span class="math inline">\((\hat\alpha_T,\hat\beta_T)\)</span> ou sous <span class="math inline">\((1,1)\)</span> donne la même loi.</p></li>
-<li><p><em>Calcul.</em> Avec <span class="math inline">\(V_{(1)}\le\dots\le V_{(n)}\)</span> (soit <span class="math inline">\(V_{(k)}=\ln(T/T_{n+1-k})\)</span>) et <span class="math inline">\(\hat p_k:=1-e^{-\hat\beta_TV_{(k)}}\)</span>, on a
-<span class="math inline">\(D_n=\max_{1\le k\le n}\max\big(\frac kn-\hat
-p_k,\;\hat p_k-\frac{k-1}{n}\big)\)</span>.</p></li>
-<li><p><em>Forme uniforme équivalente.</em> Comme <span class="math inline">\(1-e^{-\hat\beta_TV_i}=1-(T_i/T)^{\hat\beta_T}\)</span>
-et que <span class="math inline">\(x\mapsto e^{-\hat\beta_Tx}\)</span>
-est décroissante, <span class="math inline">\(D_n\)</span> est aussi la
-distance de Kolmogorov-Smirnov entre la fonction de répartition
-empirique des <span class="math inline">\(\hat
-U_i:=(T_i/T)^{\hat\beta_T}\)</span> et celle de <span class="math inline">\(\mathcal{U}([0,1])\)</span>. C’est le point 2 du
-Théorème <a href="#thm:caracT" reference-type="ref" reference="thm:caracT">21</a>, avec <span class="math inline">\(\beta\)</span> remplacé par <span class="math inline">\(\hat\beta_T\)</span>.</p></li>
-<li><p><em>Diagnostic graphique.</em> Le diagramme de fractiles de <span class="math display">\[Møl76\]</span> trace les points <span class="math inline">\(\big(V_{(k)},-\ln(1-\frac{k-1/2}{n})\big)\)</span>,
-<span class="math inline">\(1\le k\le n\)</span>. Sous <span class="math inline">\(H_0\)</span>, ils s’alignent sur une droite
-passant par l’origine, de pente <span class="math inline">\(\beta\)</span> (estimée par <span class="math inline">\(\hat\beta_T\)</span>).</p></li>
-<li><p><em>Version à <span class="math inline">\(n\)</span> fixé.</em>
-On remplace <span class="math inline">\((V_i)_{i\le n}\)</span> par les
-<span class="math inline">\(n-1\)</span> variables <span class="math inline">\(\ln(T_n/T_i)\)</span>, <span class="math inline">\(i&lt;n\)</span>, et <span class="math inline">\(\hat\beta_T\)</span> par l’estimateur <span class="math inline">\((n-1)/\sum_{i&lt;n}\ln(T_n/T_i)\)</span> de <span class="math display">\[Møl76\]</span>. Le Théorème <a href="#thm:moller" reference-type="ref" reference="thm:moller">22</a> assure que la loi
-nulle est <span class="math inline">\(K_{n-1}\)</span>. C’est le test
-appliqué par <span class="math display">\[Møl76, Table 4\]</span> aux 13
-avions de <span class="math display">\[Pro63\]</span>.</p></li>
-</ol>
-</div>
-<div id="rem:portee" class="remarque">
-<p><em>Remarque 26</em> (Ce que le test détecte, et ce qu’il ne détecte
-pas). Le test est conditionnel à <span class="math inline">\(N_T\)</span>. Il contrôle donc la <em>forme</em>
-<span class="math inline">\(x\mapsto\Lambda(Tx)/\Lambda(T)\)</span> de
-l’intensité cumulée, et non la loi de <span class="math inline">\(N_T\)</span>.</p>
-<ul>
-<li><p>Le hPP (<span class="math inline">\(\beta=1\)</span>) appartient
-à <span class="math inline">\(H_0\)</span> : il ne peut pas servir
-d’alternative dans une étude de puissance. Pour tester <span class="math inline">\(\beta=1\)</span> à l’intérieur du modèle, on
-utilise la Proposition <a href="#prop:testbeta" reference-type="ref" reference="prop:testbeta">12</a>.</p></li>
-<li><p>Des alternatives naturelles sont les iPP dont l’intensité n’est
-pas une puissance. Par exemple, l’intensité log-linéaire <span class="math inline">\(\lambda(t)=e^{a+bt}\)</span> de Cox et Lewis
-(1966), à laquelle <span class="math display">\[Møl76, §IV\]</span>
-compare le modèle, ou une intensité « en baignoire » (poly, §IV du
-chapitre 1).</p></li>
-<li><p>Une hétérogénéité sur l’échelle <span class="math inline">\(\alpha\)</span> (par exemple un <span class="math inline">\(\alpha\)</span> aléatoire, différent d’un avion à
-l’autre, avec <span class="math inline">\(\beta\)</span> commun) laisse
-la loi conditionnelle inchangée, puisque celle-ci ne dépend pas de <span class="math inline">\(\alpha\)</span> (Proposition <a href="#prop:loicond" reference-type="ref" reference="prop:loicond">4</a>). Le test ne la détecte pas. C’est
-pourquoi l’analyse se fait avion par avion : le mélange de flottes est
-précisément ce qui crée, chez <span class="math display">\[Pro63\]</span>, un taux de défaillance
-décroissant apparent sur les données regroupées.</p></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="simulations-numériques" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Simulations
+<div id="simulations-numériques" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Simulations
 numériques</h1>
-<div id="code" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Code</h2>
+<div id="code" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Code</h2>
 <p>Les formules de la partie théorique (simulation, MLE, IC, test) sont
 dans <code>src/power_law.R</code>. Les études Monte-Carlo sont dans
 <code>src/01_convergences_mle.R</code>,
@@ -2622,8 +1781,8 @@ valeurs, nombres de réplications, graines) sont dans
 ##             1 - risk, type = 1)))
 ## }</code></pre>
 </div>
-<div id="simulation-sur-0-t" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Simulation sur <span class="math inline">\([0, T]\)</span></h2>
+<div id="simulation-sur-0-t" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Simulation sur <span class="math inline">\([0, T]\)</span></h2>
 <p>On tire <span class="math inline">\(N(T) \sim
 \mathcal{P}\big((T/\alpha)^\beta\big)\)</span>. Sachant <span class="math inline">\(N(T) = n\)</span>, on pose <span class="math inline">\(T_i = T\,U_{(i)}^{1/\beta}\)</span>, où <span class="math inline">\(U_1, \dots, U_n\)</span> sont i.i.d. de loi <span class="math inline">\(\mathcal{U}([0, 1])\)</span> (Proposition « Loi
 conditionnelle des temps d’arrivée »).</p>
@@ -2634,15 +1793,15 @@ conditionnelle des temps d’arrivée »).</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Premiers temps d&#39;arrivée T_i :&quot;</span>, <span class="fu">round</span>(<span class="fu">head</span>(w_test, <span class="dv">6</span>), <span class="dv">3</span>), <span class="st">&quot;...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <pre><code>## Premiers temps d&#39;arrivée T_i : 0.193 0.62 0.676 0.864 0.891 1.249 ...</code></pre>
 </div>
-<div id="convergence-et-biais-du-mle" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Convergence et biais
+<div id="convergence-et-biais-du-mle" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Convergence et biais
 du MLE</h2>
 <p>On illustre les Propositions 3.7, 3.11 et 3.12 de Cocozza-Thivent
 (1997).</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>sim_outputs <span class="ot">&lt;-</span> <span class="fu">run_all_illustrations</span>(<span class="at">save_figs =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Illustrations des Convergences du MLE</code></pre>
-<div id="convergence-presque-sûre-proposition-3.7" class="section level3" number="4.3.1">
-<h3><span class="header-section-number">4.3.1</span> Convergence presque
+<div id="convergence-presque-sûre-proposition-3.7" class="section level3" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Convergence presque
 sûre (Proposition 3.7)</h3>
 <p>Sur une même trajectoire, <span class="math inline">\(\hat{\beta}(t)\)</span> et <span class="math inline">\(\hat{\alpha}(t)\)</span> convergent p.s. vers
 <span class="math inline">\(\beta\)</span> et <span class="math inline">\(\alpha\)</span> quand <span class="math inline">\(t \to +\infty\)</span>. La partie théorique n’en
@@ -2655,8 +1814,8 @@ démontre que la convergence en probabilité.</p>
 lentement : à <span class="math inline">\(t = 200\)</span>, il vaut
 encore entre 0,98 et 1,14. C’est le facteur <span class="math inline">\(\ln t\)</span> de la section suivante.</p>
 </div>
-<div id="normalité-asymptotique-propositions-3.11-et-3.12" class="section level3" number="4.3.2">
-<h3><span class="header-section-number">4.3.2</span> Normalité
+<div id="normalité-asymptotique-propositions-3.11-et-3.12" class="section level3" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> Normalité
 asymptotique (Propositions 3.11 et 3.12)</h3>
 <p>Pour <span class="math inline">\(\beta\)</span>, la vitesse est <span class="math inline">\(\sqrt{N(t)}\)</span> : <span class="math display">\[Z_{\beta}(t) =
 \sqrt{N(t)}\left(\frac{\hat{\beta}}{\beta} - 1\right)
@@ -2680,8 +1839,8 @@ vaut 6,7, 11,7, 19,4 et 24,9 pour <span class="math inline">\(T = 10,
 25, 60, 150\)</span>. Elle suit <span class="math inline">\((\ln T)^2
 \approx\)</span> 5,3, 10,4, 16,8 et 25,1, alors que la variance de <span class="math inline">\(Z_\alpha\)</span> reste entre 1,0 et 1,3.</p>
 </div>
-<div id="loi-limite-du-couple-hatalpha-hatbeta-propositions-3.11-3-et-3.12" class="section level3" number="4.3.3">
-<h3><span class="header-section-number">4.3.3</span> Loi limite du
+<div id="loi-limite-du-couple-hatalpha-hatbeta-propositions-3.11-3-et-3.12" class="section level3" number="2.3.3">
+<h3><span class="header-section-number">2.3.3</span> Loi limite du
 couple <span class="math inline">\((\hat{\alpha}, \hat{\beta})\)</span>
 (Propositions 3.11-3 et 3.12)</h3>
 <p>La loi limite du couple renormalisé est dégénérée : elle est portée
@@ -2694,8 +1853,8 @@ empiriques valent <span class="math inline">\(-0{,}992\)</span> (forme
 Asymptotiquement, on surestime donc <span class="math inline">\(\alpha\)</span> exactement quand on surestime
 <span class="math inline">\(\beta\)</span>.</p>
 </div>
-<div id="biais-de-hatbeta-à-taille-finie" class="section level3" number="4.3.4">
-<h3><span class="header-section-number">4.3.4</span> Biais de <span class="math inline">\(\hat{\beta}\)</span> à taille finie</h3>
+<div id="biais-de-hatbeta-à-taille-finie" class="section level3" number="2.3.4">
+<h3><span class="header-section-number">2.3.4</span> Biais de <span class="math inline">\(\hat{\beta}\)</span> à taille finie</h3>
 <p>Sachant <span class="math inline">\(N(T) = n\)</span>, <span class="math inline">\(2n\beta/\hat{\beta} \sim \chi^2(2n)\)</span>, donc
 <span class="math inline">\(\mathbb{E}[\hat{\beta} \mid N(T) = n] =
 \frac{n}{n-1}\beta\)</span> pour <span class="math inline">\(n \ge
@@ -2708,8 +1867,8 @@ relatif de <span class="math inline">\(\hat{\beta}\)</span> est de <span class="
 sont inférieurs à <span class="math inline">\(1\,\%\)</span>.</p>
 </div>
 </div>
-<div id="couverture-des-intervalles-de-confiance" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> Couverture des
+<div id="couverture-des-intervalles-de-confiance" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Couverture des
 intervalles de confiance</h2>
 <p>Pour chaque horizon <span class="math inline">\(T\)</span>, on simule
 <span class="math inline">\(M = 2000\)</span> trajectoires et on compte
@@ -2727,8 +1886,8 @@ couverture de 95 % est d’environ <span class="math inline">\(\pm
 ## 4. Génération de la visualisation des segments d&#39;IC pour beta...
 ## 
 ## Validation numérique des IC terminée avec succès !</code></pre>
-<div id="ic-pour-beta-exact-ou-asymptotique" class="section level3" number="4.4.1">
-<h3><span class="header-section-number">4.4.1</span> IC pour <span class="math inline">\(\beta\)</span> : exact ou asymptotique</h3>
+<div id="ic-pour-beta-exact-ou-asymptotique" class="section level3" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> IC pour <span class="math inline">\(\beta\)</span> : exact ou asymptotique</h3>
 <p>On compare l’IC exact déduit de la loi <span class="math inline">\(\chi^2(2n)\)</span> (Corollaire 3.6) à l’IC
 asymptotique gaussien (Corollaire 3.13).</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>ci_outputs<span class="sc">$</span>plots<span class="sc">$</span>p_beta</span></code></pre></div>
@@ -2740,8 +1899,8 @@ petits horizons (96,2 % à <span class="math inline">\(T = 3\)</span>). À
 partir de <span class="math inline">\(T = 10\)</span>, les deux IC sont
 indiscernables.</p>
 </div>
-<div id="ic-pour-alpha-forme-log-ou-forme-linéaire" class="section level3" number="4.4.2">
-<h3><span class="header-section-number">4.4.2</span> IC pour <span class="math inline">\(\alpha\)</span> : forme log ou forme linéaire</h3>
+<div id="ic-pour-alpha-forme-log-ou-forme-linéaire" class="section level3" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> IC pour <span class="math inline">\(\alpha\)</span> : forme log ou forme linéaire</h3>
 <p>On compare la forme log, dont les bornes sont toujours positives, à
 la forme linéaire du Corollaire 3.13.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>ci_outputs<span class="sc">$</span>plots<span class="sc">$</span>p_alpha</span></code></pre></div>
@@ -2756,8 +1915,8 @@ large : à <span class="math inline">\(T = 150\)</span> (<span class="math inlin
 largeur vaut 0,46 pour <span class="math inline">\(\alpha = 1\)</span>,
 contre 0,14 pour <span class="math inline">\(\beta = 1{,}5\)</span>.</p>
 </div>
-<div id="intervalles-pour-beta-sur-un-petit-échantillon" class="section level3" number="4.4.3">
-<h3><span class="header-section-number">4.4.3</span> Intervalles pour
+<div id="intervalles-pour-beta-sur-un-petit-échantillon" class="section level3" number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Intervalles pour
 <span class="math inline">\(\beta\)</span> sur un petit échantillon</h3>
 <p>Intervalles pour <span class="math inline">\(\beta\)</span> obtenus
 sur 45 réplications à <span class="math inline">\(T = 5\)</span> (<span class="math inline">\(\mathbb{E}[N(T)] \approx 11\)</span>).</p>
@@ -2770,8 +1929,8 @@ asymptotique 1 fois. Sur 45 réplications, cette différence n’est pas
 significative.</p>
 </div>
 </div>
-<div id="niveau-et-puissance-du-test-dadéquation" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> Niveau et puissance
+<div id="niveau-et-puissance-du-test-dadéquation" class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Niveau et puissance
 du test d’adéquation</h2>
 <p>D’après le Théorème 1 de Møller (1976), sous <span class="math inline">\(H_0\)</span> « les défaillances suivent un
 processus de Weibull » et sachant <span class="math inline">\(N(T) =
@@ -2793,17 +1952,14 @@ d’échelle et <span class="math inline">\(\hat{\beta}\)</span> est
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># Niveau : M = 2000 réplications sous H0 (beta = 0.5, 1, 2 ; E[N(T)] de 5 à 150)</span></span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="co"># Puissance : M = 1000 réplications par alternative et par E[N(T)]</span></span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>gof_outputs <span class="ot">&lt;-</span> <span class="fu">run_all_gof_validation</span>(<span class="at">save_figs =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<pre><code>## ====================================================================
-## BE Poisson : Validation pratique du test d&#39;adéquation (Møller, 1976)
-## ====================================================================
-## 
+<pre><code>## BE Poisson : Validation pratique du test d&#39;adéquation (Møller, 1976)
 ## 1. Niveau empirique sous H0 (M = 2000 réplications par point)...
 ## 2. Puissance contre les alternatives (M = 1000 réplications par point)...
 ## 3. Diagrammes des fractiles illustratifs...
 ## 
 ## Validation numérique du test d&#39;adéquation terminée avec succès !</code></pre>
-<div id="niveau-sous-h_0-test-calibré-et-test-naïf" class="section level3" number="4.5.1">
-<h3><span class="header-section-number">4.5.1</span> Niveau sous <span class="math inline">\(H_0\)</span> : test calibré et test naïf</h3>
+<div id="niveau-sous-h_0-test-calibré-et-test-naïf" class="section level3" number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Niveau sous <span class="math inline">\(H_0\)</span> : test calibré et test naïf</h3>
 <p>Taux de rejet au niveau 5 % sur des données simulées sous <span class="math inline">\(H_0\)</span>, pour <span class="math inline">\(\beta = 0{,}5\)</span>, <span class="math inline">\(1\)</span> et <span class="math inline">\(2\)</span>. En bas, la distribution des p-valeurs
 pour <span class="math inline">\(\mathbb{E}[N(T)] = 20\)</span>.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>gof_outputs<span class="sc">$</span>plots<span class="sc">$</span>p_level</span></code></pre></div>
@@ -2818,8 +1974,8 @@ uniformes : chaque décile en contient entre 9,2 % et 10,4 %. Le test
 naïf rejette au plus 0,9 % du temps, et 20 % de ses p-valeurs dépassent
 0,9. Il est donc très conservatif.</p>
 </div>
-<div id="puissance-contre-des-alternatives-hors-modèle" class="section level3" number="4.5.2">
-<h3><span class="header-section-number">4.5.2</span> Puissance contre
+<div id="puissance-contre-des-alternatives-hors-modèle" class="section level3" number="2.5.2">
+<h3><span class="header-section-number">2.5.2</span> Puissance contre
 des alternatives hors modèle</h3>
 <p>Trois familles de processus qui ne sont pas des processus de Weibull
 :</p>
@@ -2863,8 +2019,8 @@ prise une à une, pas leur dépendance.</li>
 <p>Le test naïf est nettement moins puissant que le test calibré dans
 tous les cas où ce dernier rejette.</p>
 </div>
-<div id="diagrammes-des-fractiles-exponentiels" class="section level3" number="4.5.3">
-<h3><span class="header-section-number">4.5.3</span> Diagrammes des
+<div id="diagrammes-des-fractiles-exponentiels" class="section level3" number="2.5.3">
+<h3><span class="header-section-number">2.5.3</span> Diagrammes des
 fractiles exponentiels</h3>
 <p>On représente le test comme dans Møller (1976, Fig. 1 à 4) : sous
 <span class="math inline">\(H_0\)</span>, les points <span class="math inline">\(\left(-\ln(1 - \tfrac{i - 1/2}{n}),\ \hat{\beta}\,
@@ -2879,11 +2035,11 @@ bande et le test rejette (p-valeurs 0,004 et inférieure à 0,001).</p>
 </div>
 </div>
 </div>
-<div id="application-aux-données-réelles-proschan-1963" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Application aux données
+<div id="application-aux-données-réelles-proschan-1963" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Application aux données
 réelles (Proschan, 1963)</h1>
-<div id="préparation-des-données-et-définition-de-lhorizon-t" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Préparation des
+<div id="préparation-des-données-et-définition-de-lhorizon-t" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Préparation des
 données et définition de l’horizon <span class="math inline">\(T\)</span></h2>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Données de la flotte Boeing 720</span></span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>df_proschan <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/proschan1963.csv&quot;</span>)</span>
@@ -2897,8 +2053,8 @@ données et définition de l’horizon <span class="math inline">\(T\)</span></h
 ## 6  7907             6      181          493          False</code></pre>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Pour chaque avion, l&#39;horizon d&#39;observation T peut être pris comme la durée totale cumulée de suivi</span></span></code></pre></div>
 </div>
-<div id="ajustement-du-modèle-par-avion-à-horizon-t" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Ajustement du modèle
+<div id="ajustement-du-modèle-par-avion-à-horizon-t" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Ajustement du modèle
 par avion à horizon <span class="math inline">\(T\)</span></h2>
 <!-- 
 TODO:
@@ -2908,8 +2064,8 @@ TODO:
 -->
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Estimation et IC par avion</span></span></code></pre></div>
 </div>
-<div id="test-dadéquation-et-diagnostics-graphiques" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Test d’adéquation et
+<div id="test-dadéquation-et-diagnostics-graphiques" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Test d’adéquation et
 diagnostics graphiques</h2>
 <!-- 
 TODO:
@@ -2918,8 +2074,8 @@ TODO:
 -->
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Diagnostics graphiques et p-valeurs du test d&#39;adéquation</span></span></code></pre></div>
 </div>
-<div id="discussion-le-processus-de-weibull-est-il-adapté" class="section level2" number="5.4">
-<h2><span class="header-section-number">5.4</span> Discussion : le
+<div id="discussion-le-processus-de-weibull-est-il-adapté" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Discussion : le
 processus de Weibull est-il adapté ?</h2>
 <!-- 
 TODO:
@@ -2929,14 +2085,14 @@ TODO:
 -->
 </div>
 </div>
-<div id="conclusion" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Conclusion</h1>
+<div id="conclusion" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Conclusion</h1>
 <!-- 
 TODO: Synthèse globale des résultats théoriques, empiriques et appliqués sous horizon fixé T.
 -->
 </div>
-<div id="références" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Références</h1>
+<div id="références" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Références</h1>
 <ul>
 <li><strong>Albert, M. (2026).</strong> <em>Poisson processes and
 application to reliability theory and actuarial science</em>. Polycopié
