@@ -157,7 +157,8 @@ gof_transform <- function(w, T_end = NULL) {
 #' Test d'adéquation au Processus de Weibull (Møller, 1976)
 #'
 #' Les Y_i sont testés par KScorrect::LcKS : KS contre Exp(beta) avec beta estimé,
-#' p-valeur calibrée par Monte-Carlo (Lilliefors).
+#' p-valeur calibrée par Monte-Carlo (Lilliefors). Sous H0 la loi de D ne dépend
+#' que de m : cache = TRUE (fork du package) réutilise D.sim d'un appel à l'autre.
 #'
 #' @param w     Vecteur des instants de sauts observés
 #' @param T_end Horizon d'observation T (NULL = troncature par le n-ième défaut)
@@ -173,7 +174,7 @@ gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, risk = 1 - CONFIG$c
                 p_value_naive = NA_real_, crit_value = NA_real_))
   }
   beta_hat <- 1 / mean(y)  # MLE du taux exponentiel (non renvoyé par LcKS)
-  lc <- KScorrect::LcKS(y, cdf = "pexp", nreps = B)
+  lc <- KScorrect::LcKS(y, cdf = "pexp", nreps = B, cache = TRUE)
 
   # p-valeur naïve : on fait comme on connaissait β 
   p_value_naive <- suppressWarnings(

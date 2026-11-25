@@ -39,8 +39,7 @@ CONFIG <- list(
 
   # 03 : niveau et puissance du test d'adéquation
   gof = list(
-    B              = 4000, # nreps de LcKS pour un test isolé
-    B_study        = 499,  # nreps dans les études niveau / puissance (84 000 appels à LcKS)
+    B              = 4000, # nreps de LcKS : une simulation par taille m, mise en cache
     min_m          = 3,    # taille minimale de l'échantillon exponentiel testé
     min_n          = 3,    # trajectoires avec moins d'événements : retirées
     mean_N_values  = c(5, 10, 20, 40, 80, 150),

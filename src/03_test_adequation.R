@@ -70,7 +70,7 @@ sim_weibull_renewal <- function(shape, T_end) {
 #' @param risk    Risque de première espèce du test
 #' @param min_n   Nombre minimal d'événements (rejet des trajectoires trop courtes)
 #' @return Liste : résumé (taux de rejet, n moyen) et p-valeurs brutes
-rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B_study, risk = 1 - CONFIG$conf_level,
+rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B, risk = 1 - CONFIG$conf_level,
                            min_n = CONFIG$gof$min_n) {
   p_cal <- numeric(M)
   p_naive <- numeric(M)
@@ -98,7 +98,7 @@ rejection_rate <- function(sim_fun, T_end, M, B = CONFIG$gof$B_study, risk = 1 -
 monte_carlo_gof_level <- function(alpha_true = CONFIG$model$alpha_true,
                                   beta_values = CONFIG$gof$level_beta_values,
                                   mean_N_values = CONFIG$gof$mean_N_values,
-                                  M = CONFIG$gof$M_level, B = CONFIG$gof$B_study,
+                                  M = CONFIG$gof$M_level, B = CONFIG$gof$B,
                                   risk = 1 - CONFIG$conf_level,
                                   seed = CONFIG$gof$seed_level) {
   set.seed(seed)
@@ -134,7 +134,7 @@ monte_carlo_gof_power <- function(mean_N_values = CONFIG$gof$mean_N_values,
                                   delta_values = CONFIG$gof$delta_values,
                                   rho_values = CONFIG$gof$rho_values,
                                   shape_values = CONFIG$gof$shape_values,
-                                  M = CONFIG$gof$M_power, B = CONFIG$gof$B_study,
+                                  M = CONFIG$gof$M_power, B = CONFIG$gof$B,
                                   risk = 1 - CONFIG$conf_level,
                                   seed = CONFIG$gof$seed_power) {
   set.seed(seed)
@@ -313,7 +313,7 @@ plot_gof_examples <- function(ex = CONFIG$gof$examples, T_alt = CONFIG$gof$T_alt
 run_all_gof_validation <- function(save_figs = TRUE, output_dir = "figures",
                                    M_level = CONFIG$gof$M_level,
                                    M_power = CONFIG$gof$M_power,
-                                   B = CONFIG$gof$B_study) {
+                                   B = CONFIG$gof$B) {
   cat("BE Poisson : Validation pratique du test d'adéquation (Møller, 1976)\n")
 
   if (save_figs && !dir.exists(output_dir)) {
