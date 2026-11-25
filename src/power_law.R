@@ -16,19 +16,24 @@ sim_power_law_process <- function(alpha, beta, T_end) {
     stop("alpha, beta et T_end doivent être strictement positifs.")
   }
   
-  # 1. Nombre total d'événements N(T) ~ Poisson( (T / alpha)^beta
-  mean_N <- (T_end / alpha)^beta
-  n <- rpois(1, lambda = mean_N)
-  
-  if (n == 0) {
-    return(numeric(0))
+  # Changement de temps (Proposition 4.8 du poly) : si S_1 < S_2 < ... sont les temps
+  # d'arrivée d'un hPP d'intensité 1, alors les Lambda^{-1}(S_k) sont ceux d'un iPP
+  # d'intensité lambda, avec ici Lambda^{-1}(s) = alpha * s^(1 / beta).
+
+  # 1. hPP d'intensité 1 sur [0, Lambda(T)] : S_k = E_1 + ... + E_k, E_j i.i.d. Exp(1).
+  #    On tire les E_j par blocs jusqu'à dépasser Lambda(T) (pr éviter un 2eme while), puis on tronque.
+  Lambda_T <- (T_end / alpha)^beta
+  block_size <- ceiling(Lambda_T + 4 * sqrt(Lambda_T)) + 10  
+  s <- numeric(0)
+  s_last <- 0
+  while (s_last <= Lambda_T) {
+    s <- c(s, s_last + cumsum(rexp(block_size, rate = 1)))
+    s_last <- s[length(s)]
   }
-  
-  # 2. Conditionnellement à N(T) = n, (W_i / T)^beta sont des statistiques
-  #    d'ordre de variables uniformes U(0, 1) i.i.d. (cf algo poly cours)
-  #    => W_i = T * U_(i)^(1 / beta)
-  u <- sort(runif(n, min = 0, max = 1))
-  w <- T_end * (u^(1 / beta))
+  s <- s[s <= Lambda_T]  # S_k <= Lambda(T) <=> W_k <= T
+
+  # 2. Retour à l'échelle de temps d'origine : W_k = Lambda^{-1}(S_k)
+  w <- alpha * s^(1 / beta)
   return(w)
 }
 

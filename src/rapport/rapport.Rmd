@@ -109,7 +109,7 @@ gof_power_law
 
 ## Simulation sur $[0, T]$
 
-On tire $N(T) \sim \mathcal{P}\big((T/\alpha)^\beta\big)$. Sachant $N(T) = n$, on pose $T_i = T\,U_{(i)}^{1/\beta}$, où $U_1, \dots, U_n$ sont i.i.d. de loi $\mathcal{U}([0, 1])$ (Proposition « Loi conditionnelle des temps d'arrivée »).
+On utilise le changement de temps (Proposition 4.8 du poly). On simule les temps d'arrivée $S_k = E_1 + \dots + E_k$ d'un hPP d'intensité 1, où les $E_j$ sont i.i.d. de loi $\mathcal{E}(1)$, jusqu'à dépasser $\Lambda(T) = (T/\alpha)^\beta$. On pose ensuite $T_k = \Lambda^{-1}(S_k) = \alpha\, S_k^{1/\beta}$ pour tous les $S_k \le \Lambda(T)$.
 
 ```{r q5-sim-function}
 set.seed(42)
