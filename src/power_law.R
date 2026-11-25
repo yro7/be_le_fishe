@@ -135,6 +135,52 @@ confint_power_law <- function(n, beta_hat, alpha_hat, T_end, level = CONFIG$conf
   ))
 }
 
+#' Loi exacte de beta_hat * log(alpha_hat / alpha) à n fixé (CT97, Proposition 3.21)
+#'
+#' Elle ne dépend que de n. Avec U_n = (T_n / alpha)^beta ~ Gamma(n, 1), indépendant de
+#' R = beta / beta_hat ~ Gamma(n - 1, n), on a :
+#'   P(beta_hat * log(alpha_hat / alpha) <= x) = E[ F_{2n}(2 * exp(R * (x + log(n)))) ]
+#' où F_{2n} est la fonction de répartition du χ²(2n).
+#' L'espérance est intégrée sur les quantiles de R (intégrale sur ]0, 1[).
+#'
+#' @param x Point d'évaluation (scalaire)
+#' @param n Nombre d'événements observés (n >= 2)
+p_alpha_pivot <- function(x, n) {
+  integrand <- function(u) {
+    r <- qgamma(u, shape = n - 1, rate = n)
+    pchisq(2 * exp(r * (x + log(n))), df = 2 * n)
+  }
+  integrate(integrand, 0, 1, rel.tol = 1e-8, subdivisions = 1000L)$value
+}
+
+#' Quantile du pivot de alpha (inverse numérique de p_alpha_pivot)
+q_alpha_pivot <- function(p, n) {
+  uniroot(function(x) p_alpha_pivot(x, n) - p, interval = c(-5, 5),
+          extendInt = "upX", tol = 1e-8)$root
+}
+
+#' Intervalle de confiance EXACT pour alpha quand on observe les n premiers points (T = T_n)
+#'
+#' P(q_low <= beta_hat * log(alpha_hat / alpha) <= q_up) = level, d'où
+#'   alpha dans [alpha_hat * exp(-q_up / beta_hat), alpha_hat * exp(-q_low / beta_hat)].
+#' Contrairement à alpha_log et alpha_lin, l'IC ne dépend pas de l'unité de temps.
+#'
+#' @param n         Nombre d'événements observés (n >= 2)
+#' @param beta_hat  MLE de beta, avec T = T_n
+#' @param alpha_hat MLE de alpha, avec T = T_n
+#' @param level     Niveau de confiance nominal
+#' @return Vecteur c(lower, upper)
+confint_alpha_exact <- function(n, beta_hat, alpha_hat, level = CONFIG$conf_level) {
+  if (is.na(n) || n < 2 || is.na(beta_hat) || is.na(alpha_hat)) {
+    return(c(lower = NA_real_, upper = NA_real_))
+  }
+  risk <- 1 - level
+  c(
+    lower = alpha_hat * exp(-q_alpha_pivot(1 - risk / 2, n) / beta_hat),
+    upper = alpha_hat * exp(-q_alpha_pivot(risk / 2, n) / beta_hat)
+  )
+}
+
 # 3. Test d'adéquation
 
 #' Transforme les instants de défaillance en échantillon exponentiel (Théorème 1)

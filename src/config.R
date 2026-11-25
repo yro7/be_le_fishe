@@ -57,5 +57,12 @@ CONFIG <- list(
     shape_values = c(0.5, 2, 3),      # renouvellement de Weibull
     # Diagrammes des fractiles d'exemple
     examples = list(seed = 7, beta = 1.5, mean_N = 30, delta = -3, rho = 0.25)
+  ),
+
+  # 04 : données de Proschan
+  proschan = list(
+    file     = "data/proschan1963.csv",
+    seed     = 2028,   # p-valeurs calibrées par Monte-Carlo
+    examples = c("7907", "7912", "7913")  # segments des diagrammes des fractiles
   )
 )

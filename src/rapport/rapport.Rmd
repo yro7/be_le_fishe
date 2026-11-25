@@ -46,6 +46,7 @@ src_hash <- unname(tools::md5sum(src_files))
 ```
 
 
+
 # Introduction et contexte
 
 <!-- 
@@ -81,6 +82,7 @@ if (knitr::is_latex_output()) {
 ```
 
 
+
 # Simulations numériques
 
 ## Code
@@ -110,6 +112,7 @@ gof_power_law
 ```
 
 
+
 ## Simulation sur $[0, T]$
 
 On utilise le changement de temps (Proposition 4.8 du poly). On simule les temps d'arrivée $S_k = E_1 + \dots + E_k$ d'un hPP d'intensité 1, où les $E_j$ sont i.i.d. de loi $\mathcal{E}(1)$, jusqu'à dépasser $\Lambda(T) = (T/\alpha)^\beta$. On pose ensuite $T_k = \Lambda^{-1}(S_k) = \alpha\, S_k^{1/\beta}$ pour tous les $S_k \le \Lambda(T)$.
@@ -122,6 +125,7 @@ cat("Premiers temps d'arrivée T_i :", round(head(w_test, 6), 3), "...\n")
 ```
 
 
+
 ## Convergence et biais du MLE
 
 On illustre les Propositions 3.7, 3.11 et 3.12 de Cocozza-Thivent (1997).
@@ -131,6 +135,7 @@ sim_outputs <- run_all_illustrations(save_figs = FALSE)
 ```
 
 
+
 ### Convergence presque sûre (Proposition 3.7)
 
 Sur une même trajectoire, $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent p.s. vers $\beta$ et $\alpha$ quand $t \to +\infty$. La partie théorique n'en démontre que la convergence en probabilité.
@@ -138,6 +143,7 @@ Sur une même trajectoire, $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent p.s.
 ```{r q6-fig-ps, fig.width=8.5, fig.height=6.5}
 sim_outputs$plots$p_as
 ```
+
 
 
 Sur les trois trajectoires tracées, $\hat{\beta}$ est compris entre 1,62 et 1,95 à $t = 10$ ($N(t) \approx 30$), et entre 1,49 et 1,53 à $t = 200$ ($N(t) \approx 2800$). $\hat{\alpha}$ converge nettement plus lentement : à $t = 200$, il vaut encore entre 0,98 et 1,14. C'est le facteur $\ln t$ de la section suivante.
@@ -152,6 +158,7 @@ sim_outputs$plots$p_beta_norm
 ```
 
 
+
 À $T = 10$ ($\mathbb{E}[N(T)] \approx 32$), $Z_\beta$ a pour moyenne 0,22 et pour écart-type 1,09 : la distribution est décalée vers la droite, ce qui reflète le biais de $\hat{\beta}$ (voir plus bas). À $T = 150$, la moyenne vaut 0,03 et l'écart-type 0,99.
 
 Pour $\alpha$, la vitesse est divisée par $\ln t$ :
@@ -160,6 +167,7 @@ $$Z_{\alpha}(t) = \frac{\sqrt{N(t)}}{\ln t}\left(\frac{\hat{\alpha}}{\alpha} - 1
 ```{r q6-fig-alpha-norm, fig.width=8.5, fig.height=7}
 sim_outputs$plots$p_alpha_norm
 ```
+
 
 
 La convergence est plus lente que pour $\beta$ : le coefficient d'asymétrie de $Z_\alpha$ vaut 0,80 à $T = 10$ et encore 0,20 à $T = 150$. Sans le facteur $\ln t$, la variance de $\sqrt{N(t)}\,(\hat{\alpha}/\alpha - 1)$ vaut 6,7, 11,7, 19,4 et 24,9 pour $T = 10, 25, 60, 150$. Elle suit $(\ln T)^2 \approx$ 5,3, 10,4, 16,8 et 25,1, alors que la variance de $Z_\alpha$ reste entre 1,0 et 1,3.
@@ -173,6 +181,7 @@ sim_outputs$plots$p_joint
 ```
 
 
+
 À $T = 150$, les corrélations empiriques valent $-0{,}992$ (forme 3.a) et $0{,}990$ (forme 3.b). Asymptotiquement, on surestime donc $\alpha$ exactement quand on surestime $\beta$.
 
 ### Biais de $\hat{\beta}$ à taille finie
@@ -182,6 +191,7 @@ Sachant $N(T) = n$, $2n\beta/\hat{\beta} \sim \chi^2(2n)$, donc $\mathbb{E}[\hat
 ```{r q6-fig-bias, fig.width=8, fig.height=4.5}
 sim_outputs$plots$p_bias
 ```
+
 
 
 À $T = 10$ ($\mathbb{E}[N(T)] \approx 32$), le biais relatif de $\hat{\beta}$ est de $+4{,}1\,\%$, contre $+0{,}7\,\%$ pour $\tilde{\beta}$. Dès $\mathbb{E}[N(T)] \approx 125$, les deux sont inférieurs à $1\,\%$.
@@ -195,6 +205,7 @@ ci_outputs <- run_all_ci_validation(save_figs = FALSE)
 ```
 
 
+
 ### IC pour $\beta$ : exact ou asymptotique
 
 On compare l'IC exact déduit de la loi $\chi^2(2n)$ (Corollaire 3.6) à l'IC asymptotique gaussien (Corollaire 3.13).
@@ -202,6 +213,7 @@ On compare l'IC exact déduit de la loi $\chi^2(2n)$ (Corollaire 3.6) à l'IC as
 ```{r q7-fig-beta, fig.width=8.5, fig.height=7}
 ci_outputs$plots$p_beta
 ```
+
 
 
 L'IC exact couvre entre 94,0 % et 95,5 % à tous les horizons, y compris à $T = 3$ où $\mathbb{E}[N(T)] \approx 5$. L'IC asymptotique a quasiment la même largeur, mais couvre un peu trop aux petits horizons (96,2 % à $T = 3$). À partir de $T = 10$, les deux IC sont indiscernables.
@@ -215,6 +227,7 @@ ci_outputs$plots$p_alpha
 ```
 
 
+
 La forme log couvre entre 93,6 % et 94,9 %. La forme linéaire couvre trop peu aux petits horizons (88,1 % à $T = 3$, 91,2 % à $T = 10$), et sa borne inférieure est négative dans 40 % des cas à $T = 3$ et 33 % à $T = 5$. Les deux formes se rejoignent vers $T = 40$ ($\mathbb{E}[N(T)] \approx 250$). Dans tous les cas, l'IC pour $\alpha$ reste large : à $T = 150$ ($\mathbb{E}[N(T)] \approx 1800$), sa largeur vaut 0,46 pour $\alpha = 1$, contre 0,14 pour $\beta = 1{,}5$.
 
 ### Intervalles pour $\beta$ sur un petit échantillon
@@ -224,6 +237,7 @@ Intervalles pour $\beta$ obtenus sur 45 réplications à $T = 5$ ($\mathbb{E}[N(
 ```{r q7-fig-segments, fig.width=9.5, fig.height=4.5}
 ci_outputs$plots$p_segments
 ```
+
 
 
 Ici, $N(T)$ varie de 6 à 20 d'une réplication à l'autre, et la largeur des intervalles varie en conséquence. L'IC exact manque la vraie valeur 2 fois sur 45, l'IC asymptotique 1 fois. Sur 45 réplications, cette différence n'est pas significative.
@@ -241,6 +255,7 @@ gof_outputs <- run_all_gof_validation(save_figs = FALSE)
 ```
 
 
+
 ### Niveau sous $H_0$ : test calibré et test naïf
 
 Taux de rejet au niveau 5 % sur des données simulées sous $H_0$, pour $\beta = 0{,}5$, $1$ et $2$. En bas, la distribution des p-valeurs pour $\mathbb{E}[N(T)] = 20$.
@@ -248,6 +263,7 @@ Taux de rejet au niveau 5 % sur des données simulées sous $H_0$, pour $\beta =
 ```{r q8-fig-level, fig.width=9, fig.height=8}
 gof_outputs$plots$p_level
 ```
+
 
 
 Le test calibré rejette entre 4,1 % et 6,3 % du temps, quels que soient $\beta$ et $\mathbb{E}[N(T)]$. Sur les 18 configurations, une seule s'écarte de 5 % de plus de 1 point, l'erreur Monte-Carlo : 6,25 % pour $\beta = 1$ et $\mathbb{E}[N(T)] = 40$. Sur 18 configurations, un tel écart n'a rien d'anormal. Ses p-valeurs sont uniformes : chaque décile en contient entre 9,2 % et 10,4 %. Le test naïf rejette au plus 0,9 % du temps, et 20 % de ses p-valeurs dépassent 0,9. Il est donc très conservatif.
@@ -263,6 +279,7 @@ Trois familles de processus qui ne sont pas des processus de Weibull :
 ```{r q8-fig-power, fig.width=11, fig.height=4.5}
 gof_outputs$plots$p_power
 ```
+
 
 
 La puissance dépend fortement de l'alternative :
@@ -283,6 +300,7 @@ gof_outputs$plots$p_examples
 ```
 
 
+
 Sous $H_0$, les points restent dans la bande (p-valeur 0,72). Pour l'intensité log-linéaire ($\delta = -3$) et pour la rupture ($\rho = 0{,}25$), des points sortent de la bande et le test rejette (p-valeurs 0,004 et inférieure à 0,001).
 
 # Application aux données réelles (Proschan, 1963)
@@ -294,8 +312,19 @@ Sous $H_0$, les points restent dans la bande (p-valeur 0,72). Pour l'intensité 
 df_proschan <- read.csv("data/proschan1963.csv")
 head(df_proschan)
 
-# Pour chaque avion, l'horizon d'observation T peut être pris comme la durée totale cumulée de suivi
+# Horizon de chaque avion : T = T_n, instant de sa dernière panne (voir ci-dessous)
 ```
+
+
+Proschan donne les intervalles entre pannes, mais pas la date de fin d'observation de chaque avion. On prend donc pour horizon l'instant de la dernière panne, $T = T_n$.
+
+Ce choix introduit un biais : $T$ devrait être fixé indépendamment des données, or $T_n$ est aléatoire. Si l'observation s'arrête à la $n$-ième panne :
+
+- $\hat{\beta}$ a la même expression, mais $2n\beta / \hat{\beta}$ suit une loi $\chi^2(2n-2)$ et non $\chi^2(2n)$ (Cocozza-Thivent, 1997, Corollaire 3.20). On a donc $\mathbb{E}[\hat{\beta}] = \frac{n}{n-2}\,\beta$ pour $n \geq 3$, au lieu de $\frac{n}{n-1}\,\beta$ : $\beta$ est davantage surestimé ;
+- l'IC « exact » à 95 % pour $\beta$ est décalé vers le haut. Sa couverture réelle est de 91,8 % pour $n = 6$, 93,6 % pour $n = 12$ et 94,5 % pour $n = 30$ ;
+- le test d'adéquation n'est pas biaisé, à condition de retirer la dernière panne, pour laquelle $Y_n = \ln(T_n / T_n) = 0$. On retrouve alors le test de Møller (1976), sur $n - 1$ variables.
+
+On pourrait éviter ce biais en tronquant les données à un horizon fixé avant la dernière panne, mais on perdrait des observations alors que les échantillons sont déjà petits (4 avions sur 13 ont moins de 10 pannes). On garde donc $T = T_n$.
 
 
 ## Ajustement du modèle par avion à horizon $T$
@@ -312,6 +341,7 @@ TODO:
 ```
 
 
+
 ## Test d'adéquation et diagnostics graphiques
 
 <!-- 
@@ -323,6 +353,7 @@ TODO:
 ```{r q11-proschan-diagnostics}
 # TODO: Diagnostics graphiques et p-valeurs du test d'adéquation
 ```
+
 
 
 ## Discussion : le processus de Weibull est-il adapté ?
