@@ -1,0 +1,4 @@
+[submodule "KScorrect"]
+	path = KScorrect
+	url = https://github.com/yro7/KScorrect.git
+	branch = be
