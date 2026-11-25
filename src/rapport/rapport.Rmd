@@ -45,6 +45,7 @@ for (f in src_files) source(f)
 src_hash <- unname(tools::md5sum(src_files))
 ```
 
+
 # Introduction et contexte
 
 <!-- 
@@ -79,6 +80,7 @@ if (knitr::is_latex_output()) {
 }
 ```
 
+
 # Simulations numériques
 
 ## Code
@@ -102,10 +104,11 @@ confint_power_law
 # Test de Møller à T fixé :
 #   Y_i = ln(T / T_i) | N(T) = n  ~  n v.a. i.i.d. E(beta)
 #   D = statistique de KS où beta est remplacé par son MLE
-#   Loi de D sous H0 tabulée par simulation sous E(1) (Lilliefors), une table par n.
+#   p-valeur de Lilliefors via KScorrect
 #   Avec T_end = NULL : version d'origine de Møller, normalisée par T_n.
 gof_power_law
 ```
+
 
 ## Simulation sur $[0, T]$
 
@@ -118,6 +121,7 @@ cat("Nombre d'événements simulés N(50) :", length(w_test), "\n")
 cat("Premiers temps d'arrivée T_i :", round(head(w_test, 6), 3), "...\n")
 ```
 
+
 ## Convergence et biais du MLE
 
 On illustre les Propositions 3.7, 3.11 et 3.12 de Cocozza-Thivent (1997).
@@ -126,6 +130,7 @@ On illustre les Propositions 3.7, 3.11 et 3.12 de Cocozza-Thivent (1997).
 sim_outputs <- run_all_illustrations(save_figs = FALSE)
 ```
 
+
 ### Convergence presque sûre (Proposition 3.7)
 
 Sur une même trajectoire, $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent p.s. vers $\beta$ et $\alpha$ quand $t \to +\infty$. La partie théorique n'en démontre que la convergence en probabilité.
@@ -133,6 +138,7 @@ Sur une même trajectoire, $\hat{\beta}(t)$ et $\hat{\alpha}(t)$ convergent p.s.
 ```{r q6-fig-ps, fig.width=8.5, fig.height=6.5}
 sim_outputs$plots$p_as
 ```
+
 
 Sur les trois trajectoires tracées, $\hat{\beta}$ est compris entre 1,62 et 1,95 à $t = 10$ ($N(t) \approx 30$), et entre 1,49 et 1,53 à $t = 200$ ($N(t) \approx 2800$). $\hat{\alpha}$ converge nettement plus lentement : à $t = 200$, il vaut encore entre 0,98 et 1,14. C'est le facteur $\ln t$ de la section suivante.
 
@@ -145,6 +151,7 @@ $$Z_{\beta}(t) = \sqrt{N(t)}\left(\frac{\hat{\beta}}{\beta} - 1\right) \xrightar
 sim_outputs$plots$p_beta_norm
 ```
 
+
 À $T = 10$ ($\mathbb{E}[N(T)] \approx 32$), $Z_\beta$ a pour moyenne 0,22 et pour écart-type 1,09 : la distribution est décalée vers la droite, ce qui reflète le biais de $\hat{\beta}$ (voir plus bas). À $T = 150$, la moyenne vaut 0,03 et l'écart-type 0,99.
 
 Pour $\alpha$, la vitesse est divisée par $\ln t$ :
@@ -153,6 +160,7 @@ $$Z_{\alpha}(t) = \frac{\sqrt{N(t)}}{\ln t}\left(\frac{\hat{\alpha}}{\alpha} - 1
 ```{r q6-fig-alpha-norm, fig.width=8.5, fig.height=7}
 sim_outputs$plots$p_alpha_norm
 ```
+
 
 La convergence est plus lente que pour $\beta$ : le coefficient d'asymétrie de $Z_\alpha$ vaut 0,80 à $T = 10$ et encore 0,20 à $T = 150$. Sans le facteur $\ln t$, la variance de $\sqrt{N(t)}\,(\hat{\alpha}/\alpha - 1)$ vaut 6,7, 11,7, 19,4 et 24,9 pour $T = 10, 25, 60, 150$. Elle suit $(\ln T)^2 \approx$ 5,3, 10,4, 16,8 et 25,1, alors que la variance de $Z_\alpha$ reste entre 1,0 et 1,3.
 
@@ -164,6 +172,7 @@ La loi limite du couple renormalisé est dégénérée : elle est portée par un
 sim_outputs$plots$p_joint
 ```
 
+
 À $T = 150$, les corrélations empiriques valent $-0{,}992$ (forme 3.a) et $0{,}990$ (forme 3.b). Asymptotiquement, on surestime donc $\alpha$ exactement quand on surestime $\beta$.
 
 ### Biais de $\hat{\beta}$ à taille finie
@@ -173,6 +182,7 @@ Sachant $N(T) = n$, $2n\beta/\hat{\beta} \sim \chi^2(2n)$, donc $\mathbb{E}[\hat
 ```{r q6-fig-bias, fig.width=8, fig.height=4.5}
 sim_outputs$plots$p_bias
 ```
+
 
 À $T = 10$ ($\mathbb{E}[N(T)] \approx 32$), le biais relatif de $\hat{\beta}$ est de $+4{,}1\,\%$, contre $+0{,}7\,\%$ pour $\tilde{\beta}$. Dès $\mathbb{E}[N(T)] \approx 125$, les deux sont inférieurs à $1\,\%$.
 
@@ -184,6 +194,7 @@ Pour chaque horizon $T$, on simule $M = 2000$ trajectoires et on compte la propo
 ci_outputs <- run_all_ci_validation(save_figs = FALSE)
 ```
 
+
 ### IC pour $\beta$ : exact ou asymptotique
 
 On compare l'IC exact déduit de la loi $\chi^2(2n)$ (Corollaire 3.6) à l'IC asymptotique gaussien (Corollaire 3.13).
@@ -191,6 +202,7 @@ On compare l'IC exact déduit de la loi $\chi^2(2n)$ (Corollaire 3.6) à l'IC as
 ```{r q7-fig-beta, fig.width=8.5, fig.height=7}
 ci_outputs$plots$p_beta
 ```
+
 
 L'IC exact couvre entre 94,0 % et 95,5 % à tous les horizons, y compris à $T = 3$ où $\mathbb{E}[N(T)] \approx 5$. L'IC asymptotique a quasiment la même largeur, mais couvre un peu trop aux petits horizons (96,2 % à $T = 3$). À partir de $T = 10$, les deux IC sont indiscernables.
 
@@ -202,6 +214,7 @@ On compare la forme log, dont les bornes sont toujours positives, à la forme li
 ci_outputs$plots$p_alpha
 ```
 
+
 La forme log couvre entre 93,6 % et 94,9 %. La forme linéaire couvre trop peu aux petits horizons (88,1 % à $T = 3$, 91,2 % à $T = 10$), et sa borne inférieure est négative dans 40 % des cas à $T = 3$ et 33 % à $T = 5$. Les deux formes se rejoignent vers $T = 40$ ($\mathbb{E}[N(T)] \approx 250$). Dans tous les cas, l'IC pour $\alpha$ reste large : à $T = 150$ ($\mathbb{E}[N(T)] \approx 1800$), sa largeur vaut 0,46 pour $\alpha = 1$, contre 0,14 pour $\beta = 1{,}5$.
 
 ### Intervalles pour $\beta$ sur un petit échantillon
@@ -212,19 +225,21 @@ Intervalles pour $\beta$ obtenus sur 45 réplications à $T = 5$ ($\mathbb{E}[N(
 ci_outputs$plots$p_segments
 ```
 
+
 Ici, $N(T)$ varie de 6 à 20 d'une réplication à l'autre, et la largeur des intervalles varie en conséquence. L'IC exact manque la vraie valeur 2 fois sur 45, l'IC asymptotique 1 fois. Sur 45 réplications, cette différence n'est pas significative.
 
 ## Niveau et puissance du test d'adéquation
 
 D'après le Théorème 1 de Møller (1976), sous $H_0$ « les défaillances suivent un processus de Weibull » et sachant $N(T) = n$, les variables $Y_i = \ln(T / T_i)$ sont $n$ observations i.i.d. de loi $\mathcal{E}(\beta)$. On teste leur exponentialité avec la statistique de Kolmogorov-Smirnov, où $\beta$ est remplacé par son MLE $\hat{\beta}$ :
 $$D_n = \sup_{x > 0} \left| H_n(x) - \left(1 - e^{-\hat{\beta} x}\right) \right|.$$
-Comme $\hat{\beta}$ est ajusté sur les mêmes données, $D_n$ est plus petit que si $\beta$ était connu : la loi de Kolmogorov ne s'applique plus, et le test qui l'utilise quand même est appelé ici « naïf ». Sous $H_0$, la loi de $D_n$ ne dépend que de $n$, car $\mathcal{E}(\beta)$ est une famille d'échelle et $\hat{\beta}$ est équivariant. On la tabule donc par simulation sous $\mathcal{E}(1)$ (correction de Lilliefors, 1969).
+Comme $\hat{\beta}$ est ajusté sur les mêmes données, $D_n$ est plus petit que si $\beta$ était connu : la loi de Kolmogorov ne s'applique plus, et le test qui l'utilise quand même est appelé ici « naïf ». Sous $H_0$, la loi de $D_n$ ne dépend que de $n$, car $\mathcal{E}(\beta)$ est une famille d'échelle et $\hat{\beta}$ est équivariant. On l'approche donc par simulation (correction de Lilliefors, 1969) : c'est ce que fait la fonction `LcKS` du package `KScorrect`, avec 499 tirages par test dans les études de niveau et de puissance, et 4000 pour un test isolé.
 
 ```{r q8-sim-gof, cache=TRUE, cache.extra=src_hash}
 # Niveau : M = 2000 réplications sous H0 (beta = 0.5, 1, 2 ; E[N(T)] de 5 à 150)
 # Puissance : M = 1000 réplications par alternative et par E[N(T)]
 gof_outputs <- run_all_gof_validation(save_figs = FALSE)
 ```
+
 
 ### Niveau sous $H_0$ : test calibré et test naïf
 
@@ -233,6 +248,7 @@ Taux de rejet au niveau 5 % sur des données simulées sous $H_0$, pour $\beta =
 ```{r q8-fig-level, fig.width=9, fig.height=8}
 gof_outputs$plots$p_level
 ```
+
 
 Le test calibré rejette entre 4,1 % et 6,3 % du temps, quels que soient $\beta$ et $\mathbb{E}[N(T)]$. Sur les 18 configurations, une seule s'écarte de 5 % de plus de 1 point, l'erreur Monte-Carlo : 6,25 % pour $\beta = 1$ et $\mathbb{E}[N(T)] = 40$. Sur 18 configurations, un tel écart n'a rien d'anormal. Ses p-valeurs sont uniformes : chaque décile en contient entre 9,2 % et 10,4 %. Le test naïf rejette au plus 0,9 % du temps, et 20 % de ses p-valeurs dépassent 0,9. Il est donc très conservatif.
 
@@ -247,6 +263,7 @@ Trois familles de processus qui ne sont pas des processus de Weibull :
 ```{r q8-fig-power, fig.width=11, fig.height=4.5}
 gof_outputs$plots$p_power
 ```
+
 
 La puissance dépend fortement de l'alternative :
 
@@ -265,6 +282,7 @@ On représente le test comme dans Møller (1976, Fig. 1 à 4) : sous $H_0$, les 
 gof_outputs$plots$p_examples
 ```
 
+
 Sous $H_0$, les points restent dans la bande (p-valeur 0,72). Pour l'intensité log-linéaire ($\delta = -3$) et pour la rupture ($\rho = 0{,}25$), des points sortent de la bande et le test rejette (p-valeurs 0,004 et inférieure à 0,001).
 
 # Application aux données réelles (Proschan, 1963)
@@ -279,6 +297,7 @@ head(df_proschan)
 # Pour chaque avion, l'horizon d'observation T peut être pris comme la durée totale cumulée de suivi
 ```
 
+
 ## Ajustement du modèle par avion à horizon $T$
 
 <!-- 
@@ -292,6 +311,7 @@ TODO:
 # TODO: Estimation et IC par avion
 ```
 
+
 ## Test d'adéquation et diagnostics graphiques
 
 <!-- 
@@ -303,6 +323,7 @@ TODO:
 ```{r q11-proschan-diagnostics}
 # TODO: Diagnostics graphiques et p-valeurs du test d'adéquation
 ```
+
 
 ## Discussion : le processus de Weibull est-il adapté ?
 

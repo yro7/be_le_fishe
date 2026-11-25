@@ -154,50 +154,14 @@ gof_transform <- function(w, T_end = NULL) {
   sort(y)
 }
 
-#' Statistique de Kolmogorov-Smirnov avec paramètre estimé 
-#'
-#' @param y Échantillon (supposé exponentiel)
-#' @return Liste : D (statistique) et beta_hat (MLE du taux exponentiel)
-ks_exp_stat <- function(y) {
-  y <- sort(y)
-  m <- length(y)
-  beta_hat <- m / sum(y)
-  F_hat <- 1 - exp(-beta_hat * y)
-  i <- seq_len(m)
-  D <- max(i / m - F_hat, F_hat - (i - 1) / m)
-  list(D = D, beta_hat = beta_hat)
-}
-
-# Cache des lois nulles simulées, indexé par (m, B)
-.gof_null_cache <- new.env(parent = emptyenv())
-
-#' Loi nulle de D pour un échantillon exponentiel de taille m (paramètre estimé)
-#'
-#' La loi est pivotale (indépendante de beta) : on simule sous Exp(1).
-#'
-#' @param m Taille de l'échantillon exponentiel
-#' @param B Nombre de simulations
-#' @return Vecteur de B réalisations de D sous H0
-gof_null_distribution <- function(m, B = CONFIG$gof$B) {
-  key <- paste(m, B, sep = "_")
-  if (!is.null(.gof_null_cache[[key]])) {
-    return(.gof_null_cache[[key]])
-  }
-
-  old_seed <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
-  set.seed(CONFIG$gof$null_seed_base + m)
-  y_mat <- matrix(rexp(m * B), nrow = m)
-  d_null <- apply(y_mat, 2, function(y) ks_exp_stat(y)$D)
-  if (!is.null(old_seed)) assign(".Random.seed", old_seed, envir = globalenv())
-  .gof_null_cache[[key]] <- d_null
-  d_null
-}
-
 #' Test d'adéquation au Processus de Weibull (Møller, 1976)
+#'
+#' Les Y_i sont testés par KScorrect::LcKS : KS contre Exp(beta) avec beta estimé,
+#' p-valeur calibrée par Monte-Carlo (Lilliefors).
 #'
 #' @param w     Vecteur des instants de sauts observés
 #' @param T_end Horizon d'observation T (NULL = troncature par le n-ième défaut)
-#' @param B     Nombre de simulations pour la calibration de Lilliefors
+#' @param B     Nombre de simulations de LcKS (nreps)
 #' @param risk  Risque de première espèce du test (défaut : 1 - CONFIG$conf_level)
 #' @return Liste : m, beta_hat, D, p-valeur calibrée, p-valeur naïve (loi de
 #'         Kolmogorov sans correction), valeur critique calibrée au risque risk
@@ -208,23 +172,20 @@ gof_power_law <- function(w, T_end = NULL, B = CONFIG$gof$B, risk = 1 - CONFIG$c
     return(list(m = m, beta_hat = NA_real_, D = NA_real_, p_value = NA_real_,
                 p_value_naive = NA_real_, crit_value = NA_real_))
   }
-  st <- ks_exp_stat(y)
-  d_null <- gof_null_distribution(m, B)
-
-  # p-valeur Monte-Carlo
-  p_value <- (1 + sum(d_null >= st$D)) / (B + 1)
+  beta_hat <- 1 / mean(y)  # MLE du taux exponentiel (non renvoyé par LcKS)
+  lc <- KScorrect::LcKS(y, cdf = "pexp", nreps = B)
 
   # p-valeur naïve : on fait comme on connaissait β 
   p_value_naive <- suppressWarnings(
-    ks.test(y, "pexp", rate = st$beta_hat, exact = (m < 100))$p.value
+    ks.test(y, "pexp", rate = beta_hat, exact = (m < 100))$p.value
   )
 
   list(
     m = m,
-    beta_hat = st$beta_hat,
-    D = st$D,
-    p_value = p_value,
+    beta_hat = beta_hat,
+    D = lc$D.obs,
+    p_value = lc$p.value,
     p_value_naive = p_value_naive,
-    crit_value = unname(quantile(d_null, 1 - risk, type = 1))
+    crit_value = unname(quantile(lc$D.sim, 1 - risk, type = 1))
   )
 }
